@@ -93,6 +93,14 @@ function parseTimeSeries(doc, id) {
 }
 
 const gusts = parseTimeSeries(doc, "obs-obs-1-1-windgust");
+const directions = parseTimeSeries(doc, "obs-obs-1-1-winddirection");
+const combined = gusts.map((gust, i) => {
+    return {
+        gust: gust.value,
+        direction: directions[i].value,
+        time: gust.time,
+    };
+});
 
 Object.assign(window, { data: doc });
 
@@ -100,16 +108,17 @@ function Rows(props) {
     return props.data.map((point) => {
         let className = "ok";
 
-        if (point.value >= 8) {
+        if (point.gust >= 8) {
             className = "warning";
         }
 
-        if (point.value >= 11) {
+        if (point.gust >= 11) {
             className = "danger";
         }
 
         return html`<tr>
-            <td class=${className}>${point.value}</td>
+            <td class=${className}>${point.gust}</td>
+            <td>${point.direction}°</td>
             <td>${point.time.toLocaleString()}</td>
         </tr> `;
     });
@@ -121,6 +130,7 @@ function DataTable(props) {
             <thead>
                 <tr>
                     <th>m/s</th>
+                    <th>🧭</th>
                     <th>time</th>
                 </tr>
             </thead>
@@ -140,7 +150,7 @@ function Root() {
                 Tietojen käyttö omalla vastuulla. Ei takeita että tiedot ovat
                 oikein.
             </p>
-            <${DataTable} data=${gusts} />
+            <${DataTable} data=${combined} />
         </div>
     `;
 }
