@@ -1,3 +1,6 @@
+import { render } from "preact";
+
+console.log(render);
 const OBSERVATION_PARAMETERS = [
     "winddirection",
     "windspeedms",

@@ -1,0 +1,11 @@
+{
+    "scripts": {
+        "dev": "python3 -m http.server",
+        "build": "esbuild --bundle preact-entry.js --outfile=preact-bundle.js --format=esm --minify"
+    },
+    "dependencies": {
+        "esbuild": "^0.21.5",
+        "htm": "^3.1.1",
+        "preact": "^10.22.0"
+    }
+}
