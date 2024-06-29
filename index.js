@@ -71,14 +71,6 @@ export const FmiHelpers = {
         ).textContent,
 };
 
-function extendUrlQuery(url, query) {
-    const urlObj = new URL(url);
-    Object.keys(query).forEach((key) =>
-        urlObj.searchParams.append(key, query[key]),
-    );
-    return urlObj.toString();
-}
-
 async function xml2js(xml) {
     const parser = new DOMParser();
     return parser.parseFromString(xml, "application/xml");
@@ -103,19 +95,13 @@ export async function fmiRawRequest(url) {
 }
 
 export function fmiRequest(options) {
-    const metarURL = `http://opendata.fmi.fi/wfs?request=getFeature`;
+    const metarURL = new URL(`http://opendata.fmi.fi/wfs?request=getFeature`);
+    metarURL.searchParams.set("storedquery_id", options.storedQuery);
+    for (const [k, v] of Object.entries(options.params)) {
+        metarURL.searchParams.set(k, v);
+    }
 
-    const finalURL = extendUrlQuery(
-        metarURL,
-        Object.assign(
-            {
-                storedquery_id: options.storedQuery,
-            },
-            options.params,
-        ),
-    );
-
-    return fmiRawRequest(finalURL);
+    return fmiRawRequest(metarURL.toString());
 }
 
 console.log("FMI module loaded");
