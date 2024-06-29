@@ -18,8 +18,14 @@ export const getStartTime = () => {
     return date.toISOString();
 };
 
-export async function fmiRawRequest(url) {
-    console.log("FMI request", url);
+export async function fmiRequest(options) {
+    const url = new URL(`http://opendata.fmi.fi/wfs?request=getFeature`);
+    url.searchParams.set("storedquery_id", options.storedQuery);
+    for (const [k, v] of Object.entries(options.params)) {
+        url.searchParams.set(k, v);
+    }
+
+    console.log("FMI request", url.toString());
 
     try {
         const response = await fetch(url);
@@ -35,16 +41,6 @@ export async function fmiRawRequest(url) {
         console.error("FMI request failed", error);
         throw error;
     }
-}
-
-export function fmiRequest(options) {
-    const metarURL = new URL(`http://opendata.fmi.fi/wfs?request=getFeature`);
-    metarURL.searchParams.set("storedquery_id", options.storedQuery);
-    for (const [k, v] of Object.entries(options.params)) {
-        metarURL.searchParams.set(k, v);
-    }
-
-    return fmiRawRequest(metarURL.toString());
 }
 
 console.log("FMI module loaded");
