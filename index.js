@@ -50,8 +50,6 @@ export async function fmiRequest(options) {
     }
 }
 
-console.log("FMI module loaded");
-
 const doc = await fmiRequest({
     storedQuery: "fmi::observations::weather::timevaluepair",
     params: {
