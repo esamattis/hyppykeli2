@@ -1,4 +1,4 @@
-// import { render, htm } from "preact";
+import { render, html } from "preact";
 
 const url = new URL(location.href);
 
@@ -92,17 +92,47 @@ function pointsToTimeSeries(node) {
 
 function parseTimeSeries(doc, id) {
     const node = xpath(doc, `//wml2:MeasurementTimeseries[@gml:id="${id}"]`);
-    return pointsToTimeSeries(node);
+    return pointsToTimeSeries(node).reverse();
 }
 
-const res = parseTimeSeries(doc, "obs-obs-1-1-windgust");
-const latest = res.at(-1);
-
-document.getElementById("title").innerText = title;
-document.getElementById("latest-gust").innerText = latest.value;
-document.getElementById("latest-gust-date").innerText =
-    latest.time.toLocaleString();
-
-console.log("res", res);
+const gusts = parseTimeSeries(doc, "obs-obs-1-1-windgust");
 
 Object.assign(window, { data: doc });
+
+function Rows(props) {
+    return props.data.map((point) => {
+        return html`<tr>
+            <td>${point.value}</td>
+            <td>${point.time.toLocaleString()}</td>
+        </tr> `;
+    });
+}
+
+function DataTable(props) {
+    return html`
+        <table>
+            <thead>
+                <tr>
+                    <th>Value</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                <${Rows} data=${props.data} />
+            </tbody>
+        </table>
+    `;
+}
+
+function Root() {
+    return html`
+        <div>
+            <h1>Hyppykeli - <span id="title">${title}</span></h1>
+            <h2>Puuskat</h2>
+            <${DataTable} data=${gusts} />
+        </div>
+    `;
+}
+
+const root = document.getElementById("root");
+render(html`<${Root} />`, root);
