@@ -52,7 +52,7 @@ export async function fmiRequest(options) {
 
 console.log("FMI module loaded");
 
-const data = await fmiRequest({
+const doc = await fmiRequest({
     storedQuery: "fmi::observations::weather::timevaluepair",
     params: {
         starttime: getStartTime(),
@@ -62,12 +62,10 @@ const data = await fmiRequest({
     },
 });
 
-console.log(data);
-
 function xpath(doc, path) {
     return doc.evaluate(
         path,
-        data,
+        doc,
         function (prefix) {
             switch (prefix) {
                 case "wml2":
@@ -92,12 +90,12 @@ function pointsToTimeSeries(node) {
     });
 }
 
-function parseTimeSeries(id) {
-    const node = xpath(data, `//wml2:MeasurementTimeseries[@gml:id="${id}"]`);
+function parseTimeSeries(doc, id) {
+    const node = xpath(doc, `//wml2:MeasurementTimeseries[@gml:id="${id}"]`);
     return pointsToTimeSeries(node);
 }
 
-const res = parseTimeSeries("obs-obs-1-1-windgust");
+const res = parseTimeSeries(doc, "obs-obs-1-1-windgust");
 const latest = res.at(-1);
 
 document.getElementById("title").innerText = title;
@@ -107,4 +105,4 @@ document.getElementById("latest-gust-date").innerText =
 
 console.log("res", res);
 
-Object.assign(window, { data });
+Object.assign(window, { data: doc });
