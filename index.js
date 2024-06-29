@@ -1,7 +1,6 @@
 import { render, html } from "preact";
 
 const url = new URL(location.href);
-
 const title = url.searchParams.get("title");
 const fmisid = url.searchParams.get("fmisid");
 
@@ -134,3 +133,5 @@ function Root() {
 
 const root = document.getElementById("root");
 render(html`<${Root} />`, root);
+
+console.log("ver 2");
