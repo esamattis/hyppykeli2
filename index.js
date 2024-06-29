@@ -26,7 +26,7 @@ export const getStartTime = () => {
 };
 
 export async function fmiRequest(options) {
-    const url = new URL(`http://opendata.fmi.fi/wfs?request=getFeature`);
+    const url = new URL(`https://opendata.fmi.fi/wfs?request=getFeature`);
     url.searchParams.set("storedquery_id", options.storedQuery);
     for (const [k, v] of Object.entries(options.params)) {
         url.searchParams.set(k, v);
