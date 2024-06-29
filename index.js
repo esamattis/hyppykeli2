@@ -1,80 +1,22 @@
+const OBSERVATION_PARAMETERS = [
+    "winddirection",
+    "windspeedms",
+    "windgust",
+    "n_man",
+];
+
+const FORECAST_PAREMETERS = [
+    "winddirection",
+    "windspeedms",
+    "windgust",
+    "maximumwind",
+];
+
 export const getStartTime = () => {
     const date = new Date();
     date.setHours(date.getHours() - 7, 0, 0, 0);
     return date.toISOString();
 };
-
-export const FmiHelpers = {
-    getFeatures: (data) =>
-        data.querySelectorAll("wfs\\:FeatureCollection wfs\\:member"),
-
-    OBSERVATION_PARAMETERS: [
-        "winddirection",
-        "windspeedms",
-        "windgust",
-        "n_man",
-    ],
-
-    FORECAST_PAREMETERS: [
-        "winddirection",
-        "windspeedms",
-        "windgust",
-        "maximumwind",
-    ],
-
-    getFeatureDescriptionHref: (data) =>
-        data
-            .querySelector(
-                "omso\\:PointTimeSeriesObservation om\\:observedProperty",
-            )
-            .getAttribute("xlink:href"),
-
-    getFeatureId: (data) =>
-        data
-            .querySelector(
-                "omso\\:PointTimeSeriesObservation om\\:featureOfInterest sams\\:SF_SpatialSamplingFeature",
-            )
-            .getAttribute("gml:id"),
-
-    getDescription: (data) =>
-        data.querySelector("ObservableProperty label").textContent,
-
-    getFeatureStationName: (data) =>
-        data.querySelector(
-            "omso\\:PointTimeSeriesObservation om\\:featureOfInterest sams\\:SF_SpatialSamplingFeature sams\\:shape gml\\:Point gml\\:name",
-        ).textContent,
-
-    getFeatureStationCoordinates: (data) =>
-        data.querySelector(
-            "omso\\:PointTimeSeriesObservation om\\:featureOfInterest sams\\:SF_SpatialSamplingFeature sams\\:shape gml\\:Point gml\\:pos",
-        ).textContent,
-
-    getPoints: (data) =>
-        data.querySelectorAll(
-            "omso\\:PointTimeSeriesObservation om\\:result wml2\\:MeasurementTimeseries wml2\\:point",
-        ),
-
-    getTime: (point) =>
-        point.querySelector("wml2\\:MeasurementTVP wml2\\:time").textContent,
-
-    getValue: (point) =>
-        point.querySelector("wml2\\:MeasurementTVP wml2\\:value").textContent,
-
-    getForecastLocationName: (data) =>
-        data.querySelector(
-            "omso\\:PointTimeSeriesObservation om\\:featureOfInterest sams\\:SF_SpatialSamplingFeature sams\\:shape gml\\:MultiPoint gml\\:pointMembers gml\\:Point gml\\:name",
-        ).textContent,
-
-    getForecastLocationCoordinates: (data) =>
-        data.querySelector(
-            "omso\\:PointTimeSeriesObservation om\\:featureOfInterest sams\\:SF_SpatialSamplingFeature sams\\:shape gml\\:MultiPoint gml\\:pointMembers gml\\:Point gml\\:pos",
-        ).textContent,
-};
-
-async function xml2js(xml) {
-    const parser = new DOMParser();
-    return parser.parseFromString(xml, "application/xml");
-}
 
 export async function fmiRawRequest(url) {
     console.log("FMI request", url);
@@ -85,7 +27,8 @@ export async function fmiRawRequest(url) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const text = await response.text();
-        const data = await xml2js(text);
+        const parser = new DOMParser();
+        const data = parser.parseFromString(text, "application/xml");
         console.log("FMI request completed", url);
         return data;
     } catch (error) {
@@ -111,7 +54,7 @@ const data = await fmiRequest({
     params: {
         starttime: getStartTime(),
         // endtime: moment().toISOString(),
-        parameters: FmiHelpers.OBSERVATION_PARAMETERS,
+        parameters: OBSERVATION_PARAMETERS,
         fmisid: 101191,
     },
 });
