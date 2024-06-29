@@ -9,6 +9,12 @@ td:has(.direction) {
     padding-right: 10px;
 }
 
+.logo,
+.logo:visited {
+    text-decoration: none;
+    color: blue;
+}
+
 .direction {
     display: inline-block;
     transform: rotate(var(--direction));

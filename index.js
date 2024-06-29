@@ -165,7 +165,10 @@ function DataTable(props) {
 function Root() {
     return html`
         <div>
-            <h1>Hyppykeli - <span id="title">${title}</span></h1>
+            <h1>
+                <a class="logo" href="/"> Hyppykeli</a> –${" "}
+                <span id="title">${title}</span>
+            </h1>
 
             <a href="https://www.google.fi/maps/place/${coordinates}"
                 >Sääaseman sijainti</a
