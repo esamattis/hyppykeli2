@@ -116,10 +116,13 @@ function Rows(props) {
             className = "danger";
         }
 
+        const datetime = point.time.toLocaleString();
+        const time = datetime.split(" ")[1];
+
         return html`<tr>
             <td class=${className}>${point.gust}</td>
             <td>${point.direction}°</td>
-            <td>${point.time.toLocaleString()}</td>
+            <td title=${datetime}>${time}</td>
         </tr> `;
     });
 }
@@ -130,7 +133,7 @@ function DataTable(props) {
             <thead>
                 <tr>
                     <th>m/s</th>
-                    <th>🧭</th>
+                    <th></th>
                     <th>time</th>
                 </tr>
             </thead>

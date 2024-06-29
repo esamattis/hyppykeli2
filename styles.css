@@ -1,5 +1,9 @@
-table thead th {
+th {
     text-align: left;
+}
+
+td {
+    padding-right: 10px;
 }
 
 .ok {
