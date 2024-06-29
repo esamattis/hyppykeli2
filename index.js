@@ -1,6 +1,10 @@
-import { render } from "preact";
+// import { render, htm } from "preact";
 
-console.log(render);
+const url = new URL(location.href);
+
+const title = url.searchParams.get("title");
+const fmisid = url.searchParams.get("fmisid");
+
 const OBSERVATION_PARAMETERS = [
     "winddirection",
     "windspeedms",
@@ -54,7 +58,7 @@ const data = await fmiRequest({
         starttime: getStartTime(),
         // endtime: moment().toISOString(),
         parameters: OBSERVATION_PARAMETERS,
-        fmisid: 101191,
+        fmisid,
     },
 });
 
@@ -93,8 +97,14 @@ function parseTimeSeries(id) {
     return pointsToTimeSeries(node);
 }
 
-const res = parseTimeSeries("obs-obs-1-1-winddirection");
-console.log(res);
+const res = parseTimeSeries("obs-obs-1-1-windgust");
+const latest = res.at(-1);
 
-// console.log(2, windDirections.querySelectorAll("wml2\\:point"));
+document.getElementById("title").innerText = title;
+document.getElementById("latest-gust").innerText = latest.value;
+document.getElementById("latest-gust-date").innerText =
+    latest.time.toLocaleString();
+
+console.log("res", res);
+
 Object.assign(window, { data });
