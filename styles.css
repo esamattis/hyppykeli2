@@ -3,7 +3,15 @@ th {
 }
 
 td {
+}
+
+td:has(.direction) {
     padding-right: 10px;
+}
+
+.direction {
+    display: inline-block;
+    transform: rotate(var(--direction));
 }
 
 .ok {

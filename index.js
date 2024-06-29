@@ -128,8 +128,15 @@ function Rows(props) {
         // });
 
         return html`<tr>
-            <td class=${className}>${point.gust}</td>
+            <td class=${className}>${point.gust} m/s</td>
             <td>${point.direction}°</td>
+            <td>
+                <span
+                    class="direction"
+                    style=${{ "--direction": point.direction + "deg" }}
+                    >↑</span
+                >
+            </td>
             <td title=${point.time.toString()}>
                 ${point.time.toLocaleTimeString()}
             </td>
@@ -142,7 +149,8 @@ function DataTable(props) {
         <table>
             <thead>
                 <tr>
-                    <th>m/s</th>
+                    <th>Puuska</th>
+                    <th>Suunta</th>
                     <th></th>
                     <th>time</th>
                 </tr>
@@ -163,7 +171,6 @@ function Root() {
                 >Sääaseman sijainti</a
             >
 
-            <h2>Puuskat</h2>
             <p>
                 Tietojen käyttö omalla vastuulla. Ei takeita että tiedot ovat
                 oikein.
