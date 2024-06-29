@@ -49,16 +49,6 @@ export async function fmiRequest(options) {
     }
 }
 
-const doc = await fmiRequest({
-    storedQuery: "fmi::observations::weather::timevaluepair",
-    params: {
-        starttime: getStartTime(),
-        // endtime: moment().toISOString(),
-        parameters: OBSERVATION_PARAMETERS,
-        fmisid,
-    },
-});
-
 function xpath(doc, path) {
     return doc.evaluate(
         path,
@@ -92,6 +82,21 @@ function parseTimeSeries(doc, id) {
     return pointsToTimeSeries(node).reverse();
 }
 
+const doc = await fmiRequest({
+    storedQuery: "fmi::observations::weather::timevaluepair",
+    params: {
+        starttime: getStartTime(),
+        // endtime: moment().toISOString(),
+        parameters: OBSERVATION_PARAMETERS,
+        fmisid,
+    },
+});
+
+const coordinates = doc
+    .querySelector("pos")
+    .innerHTML.trim()
+    .split(" ")
+    .join(", ");
 const gusts = parseTimeSeries(doc, "obs-obs-1-1-windgust");
 const directions = parseTimeSeries(doc, "obs-obs-1-1-winddirection");
 const combined = gusts.map((gust, i) => {
@@ -153,6 +158,11 @@ function Root() {
     return html`
         <div>
             <h1>Hyppykeli - <span id="title">${title}</span></h1>
+
+            <a href="https://www.google.fi/maps/place/${coordinates}"
+                >Sääaseman sijainti</a
+            >
+
             <h2>Puuskat</h2>
             <p>
                 Tietojen käyttö omalla vastuulla. Ei takeita että tiedot ovat
