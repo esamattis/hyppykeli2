@@ -98,8 +98,18 @@ Object.assign(window, { data: doc });
 
 function Rows(props) {
     return props.data.map((point) => {
+        let className = "ok";
+
+        if (point.value >= 8) {
+            className = "warning";
+        }
+
+        if (point.value >= 11) {
+            className = "danger";
+        }
+
         return html`<tr>
-            <td>${point.value}</td>
+            <td class=${className}>${point.value}</td>
             <td>${point.time.toLocaleString()}</td>
         </tr> `;
     });
@@ -110,8 +120,8 @@ function DataTable(props) {
         <table>
             <thead>
                 <tr>
-                    <th>Value</th>
-                    <th>Time</th>
+                    <th>m/s</th>
+                    <th>time</th>
                 </tr>
             </thead>
             <tbody>
@@ -126,6 +136,10 @@ function Root() {
         <div>
             <h1>Hyppykeli - <span id="title">${title}</span></h1>
             <h2>Puuskat</h2>
+            <p>
+                Tietojen käyttö omalla vastuulla. Ei takeita että tiedot ovat
+                oikein.
+            </p>
             <${DataTable} data=${gusts} />
         </div>
     `;

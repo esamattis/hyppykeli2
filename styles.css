@@ -1,3 +1,15 @@
 table thead th {
     text-align: left;
 }
+
+.ok {
+    color: green;
+}
+
+.warning {
+    color: orange;
+}
+
+.danger {
+    color: red;
+}
