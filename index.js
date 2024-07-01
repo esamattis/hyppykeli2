@@ -1,11 +1,11 @@
 import { render, html, signal } from "preact";
 
+const NAME = signal("Loading...");
 const OBSERVATIONS = signal([]);
 const FORECASTS = signal([]);
 const LATLONG = signal(null);
 
 const url = new URL(location.href);
-const title = url.searchParams.get("title");
 const fmisid = url.searchParams.get("fmisid");
 
 const OBSERVATION_PARAMETERS = [
@@ -145,7 +145,7 @@ function Root() {
         <div>
             <h1>
                 <a class="logo" href="/"> Hyppykeli</a> –${" "}
-                <span id="title">${title}</span>
+                <span id="title">${NAME}</span>
             </h1>
 
             <a href="https://www.google.fi/maps/place/${LATLONG}"
@@ -179,6 +179,19 @@ async function updateWeatherData() {
             fmisid,
         },
     });
+
+    // <gml:name codeSpace="http://xml.fmi.fi/namespace/locationcode/name">Kouvola Utti lentoasema</gml:name>
+    const name = xpath(
+        doc,
+        "//gml:name[@codeSpace='http://xml.fmi.fi/namespace/locationcode/name']",
+    )?.innerHTML;
+
+    if (!name) {
+        NAME.value = "Bad station?";
+        return;
+    }
+
+    NAME.value = name;
 
     const coordinates = doc
         .querySelector("pos")
