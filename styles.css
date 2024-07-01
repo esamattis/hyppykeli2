@@ -1,3 +1,12 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.content {
+    margin: 10px;
+}
+
 a:visited {
     color: blue;
 }
@@ -49,5 +58,10 @@ td:has(.direction) {
     background-color: white;
     padding-top: 10px;
     padding-bottom: 10px;
-    border-top: 1px dashed black;
+    box-shadow: 0 -4px 2px -2px gray;
+}
+
+.ball {
+    display: inline-block;
+    transform: scale(3);
 }

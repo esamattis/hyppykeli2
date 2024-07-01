@@ -143,29 +143,31 @@ function DataTable(props) {
 function Root() {
     return html`
         <div>
-            <h1>
-                <a class="logo" href="/"> Hyppykeli</a> –${" "}
-                <span id="title">${NAME}</span>
-            </h1>
+            <div class="content">
+                <h1>
+                    <a class="logo" href="/"> Hyppykeli</a> –${" "}
+                    <span id="title">${NAME}</span>
+                </h1>
 
-            <a href="https://www.google.fi/maps/place/${LATLONG}"
-                >Sääaseman sijainti</a
-            >
+                <a href="https://www.google.fi/maps/place/${LATLONG}"
+                    >Sääaseman sijainti</a
+                >
 
-            <p>
-                Tietojen käyttö omalla vastuulla. Ei takeita että tiedot ovat
-                oikein.
-            </p>
+                <p>
+                    Tietojen käyttö omalla vastuulla. Ei takeita että tiedot
+                    ovat oikein.
+                </p>
 
-            <h2 id="observations">Havainnot</h2>
-            <${DataTable} data=${OBSERVATIONS} />
+                <h2 id="observations">Havainnot</h2>
+                <${DataTable} data=${OBSERVATIONS} />
 
-            <h2 id="forecasts">Ennuste</h2>
-            <${DataTable} data=${FORECASTS} />
+                <h2 id="forecasts">Ennuste</h2>
+                <${DataTable} data=${FORECASTS} />
+            </div>
 
             <div class="sticky-footer">
                 <a href="#observations">Havainnot</a>
-                ᐧ
+                <span class="ball">ᐧ</span>
                 <a href="#forecasts">Ennuste</a>
             </div>
         </div>
