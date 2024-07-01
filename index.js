@@ -157,11 +157,17 @@ function Root() {
                 oikein.
             </p>
 
-            <h2>Havainnot</h2>
+            <h2 id="observations">Havainnot</h2>
             <${DataTable} data=${OBSERVATIONS} />
 
-            <h2>Ennuste</h2>
+            <h2 id="forecasts">Ennuste</h2>
             <${DataTable} data=${FORECASTS} />
+
+            <div class="sticky-footer">
+                <a href="#observations">Havainnot</a>
+                ᐧ
+                <a href="#forecasts">Ennuste</a>
+            </div>
         </div>
     `;
 }

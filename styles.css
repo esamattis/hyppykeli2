@@ -1,3 +1,7 @@
+a:visited {
+    color: blue;
+}
+
 th {
     text-align: left;
 }
@@ -30,4 +34,20 @@ td:has(.direction) {
 
 .danger {
     color: red;
+}
+
+.sticky-footer a {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.sticky-footer {
+    font-size: 130%;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: white;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-top: 1px dashed black;
 }
