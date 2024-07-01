@@ -55,6 +55,10 @@ td:has(.direction) {
     transform: scale(2);
 }
 
+p {
+    line-height: 1.5;
+}
+
 .sticky-footer {
     font-size: 130%;
     position: fixed;
