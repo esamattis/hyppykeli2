@@ -1,4 +1,8 @@
-import { render, html, useEffect } from "preact";
+import { render, html, signal } from "preact";
+
+const OBSERVATIONS = signal([]);
+const FORECASTS = signal([]);
+const LATLONG = signal(null);
 
 const url = new URL(location.href);
 const title = url.searchParams.get("title");
@@ -83,67 +87,8 @@ function parseTimeSeries(doc, id) {
     return pointsToTimeSeries(node).reverse();
 }
 
-const doc = await fmiRequest({
-    storedQuery: "fmi::observations::weather::timevaluepair",
-    params: {
-        starttime: getStartTime(),
-        // endtime: moment().toISOString(),
-        parameters: OBSERVATION_PARAMETERS.join(","),
-        fmisid,
-    },
-});
-
-const coordinates = doc
-    .querySelector("pos")
-    .innerHTML.trim()
-    .split(/\s+/)
-    .join(",");
-
-console.log("coordinates", coordinates);
-
-const gusts = parseTimeSeries(doc, "obs-obs-1-1-windgust");
-const directions = parseTimeSeries(doc, "obs-obs-1-1-winddirection");
-const combined = gusts.map((gust, i) => {
-    return {
-        gust: gust.value,
-        direction: directions[i]?.value ?? "N/A",
-        time: gust.time,
-    };
-});
-
-const forecastXml = await fmiRequest({
-    storedQuery: "fmi::observations::weather::timevaluepair",
-    params: {
-        // storedquery_id: "fmi::forecast::hirlam::surface::point::timevaluepair",
-        // storedquery_id: "ecmwf::forecast::surface::point::simple",
-        storedquery_id:
-            "fmi::forecast::edited::weather::scandinavia::point::timevaluepair",
-        // storedquery_id: "ecmwf::forecast::surface::point::timevaluepair",
-        // fmisid,
-        // parameters: FORECAST_PAREMETERS.join(","),
-        // parameters: "WindGust",
-        parameters: "HourlyMaximumGust,WindDirection",
-        // place: "Utti",
-        latlon: coordinates,
-    },
-});
-
-const gustForecasts = parseTimeSeries(forecastXml, "mts-1-1-HourlyMaximumGust");
-const directionForecasts = parseTimeSeries(
-    forecastXml,
-    "mts-1-1-WindDirection",
-);
-
-const combinedForecasts = gustForecasts.map((gust, i) => {
-    return {
-        gust: gust.value,
-        direction: directionForecasts[i]?.value ?? "N/A",
-        time: gust.time,
-    };
-});
-
 function Rows(props) {
-    return props.data.map((point) => {
+    return props.data.value.map((point) => {
         let className = "ok";
 
         if (point.gust >= 8) {
@@ -203,7 +148,7 @@ function Root() {
                 <span id="title">${title}</span>
             </h1>
 
-            <a href="https://www.google.fi/maps/place/${coordinates}"
+            <a href="https://www.google.fi/maps/place/${LATLONG}"
                 >Sääaseman sijainti</a
             >
 
@@ -213,13 +158,97 @@ function Root() {
             </p>
 
             <h2>Havainnot</h2>
-            <${DataTable} data=${combined} />
+            <${DataTable} data=${OBSERVATIONS} />
 
             <h2>Ennuste</h2>
-            <${DataTable} data=${combinedForecasts} />
+            <${DataTable} data=${FORECASTS} />
         </div>
     `;
 }
 
 const root = document.getElementById("root");
 render(html`<${Root} />`, root);
+
+async function updateWeatherData() {
+    const doc = await fmiRequest({
+        storedQuery: "fmi::observations::weather::timevaluepair",
+        params: {
+            starttime: getStartTime(),
+            // endtime: moment().toISOString(),
+            parameters: OBSERVATION_PARAMETERS.join(","),
+            fmisid,
+        },
+    });
+
+    const coordinates = doc
+        .querySelector("pos")
+        .innerHTML.trim()
+        .split(/\s+/)
+        .join(",");
+
+    LATLONG.value = coordinates;
+
+    const gusts = parseTimeSeries(doc, "obs-obs-1-1-windgust");
+    const directions = parseTimeSeries(doc, "obs-obs-1-1-winddirection");
+    const combined = gusts.map((gust, i) => {
+        return {
+            gust: gust.value,
+            direction: directions[i]?.value ?? "N/A",
+            time: gust.time,
+        };
+    });
+
+    OBSERVATIONS.value = combined;
+
+    const forecastXml = await fmiRequest({
+        storedQuery: "fmi::observations::weather::timevaluepair",
+        params: {
+            // storedquery_id: "fmi::forecast::hirlam::surface::point::timevaluepair",
+            // storedquery_id: "ecmwf::forecast::surface::point::simple",
+            storedquery_id:
+                "fmi::forecast::edited::weather::scandinavia::point::timevaluepair",
+            // storedquery_id: "ecmwf::forecast::surface::point::timevaluepair",
+            // fmisid,
+            // parameters: FORECAST_PAREMETERS.join(","),
+            // parameters: "WindGust",
+            parameters: "HourlyMaximumGust,WindDirection",
+            // place: "Utti",
+            latlon: coordinates,
+        },
+    });
+
+    const gustForecasts = parseTimeSeries(
+        forecastXml,
+        "mts-1-1-HourlyMaximumGust",
+    );
+    const directionForecasts = parseTimeSeries(
+        forecastXml,
+        "mts-1-1-WindDirection",
+    );
+
+    const combinedForecasts = gustForecasts.map((gust, i) => {
+        return {
+            gust: gust.value,
+            direction: directionForecasts[i]?.value ?? "N/A",
+            time: gust.time,
+        };
+    });
+
+    FORECASTS.value = combinedForecasts;
+}
+
+await updateWeatherData();
+
+document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+        updateWeatherData();
+    }
+});
+
+window.addEventListener("pageshow", (event) => {
+    if (event.persisted) {
+        updateWeatherData();
+    }
+});
+
+setInterval(updateWeatherData, 60000);
