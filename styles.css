@@ -50,6 +50,11 @@ td:has(.direction) {
     margin-right: 10px;
 }
 
+.ball {
+    display: inline-block;
+    transform: scale(2);
+}
+
 .sticky-footer {
     font-size: 130%;
     position: fixed;
@@ -61,7 +66,13 @@ td:has(.direction) {
     box-shadow: 0 -4px 2px -2px gray;
 }
 
-.ball {
-    display: inline-block;
-    transform: scale(3);
+@media (max-width: 600px) {
+    .sticky-footer {
+        display: flex;
+        justify-content: space-around;
+    }
+
+    .ball {
+        display: none;
+    }
 }
