@@ -24,7 +24,7 @@ const FORECAST_PAREMETERS = [
 
 export const getStartTime = () => {
     const date = new Date();
-    date.setHours(date.getHours() - 7, 0, 0, 0);
+    date.setHours(date.getHours() - 4, 0, 0, 0);
     return date.toISOString();
 };
 
