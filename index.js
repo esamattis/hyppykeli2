@@ -1,4 +1,4 @@
-import { render, html } from "preact";
+import { render, html, useEffect } from "preact";
 
 const url = new URL(location.href);
 const title = url.searchParams.get("title");
@@ -69,6 +69,7 @@ function xpath(doc, path) {
 }
 
 function pointsToTimeSeries(node) {
+    console.log("pointsToTimeSeries", node);
     return Array.from(node.querySelectorAll("point")).map((point) => {
         return {
             value: Number(point.querySelector("value").innerHTML),
@@ -87,7 +88,7 @@ const doc = await fmiRequest({
     params: {
         starttime: getStartTime(),
         // endtime: moment().toISOString(),
-        parameters: OBSERVATION_PARAMETERS,
+        parameters: OBSERVATION_PARAMETERS.join(","),
         fmisid,
     },
 });
@@ -95,19 +96,51 @@ const doc = await fmiRequest({
 const coordinates = doc
     .querySelector("pos")
     .innerHTML.trim()
-    .split(" ")
-    .join(", ");
+    .split(/\s+/)
+    .join(",");
+
+console.log("coordinates", coordinates);
+
 const gusts = parseTimeSeries(doc, "obs-obs-1-1-windgust");
 const directions = parseTimeSeries(doc, "obs-obs-1-1-winddirection");
 const combined = gusts.map((gust, i) => {
     return {
         gust: gust.value,
-        direction: directions[i].value,
+        direction: directions[i]?.value ?? "N/A",
         time: gust.time,
     };
 });
 
-Object.assign(window, { data: doc });
+const forecastXml = await fmiRequest({
+    storedQuery: "fmi::observations::weather::timevaluepair",
+    params: {
+        // storedquery_id: "fmi::forecast::hirlam::surface::point::timevaluepair",
+        // storedquery_id: "ecmwf::forecast::surface::point::simple",
+        storedquery_id:
+            "fmi::forecast::edited::weather::scandinavia::point::timevaluepair",
+        // storedquery_id: "ecmwf::forecast::surface::point::timevaluepair",
+        // fmisid,
+        // parameters: FORECAST_PAREMETERS.join(","),
+        // parameters: "WindGust",
+        parameters: "HourlyMaximumGust,WindDirection",
+        // place: "Utti",
+        latlon: coordinates,
+    },
+});
+
+const gustForecasts = parseTimeSeries(forecastXml, "mts-1-1-HourlyMaximumGust");
+const directionForecasts = parseTimeSeries(
+    forecastXml,
+    "mts-1-1-WindDirection",
+);
+
+const combinedForecasts = gustForecasts.map((gust, i) => {
+    return {
+        gust: gust.value,
+        direction: directionForecasts[i]?.value ?? "N/A",
+        time: gust.time,
+    };
+});
 
 function Rows(props) {
     return props.data.map((point) => {
@@ -178,12 +211,15 @@ function Root() {
                 Tietojen käyttö omalla vastuulla. Ei takeita että tiedot ovat
                 oikein.
             </p>
+
+            <h2>Havainnot</h2>
             <${DataTable} data=${combined} />
+
+            <h2>Ennuste</h2>
+            <${DataTable} data=${combinedForecasts} />
         </div>
     `;
 }
 
 const root = document.getElementById("root");
 render(html`<${Root} />`, root);
-
-console.log("ver 2");
