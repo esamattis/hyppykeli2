@@ -31,7 +31,7 @@ function updateCharts(obs, fore) {
      */
     const createWarningLines = (data) => [
         {
-            label: "A-keliraja",
+            label: "A-Kelpparit",
             data: data.map(() => 11),
             borderColor: "red",
             pointRadius: 0,
