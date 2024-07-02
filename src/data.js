@@ -226,7 +226,23 @@ async function updateWeatherData() {
     FORECASTS.value = combinedForecasts;
 }
 
-updateWeatherData();
+updateWeatherData().then(() => {
+    const fragment = location.hash;
+    if (!fragment) {
+        return;
+    }
+
+    let element;
+
+    try {
+        element = document.querySelector(fragment);
+    } catch (error) {}
+
+    if (element) {
+        console.log("scrolling to ", element);
+        element.scrollIntoView();
+    }
+});
 
 document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") {
