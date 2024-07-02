@@ -83,7 +83,7 @@ function Root() {
                 </h1>
 
                 <a href="https://www.google.fi/maps/place/${LATLONG}"
-                    >Sääaseman sijainti</a
+                    >Katso havaintoaseman sijainti</a
                 >
 
                 <p>
