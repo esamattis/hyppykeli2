@@ -1,4 +1,5 @@
-import { render, html } from "preact";
+import { render } from "preact";
+import { html } from "htm/preact";
 import { FORECASTS, OBSERVATIONS, NAME, LATLONG } from "./data.js";
 
 function Rows(props) {

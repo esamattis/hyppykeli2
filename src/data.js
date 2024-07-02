@@ -1,6 +1,10 @@
-import { signal } from "preact";
+import { signal } from "@preact/signals";
 
+/**
+ * @type {import('preact').Signal<string>}
+ */
 export const NAME = signal("Loading...");
+
 export const OBSERVATIONS = signal([]);
 export const FORECASTS = signal([]);
 export const LATLONG = signal(null);
