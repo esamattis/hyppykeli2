@@ -49,6 +49,7 @@ td:has(.direction) {
 .sticky-footer a {
     margin-left: 10px;
     margin-right: 10px;
+    text-align: center;
 }
 
 .ball {
@@ -61,7 +62,7 @@ p {
 }
 
 .sticky-footer {
-    font-size: 130%;
+    font-size: 80%;
     position: fixed;
     bottom: 0;
     width: 100%;

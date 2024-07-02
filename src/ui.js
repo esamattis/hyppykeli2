@@ -3,6 +3,8 @@ import { render } from "preact";
 import { html } from "htm/preact";
 import { FORECASTS, OBSERVATIONS, NAME, LATLONG } from "./data.js";
 
+import { Graph } from "./graph.js";
+
 /**
  * @typedef {import('./data.js').WeatherData} WeatherData
  */
@@ -91,6 +93,8 @@ function Root() {
                     ovat oikein.
                 </p>
 
+                <${Graph} />
+
                 <h2 id="observations">Havainnot</h2>
                 <${DataTable} data=${OBSERVATIONS} />
 
@@ -99,9 +103,12 @@ function Root() {
             </div>
 
             <div class="sticky-footer">
-                <a href="#observations">Havainnot</a>
+                <a href="#observation-graph">Havainnot 📈</a>
                 <span class="ball">ᐧ</span>
-                <a href="#forecasts">Ennuste</a>
+                <a href="#forecast-graph">Ennuste 📈</a>
+                <a href="#observations">Havainnot 🍔</a>
+                <span class="ball">ᐧ</span>
+                <a href="#forecasts">Ennuste 🍔</a>
             </div>
         </div>
     `;

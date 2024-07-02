@@ -136,7 +136,7 @@ function parseTimeSeries(doc, id) {
 async function updateWeatherData() {
     const url = new URL(location.href);
     const fmisid = url.searchParams.get("fmisid");
-    const obsRange = Number(url.searchParams.get("observation_range")) || 4;
+    const obsRange = Number(url.searchParams.get("observation_range")) || 12;
     const forecastRange = Number(url.searchParams.get("forecast_range")) || 8;
 
     const obsStartTime = new Date();

@@ -8,6 +8,9 @@ dependencies:
   '@preact/signals':
     specifier: ^1.2.3
     version: 1.2.3(preact@10.22.0)
+  chart.js:
+    specifier: ^4.4.3
+    version: 4.4.3
   esbuild:
     specifier: ^0.21.5
     version: 0.21.5
@@ -230,6 +233,10 @@ packages:
     dev: false
     optional: true
 
+  /@kurkle/color@0.3.2:
+    resolution: {integrity: sha512-fuscdXJ9G1qb7W8VdHi+IwRqij3lBkosAm4ydQtEmbY58OzHXqQhvlxqEkoz0yssNVn38bcpRWgA9PP+OGoisw==}
+    dev: false
+
   /@preact/signals-core@1.6.1:
     resolution: {integrity: sha512-KXEEmJoKDlo0Igju/cj9YvKIgyaWFDgnprShQjzimUd5VynAAdTWMshawEOjUVeKbsI0aR58V6WOQp+DNcKApw==}
     dev: false
@@ -241,6 +248,13 @@ packages:
     dependencies:
       '@preact/signals-core': 1.6.1
       preact: 10.22.0
+    dev: false
+
+  /chart.js@4.4.3:
+    resolution: {integrity: sha512-qK1gkGSRYcJzqrrzdR6a+I0vQ4/R+SoODXyAjscQ/4mzuNzySaMCd+hyVxitSY1+L2fjPD1Gbn+ibNqRmwQeLw==}
+    engines: {pnpm: '>=8'}
+    dependencies:
+      '@kurkle/color': 0.3.2
     dev: false
 
   /esbuild@0.21.5:
