@@ -1,9 +1,9 @@
-import { render, html, signal } from "preact";
+import { signal } from "preact";
 
-const NAME = signal("Loading...");
-const OBSERVATIONS = signal([]);
-const FORECASTS = signal([]);
-const LATLONG = signal(null);
+export const NAME = signal("Loading...");
+export const OBSERVATIONS = signal([]);
+export const FORECASTS = signal([]);
+export const LATLONG = signal(null);
 
 const url = new URL(location.href);
 const fmisid = url.searchParams.get("fmisid");
@@ -22,11 +22,11 @@ const FORECAST_PAREMETERS = [
     "maximumwind",
 ];
 
-export const getStartTime = () => {
+export function getStartTime() {
     const date = new Date();
     date.setHours(date.getHours() - 4, 0, 0, 0);
     return date.toISOString();
-};
+}
 
 export async function fmiRequest(options) {
     const url = new URL(`https://opendata.fmi.fi/wfs?request=getFeature`);
@@ -86,96 +86,6 @@ function parseTimeSeries(doc, id) {
     const node = xpath(doc, `//wml2:MeasurementTimeseries[@gml:id="${id}"]`);
     return pointsToTimeSeries(node).reverse();
 }
-
-function Rows(props) {
-    return props.data.value.map((point) => {
-        let className = "ok";
-
-        if (point.gust >= 8) {
-            className = "warning";
-        }
-
-        if (point.gust >= 11) {
-            className = "danger";
-        }
-
-        // const clock24 = point.time.toLocaleTimeString([], {
-        //     hour: "2-digit",
-        //     minute: "2-digit",
-        //     hour12: false,
-        // });
-
-        return html`<tr>
-            <td class=${className}>${point.gust} m/s</td>
-            <td>${point.direction}°</td>
-            <td>
-                <span
-                    class="direction"
-                    style=${{ "--direction": point.direction + "deg" }}
-                    >↑</span
-                >
-            </td>
-            <td title=${point.time.toString()}>
-                ${point.time.toLocaleTimeString()}
-            </td>
-        </tr> `;
-    });
-}
-
-function DataTable(props) {
-    return html`
-        <table>
-            <thead>
-                <tr>
-                    <th>Puuska</th>
-                    <th>Suunta</th>
-                    <th></th>
-                    <th>time</th>
-                </tr>
-            </thead>
-            <tbody>
-                <${Rows} data=${props.data} />
-            </tbody>
-        </table>
-    `;
-}
-
-function Root() {
-    return html`
-        <div>
-            <div class="content">
-                <h1>
-                    <a class="logo" href="/"> Hyppykeli</a> –${" "}
-                    <span id="title">${NAME}</span>
-                </h1>
-
-                <a href="https://www.google.fi/maps/place/${LATLONG}"
-                    >Sääaseman sijainti</a
-                >
-
-                <p>
-                    Tietojen käyttö omalla vastuulla. Ei takeita että tiedot
-                    ovat oikein.
-                </p>
-
-                <h2 id="observations">Havainnot</h2>
-                <${DataTable} data=${OBSERVATIONS} />
-
-                <h2 id="forecasts">Ennuste</h2>
-                <${DataTable} data=${FORECASTS} />
-            </div>
-
-            <div class="sticky-footer">
-                <a href="#observations">Havainnot</a>
-                <span class="ball">ᐧ</span>
-                <a href="#forecasts">Ennuste</a>
-            </div>
-        </div>
-    `;
-}
-
-const root = document.getElementById("root");
-render(html`<${Root} />`, root);
 
 async function updateWeatherData() {
     const doc = await fmiRequest({
@@ -258,7 +168,7 @@ async function updateWeatherData() {
     FORECASTS.value = combinedForecasts;
 }
 
-await updateWeatherData();
+updateWeatherData();
 
 document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") {
