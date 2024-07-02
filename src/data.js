@@ -39,8 +39,6 @@ export async function fmiRequest(options) {
         url.searchParams.set(k, v);
     }
 
-    console.log("FMI request", url.toString());
-
     try {
         const response = await fetch(url);
         if (!response.ok) {
@@ -49,10 +47,8 @@ export async function fmiRequest(options) {
         const text = await response.text();
         const parser = new DOMParser();
         const data = parser.parseFromString(text, "application/xml");
-        console.log("FMI request completed", url);
         return data;
     } catch (error) {
-        console.error("FMI request failed", error);
         throw error;
     }
 }
@@ -77,7 +73,6 @@ function xpath(doc, path) {
 }
 
 function pointsToTimeSeries(node) {
-    console.log("pointsToTimeSeries", node);
     return Array.from(node.querySelectorAll("point")).map((point) => {
         return {
             value: Number(point.querySelector("value").innerHTML),
