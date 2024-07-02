@@ -257,7 +257,6 @@ updateWeatherData().then(() => {
     } catch (error) {}
 
     if (element) {
-        console.log("scrolling to ", element);
         element.scrollIntoView();
     }
 });
