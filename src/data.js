@@ -1,4 +1,5 @@
 // @ts-check
+// docs https://opendata.fmi.fi/wfs?service=WFS&version=2.0.0&request=describeStoredQueries&
 import { signal } from "@preact/signals";
 
 /**
@@ -49,12 +50,6 @@ const FORECAST_PAREMETERS = [
     "windgust",
     "maximumwind",
 ];
-
-export function getStartTime() {
-    const date = new Date();
-    date.setHours(date.getHours() - 4, 0, 0, 0);
-    return date.toISOString();
-}
 
 /**
  * Makes a request to the FMI API with the given options.
@@ -139,15 +134,18 @@ function parseTimeSeries(doc, id) {
         return [];
     }
 
-    return pointsToTimeSeries(node).reverse();
+    return pointsToTimeSeries(node);
 }
 
 async function updateWeatherData() {
+    const obsStartTime = new Date();
+    obsStartTime.setHours(obsStartTime.getHours() - 4, 0, 0, 0);
+
     const doc = await fmiRequest({
         storedQuery: "fmi::observations::weather::timevaluepair",
         params: {
-            starttime: getStartTime(),
-            // endtime: moment().toISOString(),
+            starttime: obsStartTime.toISOString(),
+            // endtime:
             parameters: OBSERVATION_PARAMETERS.join(","),
             fmisid,
         },
@@ -174,8 +172,11 @@ async function updateWeatherData() {
 
     LATLONG.value = coordinates ?? null;
 
-    const gusts = parseTimeSeries(doc, "obs-obs-1-1-windgust");
-    const directions = parseTimeSeries(doc, "obs-obs-1-1-winddirection");
+    const gusts = parseTimeSeries(doc, "obs-obs-1-1-windgust").reverse();
+    const directions = parseTimeSeries(
+        doc,
+        "obs-obs-1-1-winddirection",
+    ).reverse();
 
     /** @type {WeatherData[]} */
     const combined = gusts.map((gust, i) => {
@@ -188,15 +189,24 @@ async function updateWeatherData() {
 
     OBSERVATIONS.value = combined;
 
+    const forecastStartTime = new Date();
+    const forecastEndTime = new Date();
+    forecastEndTime.setHours(forecastEndTime.getHours() + 8, 0, 0, 0);
+
     const forecastXml = await fmiRequest({
         storedQuery: "fmi::observations::weather::timevaluepair",
         params: {
+            cch: Date.now(),
             // storedquery_id: "fmi::forecast::hirlam::surface::point::timevaluepair",
             // storedquery_id: "ecmwf::forecast::surface::point::simple",
             storedquery_id:
                 "fmi::forecast::edited::weather::scandinavia::point::timevaluepair",
             // storedquery_id: "ecmwf::forecast::surface::point::timevaluepair",
-            // fmisid,
+
+            starttime: forecastStartTime.toISOString(),
+            endtime: forecastEndTime.toISOString(),
+
+            timestep: 10,
             // parameters: FORECAST_PAREMETERS.join(","),
             // parameters: "WindGust",
             parameters: "HourlyMaximumGust,WindDirection",
@@ -209,6 +219,7 @@ async function updateWeatherData() {
         forecastXml,
         "mts-1-1-HourlyMaximumGust",
     );
+
     const directionForecasts = parseTimeSeries(
         forecastXml,
         "mts-1-1-WindDirection",
