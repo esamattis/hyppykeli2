@@ -34,9 +34,6 @@ export const FORECASTS = signal([]);
  */
 export const LATLONG = signal(null);
 
-const url = new URL(location.href);
-const fmisid = url.searchParams.get("fmisid");
-
 const OBSERVATION_PARAMETERS = [
     "winddirection",
     "windspeedms",
@@ -138,8 +135,13 @@ function parseTimeSeries(doc, id) {
 }
 
 async function updateWeatherData() {
+    const url = new URL(location.href);
+    const fmisid = url.searchParams.get("fmisid");
+    const obsRange = Number(url.searchParams.get("observation_range")) || 4;
+    const forecastRange = Number(url.searchParams.get("forecast_range")) || 8;
+
     const obsStartTime = new Date();
-    obsStartTime.setHours(obsStartTime.getHours() - 4, 0, 0, 0);
+    obsStartTime.setHours(obsStartTime.getHours() - obsRange, 0, 0, 0);
 
     const doc = await fmiRequest({
         storedQuery: "fmi::observations::weather::timevaluepair",
@@ -191,7 +193,12 @@ async function updateWeatherData() {
 
     const forecastStartTime = new Date();
     const forecastEndTime = new Date();
-    forecastEndTime.setHours(forecastEndTime.getHours() + 8, 0, 0, 0);
+    forecastEndTime.setHours(
+        forecastEndTime.getHours() + forecastRange,
+        0,
+        0,
+        0,
+    );
 
     const forecastXml = await fmiRequest({
         storedQuery: "fmi::observations::weather::timevaluepair",
