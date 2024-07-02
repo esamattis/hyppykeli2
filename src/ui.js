@@ -1,7 +1,21 @@
+// @ts-check
 import { render } from "preact";
 import { html } from "htm/preact";
 import { FORECASTS, OBSERVATIONS, NAME, LATLONG } from "./data.js";
 
+/**
+ * @typedef {import('./data.js').WeatherData} WeatherData
+ */
+
+/**
+ * @typedef {import('@preact/signals').Signal<T>} Signal<T>
+ * @template {any} T
+ */
+
+/**
+ * @param {Object} props
+ * @param {Signal<WeatherData[]>} props.data
+ */
 function Rows(props) {
     return props.data.value.map((point) => {
         let className = "ok";
@@ -37,6 +51,10 @@ function Rows(props) {
     });
 }
 
+/**
+ * @param {Object} props
+ * @param {Signal<WeatherData[]>} props.data
+ */
 function DataTable(props) {
     return html`
         <table>
@@ -90,4 +108,7 @@ function Root() {
 }
 
 const root = document.getElementById("root");
+if (!root) {
+    throw new Error("Root element not found");
+}
 render(html`<${Root} />`, root);

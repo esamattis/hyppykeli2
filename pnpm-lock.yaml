@@ -17,6 +17,9 @@ dependencies:
   preact:
     specifier: ^10.22.0
     version: 10.22.0
+  typescript:
+    specifier: ^5.5.3
+    version: 5.5.3
 
 packages:
 
@@ -277,4 +280,10 @@ packages:
 
   /preact@10.22.0:
     resolution: {integrity: sha512-RRurnSjJPj4rp5K6XoP45Ui33ncb7e4H7WiOHVpjbkvqvA3U+N8Z6Qbo0AE6leGYBV66n8EhEaFixvIu3SkxFw==}
+    dev: false
+
+  /typescript@5.5.3:
+    resolution: {integrity: sha512-/hreyEujaB0w76zKo6717l3L0o/qEUtRgdvUBvlkhoWeOVMjMuHNHk0BRBzikzuGDqNmPQbg5ifMEqsHLiIUcQ==}
+    engines: {node: '>=14.17'}
+    hasBin: true
     dev: false

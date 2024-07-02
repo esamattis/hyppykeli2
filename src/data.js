@@ -1,12 +1,36 @@
+// @ts-check
 import { signal } from "@preact/signals";
 
 /**
- * @type {import('preact').Signal<string>}
+ * @typedef {import('@preact/signals').Signal<T>} Signal<T>
+ * @template {any} T
+ */
+
+/**
+ * @typedef {Object} WeatherData
+ * @property {number} gust
+ * @property {number} direction
+ * @property {Date} time
+ */
+
+/**
+ * @type {Signal<string>}
  */
 export const NAME = signal("Loading...");
 
+/**
+ * @type {Signal<WeatherData[]>}
+ */
 export const OBSERVATIONS = signal([]);
+
+/**
+ * @type {Signal<WeatherData[]>}
+ */
 export const FORECASTS = signal([]);
+
+/**
+ * @type {Signal<string|null>}
+ */
 export const LATLONG = signal(null);
 
 const url = new URL(location.href);
@@ -32,6 +56,14 @@ export function getStartTime() {
     return date.toISOString();
 }
 
+/**
+ * Makes a request to the FMI API with the given options.
+ * @param {Object} options - The options for the request.
+ * @param {string} options.storedQuery - The stored query ID for the request.
+ * @param {Object} options.params - The parameters for the request.
+ * @returns {Promise<Document>} The parsed XML document from the response.
+ * @throws Will throw an error if the request fails.
+ */
 export async function fmiRequest(options) {
     const url = new URL(`https://opendata.fmi.fi/wfs?request=getFeature`);
     url.searchParams.set("storedquery_id", options.storedQuery);
@@ -53,8 +85,13 @@ export async function fmiRequest(options) {
     }
 }
 
+/**
+ * @param {Document} doc
+ * @param {string} path
+ * @returns {Element|null}
+ */
 function xpath(doc, path) {
-    return doc.evaluate(
+    const node = doc.evaluate(
         path,
         doc,
         function (prefix) {
@@ -70,19 +107,38 @@ function xpath(doc, path) {
         XPathResult.FIRST_ORDERED_NODE_TYPE,
         null,
     ).singleNodeValue;
+
+    if (node instanceof Element) {
+        return node;
+    }
+
+    return null;
 }
 
+/**
+ * @param {Element} node
+ */
 function pointsToTimeSeries(node) {
     return Array.from(node.querySelectorAll("point")).map((point) => {
         return {
-            value: Number(point.querySelector("value").innerHTML),
-            time: new Date(point.querySelector("time").innerHTML),
+            value: Number(point.querySelector("value")?.innerHTML ?? 0),
+            time: new Date(
+                point.querySelector("time")?.innerHTML ?? new Date(),
+            ),
         };
     });
 }
 
+/**
+ * @param {Document} doc
+ * @param {string} id
+ */
 function parseTimeSeries(doc, id) {
     const node = xpath(doc, `//wml2:MeasurementTimeseries[@gml:id="${id}"]`);
+    if (!node) {
+        return [];
+    }
+
     return pointsToTimeSeries(node).reverse();
 }
 
@@ -112,18 +168,20 @@ async function updateWeatherData() {
 
     const coordinates = doc
         .querySelector("pos")
-        .innerHTML.trim()
+        ?.innerHTML.trim()
         .split(/\s+/)
         .join(",");
 
-    LATLONG.value = coordinates;
+    LATLONG.value = coordinates ?? null;
 
     const gusts = parseTimeSeries(doc, "obs-obs-1-1-windgust");
     const directions = parseTimeSeries(doc, "obs-obs-1-1-winddirection");
+
+    /** @type {WeatherData[]} */
     const combined = gusts.map((gust, i) => {
         return {
             gust: gust.value,
-            direction: directions[i]?.value ?? "N/A",
+            direction: directions[i]?.value ?? -1,
             time: gust.time,
         };
     });
@@ -156,10 +214,11 @@ async function updateWeatherData() {
         "mts-1-1-WindDirection",
     );
 
+    /** @type {WeatherData[]} */
     const combinedForecasts = gustForecasts.map((gust, i) => {
         return {
             gust: gust.value,
-            direction: directionForecasts[i]?.value ?? "N/A",
+            direction: directionForecasts[i]?.value ?? -1,
             time: gust.time,
         };
     });

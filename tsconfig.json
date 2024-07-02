@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "noEmit": true,
+        "module": "NodeNext",
+        "allowJs": true,
+        "moduleResolution": "NodeNext",
+        "strict": true,
+        "skipLibCheck": true,
+        "noUncheckedIndexedAccess": true,
+        "forceConsistentCasingInFileNames": true
+    },
+    "include": ["src"]
+}
