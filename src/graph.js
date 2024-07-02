@@ -48,7 +48,7 @@ function updateCharts(obs, fore) {
         {
             ...shared,
             label: "Puuska (m/s)",
-            data: OBSERVATIONS.value.map((obs) => obs.gust),
+            data: OBSERVATIONS.value.map((obs) => obs.gust).reverse(),
             borderColor: "blue",
         },
         ...createWarningLines(OBSERVATIONS.value),
