@@ -143,9 +143,12 @@ async function updateWeatherData() {
     const obsStartTime = new Date();
     obsStartTime.setHours(obsStartTime.getHours() - obsRange, 0, 0, 0);
 
+    const cacheBust = Math.floor(Date.now() / 30_000);
+
     const doc = await fmiRequest({
         storedQuery: "fmi::observations::weather::timevaluepair",
         params: {
+            cch: cacheBust,
             starttime: obsStartTime.toISOString(),
             // endtime:
             parameters: OBSERVATION_PARAMETERS.join(","),
@@ -203,7 +206,7 @@ async function updateWeatherData() {
     const forecastXml = await fmiRequest({
         storedQuery: "fmi::observations::weather::timevaluepair",
         params: {
-            cch: Date.now(),
+            cch: cacheBust,
             // storedquery_id: "fmi::forecast::hirlam::surface::point::timevaluepair",
             // storedquery_id: "ecmwf::forecast::surface::point::simple",
             storedquery_id:
