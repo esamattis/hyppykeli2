@@ -50,16 +50,15 @@ const FORECAST_PAREMETERS = [
 
 /**
  * Makes a request to the FMI API with the given options.
- * @param {Object} options - The options for the request.
- * @param {string} options.storedQuery - The stored query ID for the request.
- * @param {Object} options.params - The parameters for the request.
+ * @param {string} storedQuery - The stored query ID for the request.
+ * @param {Object} params - The parameters for the request.
  * @returns {Promise<Document>} The parsed XML document from the response.
  * @throws Will throw an error if the request fails.
  */
-export async function fmiRequest(options) {
+export async function fmiRequest(storedQuery, params) {
     const url = new URL(`https://opendata.fmi.fi/wfs?request=getFeature`);
-    url.searchParams.set("storedquery_id", options.storedQuery);
-    for (const [k, v] of Object.entries(options.params)) {
+    url.searchParams.set("storedquery_id", storedQuery);
+    for (const [k, v] of Object.entries(params)) {
         url.searchParams.set(k, v);
     }
 
@@ -145,15 +144,12 @@ async function updateWeatherData() {
 
     const cacheBust = Math.floor(Date.now() / 30_000);
 
-    const doc = await fmiRequest({
-        storedQuery: "fmi::observations::weather::timevaluepair",
-        params: {
-            cch: cacheBust,
-            starttime: obsStartTime.toISOString(),
-            // endtime:
-            parameters: OBSERVATION_PARAMETERS.join(","),
-            fmisid,
-        },
+    const doc = await fmiRequest("fmi::observations::weather::timevaluepair", {
+        cch: cacheBust,
+        starttime: obsStartTime.toISOString(),
+        // endtime:
+        parameters: OBSERVATION_PARAMETERS.join(","),
+        fmisid,
     });
 
     // <gml:name codeSpace="http://xml.fmi.fi/namespace/locationcode/name">Kouvola Utti lentoasema</gml:name>
@@ -203,15 +199,13 @@ async function updateWeatherData() {
         0,
     );
 
-    const forecastXml = await fmiRequest({
-        storedQuery: "fmi::observations::weather::timevaluepair",
-        params: {
+    const forecastXml = await fmiRequest(
+        // "fmi::forecast::hirlam::surface::point::timevaluepair",
+        // "ecmwf::forecast::surface::point::simple",
+        // "ecmwf::forecast::surface::point::timevaluepair",
+        "fmi::forecast::edited::weather::scandinavia::point::timevaluepair",
+        {
             cch: cacheBust,
-            // storedquery_id: "fmi::forecast::hirlam::surface::point::timevaluepair",
-            // storedquery_id: "ecmwf::forecast::surface::point::simple",
-            storedquery_id:
-                "fmi::forecast::edited::weather::scandinavia::point::timevaluepair",
-            // storedquery_id: "ecmwf::forecast::surface::point::timevaluepair",
 
             starttime: forecastStartTime.toISOString(),
             endtime: forecastEndTime.toISOString(),
@@ -223,7 +217,7 @@ async function updateWeatherData() {
             // place: "Utti",
             latlon: coordinates,
         },
-    });
+    );
 
     const gustForecasts = parseTimeSeries(
         forecastXml,
