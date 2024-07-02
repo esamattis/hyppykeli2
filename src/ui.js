@@ -106,9 +106,9 @@ function Root() {
                 <a href="#observation-graph">Havainnot 📈</a>
                 <span class="ball">ᐧ</span>
                 <a href="#forecast-graph">Ennuste 📈</a>
-                <a href="#observations">Havainnot</a>
+                <a href="#observations">Havainnot 🍔</a>
                 <span class="ball">ᐧ</span>
-                <a href="#forecasts">Ennuste</a>
+                <a href="#forecasts">Ennuste 🍔</a>
             </div>
         </div>
     `;
