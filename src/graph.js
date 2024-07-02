@@ -86,8 +86,8 @@ export function Graph() {
                 datasets: [],
             },
             options: {
+                maintainAspectRatio: false,
                 interaction: {
-                    // mode: "nearest",
                     mode: "index",
                     axis: "x",
                     intersect: false,
@@ -126,8 +126,12 @@ export function Graph() {
 
     return html`<div class="graphs">
         <h2 id="observation-graph">Havainnot</h2>
-        <canvas ref=${obsChartRef} class="chart"></canvas>
+        <div class="chart">
+            <canvas ref=${obsChartRef}></canvas>
+        </div>
         <h2 id="forecast-graph">Ennusteet</h2>
-        <canvas ref=${foreChartRef} class="chart"></canvas>
+        <div class="chart">
+            <canvas ref=${foreChartRef}></canvas>
+        </div>
     </div>`;
 }

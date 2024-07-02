@@ -83,3 +83,9 @@ p {
         display: none;
     }
 }
+
+.chart {
+    position: relative;
+    height: 80vh;
+    border: 1px solid black;
+}
