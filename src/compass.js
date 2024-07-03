@@ -76,7 +76,7 @@ function Needle() {
     const needleLength = convertRangeReversed(point.gust, 0, 11, 50, 170);
 
     return html`
-        <g style=${`opacity: ${history ? 0.3 : 1}`}>
+        <g className="${history ? "historic" : ""}">
             <polygon
                 points=${`200,${needleLength} 190,200 210,200`}
                 fill="red"

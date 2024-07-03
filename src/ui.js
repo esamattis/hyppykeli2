@@ -145,13 +145,14 @@ function FromNow(props) {
 }
 
 function LatestGust() {
+    const history = !!HOVERED_OBSERVATION.value;
     const latest = HOVERED_OBSERVATION.value || OBSERVATIONS.value[0];
     if (!latest) {
         return html`<p>Ladataan tuulitietoja...</p>`;
     }
 
     return html`
-        <p>
+        <p class=${history ? "historic" : ""}>
             Puuska
             <span
                 class=${"latest-value latest-gust " +
@@ -211,7 +212,7 @@ function LatestMetar() {
             </p>
 
             <p>
-                <em class="metar">${latest.metar}</em>
+                <span class="metar">${latest.metar}</span>
             </p>
         `;
     }

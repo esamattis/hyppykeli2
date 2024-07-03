@@ -26,9 +26,9 @@ export function Help(props) {
         </button>
         <dialog ref=${ref}>
             <div>${props.children}</div>
-            <p>
+            <div>
                 <button type="button" onClick=${close}>Sulje</button>
-            </p>
+            </div>
         </dialog>
     `;
 }

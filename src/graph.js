@@ -128,11 +128,19 @@ export function Graph() {
 
         const obsOptions = structuredClone(options);
 
+        /** @type {ReturnType<typeof setTimeout>} */
+        let timer;
+
         /**
          * @param {MouseEvent} event
          * @param {any} chartElement
          */
         const onHover = (event, chartElement) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                HOVERED_OBSERVATION.value = undefined;
+            }, 10_000);
+
             const points = obsChart.getElementsAtEventForMode(
                 event,
                 "index",

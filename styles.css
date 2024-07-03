@@ -126,6 +126,14 @@ input[type="text"] {
     display: flex;
 }
 
+.historic {
+    opacity: 0.5;
+}
+
+svg .historic {
+    opacity: 0.3;
+}
+
 dialog {
     max-width: 600px;
     margin: 20px;
@@ -135,4 +143,9 @@ dialog {
     background-color: transparent;
     color: blue;
     border: none;
+}
+
+.metar {
+    font-size: 70%;
+    font-family: monospace;
 }
