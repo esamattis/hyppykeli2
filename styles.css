@@ -66,20 +66,25 @@ p {
     line-height: 1.5;
 }
 
+.sticky-footer a {
+    display: flex;
+    height: 100%;
+    align-items: center;
+}
+
 .sticky-footer {
-    font-size: 80%;
+    display: flex;
+    align-items: center;
+    height: 50px;
     position: fixed;
     bottom: 0;
     width: 100%;
     background-color: white;
-    padding-top: 10px;
-    padding-bottom: 10px;
     box-shadow: 0 -4px 2px -2px gray;
 }
 
 @media (max-width: 600px) {
     .sticky-footer {
-        display: flex;
         justify-content: space-around;
     }
 
