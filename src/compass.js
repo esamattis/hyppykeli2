@@ -1,6 +1,7 @@
 // @ts-check
 import { html } from "htm/preact";
 import { HOVERED_OBSERVATION, OBSERVATIONS } from "./data.js";
+import { Help } from "./utils.js";
 
 /**
  * Linearly converts a value from one range to another range in a reversed manner.
@@ -35,6 +36,7 @@ export function Compass() {
     const studentCirle = convertRange(8, 0, 11, 0, circle);
     // prettier-ignore
     return html`
+        <div class="compass">
             <svg
                 width="200"
                 height="200"
@@ -53,22 +55,18 @@ export function Compass() {
               <${Needle} />
 
 
-              <!-- Center Point -->
-              <circle cx="200" cy="200" r="10" fill="black" />
             </svg>
 
-            <p>
-            <small>
-                <em>
+            <${Help}>
                 Kompassin nuoli kertoo tuulen suunnan ja pituus tuulen puuskan. Oranssi
                 ympyrä on oppilasraja (8 m/s) ja musta ympyrä on kelppariraja (11 m/s).
-                </em>
-            </small>
-            </p>
+            </${Help}>
+        </div>
     `;
 }
 
 function Needle() {
+    const history = !!HOVERED_OBSERVATION.value;
     const point = HOVERED_OBSERVATION.value ?? OBSERVATIONS.value[0];
 
     if (!point) {
@@ -78,10 +76,14 @@ function Needle() {
     const needleLength = convertRangeReversed(point.gust, 0, 11, 50, 170);
 
     return html`
-        <polygon
-            points=${`200,${needleLength} 190,200 210,200`}
-            fill="red"
-            transform=${`rotate(${point.direction}, 200, 200)`}
-        />
+        <g style=${`opacity: ${history ? 0.3 : 1}`}>
+            <polygon
+                points=${`200,${needleLength} 190,200 210,200`}
+                fill="red"
+                transform=${`rotate(${point.direction}, 200, 200)`}
+            />
+            <!-- Center Point -->
+            <circle cx="200" cy="200" r="10" fill="black" />
+        </g>
     `;
 }

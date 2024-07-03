@@ -121,3 +121,18 @@ input[type="text"] {
 .errors p {
     color: red;
 }
+
+.compass {
+    display: flex;
+}
+
+dialog {
+    max-width: 600px;
+    margin: 20px;
+}
+
+.help {
+    background-color: transparent;
+    color: blue;
+    border: none;
+}
