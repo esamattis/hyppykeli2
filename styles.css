@@ -31,6 +31,7 @@ td {
     display: inline-block;
     padding-right: 3px;
 }
+
 .direction {
     text-align: center;
     width: 20px;
@@ -163,6 +164,7 @@ dialog {
         flex-direction: column;
     }
 }
+
 @media (min-width: 650px) {
     .colum-on-big-screen {
         flex-direction: row;
@@ -178,4 +180,8 @@ dialog {
     position: sticky;
     top: 0;
     background-color: white;
+}
+
+.show-more {
+    width: 20px;
 }

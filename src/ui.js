@@ -55,7 +55,12 @@ function getWarningLevel(gust) {
  * @param {Signal<WeatherData[]>} props.data
  */
 function Rows(props) {
-    return props.data.value.map((point) => {
+    const [showAll, setShowAll] = useState(false);
+    const data = showAll ? props.data.value : props.data.value.slice(0, 50);
+
+    const showLoadMore = !showAll && props.data.value.length > data.length;
+
+    const rows = data.map((point) => {
         // const clock24 = point.time.toLocaleTimeString([], {
         //     hour: "2-digit",
         //     minute: "2-digit",
@@ -78,6 +83,23 @@ function Rows(props) {
             </td>
         </tr> `;
     });
+
+    return html`
+        ${rows}
+        ${showLoadMore
+            ? html`
+                  <tr>
+                      <td>
+                          <div class="show-more">
+                              <button onClick=${() => setShowAll(true)}>
+                                  Näytä kaikki
+                              </button>
+                          </div>
+                      </td>
+                  </tr>
+              `
+            : null}
+    `;
 }
 
 /**
