@@ -10,9 +10,11 @@ import {
     METARS,
     STATION_NAME,
     ERRORS,
+    HOVERED_OBSERVATION,
 } from "./data.js";
 
 import { Graph } from "./graph.js";
+import { Compass } from "./compass.js";
 
 /**
  * @typedef {import('./data.js').WeatherData} WeatherData
@@ -102,6 +104,7 @@ function DataTable(props) {
 function useInterval(setter) {
     const [state, setState] = useState(/** @type {T} */ (setter()));
     useEffect(() => {
+        setState(setter());
         const interval = setInterval(() => {
             setState(setter());
         }, 1000);
@@ -136,7 +139,7 @@ function FromNow(props) {
 }
 
 function LatestGust() {
-    const latest = OBSERVATIONS.value[0];
+    const latest = HOVERED_OBSERVATION.value || OBSERVATIONS.value[0];
     if (!latest) {
         return html`<p>Ladataan tuulitietoja...</p>`;
     }
@@ -197,7 +200,7 @@ function LatestMetar() {
     if (latest?.clouds.length === 0) {
         return html`
             <p>
-                Ei pilvikerroksia.
+                Ei pilvikerroksia.${" "}
                 <${FromNow} date=${latest.time} />
             </p>
 
@@ -208,8 +211,6 @@ function LatestMetar() {
     }
 
     return html`
-        <p>Pilvikerrokset${" "}</p>
-
         <ul>
             ${latest.clouds.map(
                 (cloud, i) =>
@@ -234,6 +235,7 @@ function LatestMetar() {
 }
 
 function Root() {
+    const history = !!HOVERED_OBSERVATION.value;
     return html`
         <div>
             <div class="content">
@@ -266,10 +268,14 @@ function Root() {
                     ovat oikein.
                 </p>
 
-                <h2 id="latest">Viimeisimmät havainnot</h2>
+                <h2>Pilvet</h2>
+                <${LatestMetar} />
+
+                <h2 id="latest">Tuuli</h2>
+
+                <${Compass} />
 
                 <${LatestGust} />
-                <${LatestMetar} />
 
                 <${Graph} />
 

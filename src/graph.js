@@ -4,7 +4,13 @@ import { effect } from "@preact/signals";
 import { html } from "htm/preact";
 import { Chart } from "chart.js";
 
-import { FORECASTS, OBSERVATIONS, NAME, LATLONG } from "./data.js";
+import {
+    FORECASTS,
+    OBSERVATIONS,
+    NAME,
+    LATLONG,
+    HOVERED_OBSERVATION,
+} from "./data.js";
 
 /**
  * @param {Chart} obs
@@ -120,10 +126,36 @@ export function Graph() {
             return;
         }
 
-        const obsChart = new Chart(
-            obsChartRef.current,
-            structuredClone(options),
-        );
+        const obsOptions = structuredClone(options);
+
+        /**
+         * @param {MouseEvent} event
+         * @param {any} chartElement
+         */
+        const onHover = (event, chartElement) => {
+            const points = obsChart.getElementsAtEventForMode(
+                event,
+                "index",
+                {
+                    axis: "x",
+                    intersect: false,
+                },
+                false,
+            );
+
+            const index = points[0]?.index;
+            if (index !== undefined) {
+                const reversedIndex = OBSERVATIONS.value.length - index - 1;
+                const obs = OBSERVATIONS.value[reversedIndex];
+                if (obs) {
+                    HOVERED_OBSERVATION.value = obs;
+                }
+            }
+        };
+
+        obsOptions.options.onHover = onHover;
+
+        const obsChart = new Chart(obsChartRef.current, obsOptions);
         const foreChart = new Chart(
             foreChartRef.current,
             structuredClone(options),
@@ -139,9 +171,13 @@ export function Graph() {
         };
     }, []);
 
+    const onMouseLeaveObs = () => {
+        HOVERED_OBSERVATION.value = undefined;
+    };
+
     return html`<div class="graphs">
         <h2 id="observation-graph">Havainnot</h2>
-        <div class="chart">
+        <div class="chart" onMouseLeave=${onMouseLeaveObs}>
             <canvas ref=${obsChartRef}></canvas>
         </div>
         <h2 id="forecast-graph">Ennusteet</h2>

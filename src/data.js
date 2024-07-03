@@ -47,6 +47,11 @@ export const STATION_NAME = signal(undefined);
 export const OBSERVATIONS = signal([]);
 
 /**
+ * @type {Signal<WeatherData|undefined>}
+ */
+export const HOVERED_OBSERVATION = signal(undefined);
+
+/**
  * @type {Signal<WeatherData[]>}
  */
 export const FORECASTS = signal([]);
@@ -287,13 +292,17 @@ async function updateWeatherData() {
         addError("Lentokenttä tunnus (ICAO) puuttuu.");
     }
 
-    const doc = await fmiRequest("fmi::observations::weather::timevaluepair", {
-        cch: cacheBust,
-        starttime: obsStartTime.toISOString(),
-        // endtime:
-        parameters: OBSERVATION_PARAMETERS.join(","),
-        fmisid,
-    });
+    const doc = await fmiRequest(
+        "fmi::observations::weather::timevaluepair",
+        {
+            cch: cacheBust,
+            starttime: obsStartTime.toISOString(),
+            // endtime:
+            parameters: OBSERVATION_PARAMETERS.join(","),
+            fmisid,
+        },
+        // "/example_data/observations.xml",
+    );
 
     if (!doc) {
         addError(`Havaintoasemaa ${fmisid} ei löytynyt.`);
