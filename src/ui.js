@@ -266,7 +266,7 @@ function LatestMetar() {
         </p>
 
         <small
-            >Lentokentän korkeus meren pinnasta
+            >Lentokentän korkeus meren pinnasta${" "}
             ${latest.elevation.toFixed(0)}M</small
         >
     `;
