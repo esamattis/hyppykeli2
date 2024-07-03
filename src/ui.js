@@ -306,11 +306,17 @@ function Root() {
 
                 <${Graph} />
 
-                <h2 id="observations">Havainnot</h2>
-                <${DataTable} data=${OBSERVATIONS} />
+                <div class="colum-on-big-screen">
+                    <div>
+                        <h2 id="observations">Havainnot</h2>
+                        <${DataTable} data=${OBSERVATIONS} />
+                    </div>
 
-                <h2 id="forecasts">Ennuste</h2>
-                <${DataTable} data=${FORECASTS} />
+                    <div>
+                        <h2 id="forecasts">Ennuste</h2>
+                        <${DataTable} data=${FORECASTS} />
+                    </div>
+                </div>
             </div>
 
             <div class="sticky-footer">
