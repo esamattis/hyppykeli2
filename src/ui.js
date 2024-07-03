@@ -226,7 +226,8 @@ function LatestMetar() {
                     html`<li>
                         <a href=${cloud.href}
                             >${CLOUD_TYPES[cloud.amount] ?? cloud.amount}</a
-                        >${" "} ${hectoFeetToMeters(cloud.base)} M ${" "}
+                        >${" "} ${hectoFeetToMeters(cloud.base).toFixed(0)} M
+                        ${" "}
                     </li>`,
             )}
         </ul>
