@@ -51,14 +51,29 @@ function updateCharts(obs, fore) {
             data: OBSERVATIONS.value.map((obs) => obs.gust).reverse(),
             borderColor: "blue",
         },
+        {
+            ...shared,
+            label: "Tuuli (m/s)",
+            data: OBSERVATIONS.value.map((obs) => obs.speed).reverse(),
+            borderColor: "lightblue",
+        },
         ...createWarningLines(OBSERVATIONS.value),
     ];
 
     fore.data.datasets = [
         {
             ...shared,
-            label: "Puuska Ennuste (m/s)",
+            label: "Puuskaennuste (m/s)",
             data: FORECASTS.value.map((obs) => obs.gust),
+            borderColor: "blue",
+            cubicInterpolationMode: "monotone",
+            borderDash: [5, 5],
+            borderWidth: 5,
+        },
+        {
+            ...shared,
+            label: "Tuuli (m/s)",
+            data: FORECASTS.value.map((obs) => obs.speed),
             borderColor: "lightblue",
             cubicInterpolationMode: "monotone",
             borderDash: [5, 5],

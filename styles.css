@@ -17,10 +17,7 @@ th {
 }
 
 td {
-}
-
-td:has(.direction) {
-    padding-right: 10px;
+    padding-right: 20px;
 }
 
 .logo,
@@ -29,7 +26,16 @@ td:has(.direction) {
     color: blue;
 }
 
+.direction-value {
+    width: 100px;
+    padding-right: 3px;
+    /* border: 1px solid red; */
+}
 .direction {
+    text-align: center;
+    /* border: 1px solid green; */
+    width: 20px;
+    height: 20px;
     display: inline-block;
     transform: rotate(var(--direction));
 }

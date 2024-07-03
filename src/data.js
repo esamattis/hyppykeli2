@@ -10,6 +10,7 @@ import { signal } from "@preact/signals";
 /**
  * @typedef {Object} WeatherData
  * @property {number} gust
+ * @property {number} speed
  * @property {number} direction
  * @property {Date} time
  */
@@ -174,6 +175,8 @@ async function updateWeatherData() {
     LATLONG.value = coordinates ?? null;
 
     const gusts = parseTimeSeries(doc, "obs-obs-1-1-windgust").reverse();
+    const windSpeed = parseTimeSeries(doc, "obs-obs-1-1-windspeedms").reverse();
+
     const directions = parseTimeSeries(
         doc,
         "obs-obs-1-1-winddirection",
@@ -183,6 +186,7 @@ async function updateWeatherData() {
     const combined = gusts.map((gust, i) => {
         return {
             gust: gust.value,
+            speed: windSpeed[i]?.value ?? -1,
             direction: directions[i]?.value ?? -1,
             time: gust.time,
         };
@@ -213,7 +217,7 @@ async function updateWeatherData() {
             timestep: 10,
             // parameters: FORECAST_PAREMETERS.join(","),
             // parameters: "WindGust",
-            parameters: "HourlyMaximumGust,WindDirection",
+            // parameters: "HourlyMaximumGust,WindDirection",
             // place: "Utti",
             latlon: coordinates,
         },
@@ -223,6 +227,8 @@ async function updateWeatherData() {
         forecastXml,
         "mts-1-1-HourlyMaximumGust",
     );
+
+    const speedForecasts = parseTimeSeries(forecastXml, "mts-1-1-WindSpeedM");
 
     const directionForecasts = parseTimeSeries(
         forecastXml,
@@ -234,6 +240,7 @@ async function updateWeatherData() {
         return {
             gust: gust.value,
             direction: directionForecasts[i]?.value ?? -1,
+            speed: speedForecasts[i]?.value ?? -1,
             time: gust.time,
         };
     });

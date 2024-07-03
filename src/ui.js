@@ -38,8 +38,9 @@ function Rows(props) {
 
         return html`<tr>
             <td class=${className}>${point.gust} m/s</td>
-            <td>${point.direction}°</td>
+            <td>${point.speed} m/s</td>
             <td>
+                <span class="direction-value">${point.direction}°</span>
                 <span
                     class="direction"
                     style=${{ "--direction": point.direction + "deg" }}
@@ -59,13 +60,13 @@ function Rows(props) {
  */
 function DataTable(props) {
     return html`
-        <table>
+        <table class="weather-table">
             <thead>
                 <tr>
                     <th>Puuska</th>
+                    <th>Tuuli</th>
                     <th>Suunta</th>
-                    <th></th>
-                    <th>time</th>
+                    <th>Aika</th>
                 </tr>
             </thead>
             <tbody>
