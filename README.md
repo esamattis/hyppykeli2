@@ -9,4 +9,4 @@ Deploy tapahtuu kun tämän repon `main` branchiin tehdään push. PR:t tervetul
 
 
 Tää on [Preactilla](https://preactjs.com/) toteutettu Single-Page Appi. Apuna käytetään [htm](https://github.com/developit/htm)-kirjastoa, jotta ei tarvita
-bundleria käätämään JSX:ää. Graaffeja piirretään [Chart.js v3](https://www.chartjs.org/):lla. Ei oteta enempää kirjastoja mukaan, ylläpito taakan välttämiseksi.
+bundleria käätämään JSX:ää. Graaffeja piirretään [Chart.js v4](https://www.chartjs.org/):lla. Ei oteta enempää kirjastoja mukaan, ylläpito taakan välttämiseksi.
