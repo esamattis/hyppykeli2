@@ -168,3 +168,9 @@ dialog {
         flex-direction: row;
     }
 }
+
+.sticky {
+    position: sticky;
+    top: 0;
+    background-color: white;
+}

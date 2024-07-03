@@ -308,12 +308,12 @@ function Root() {
 
                 <div class="colum-on-big-screen">
                     <div>
-                        <h2 id="observations">Havainnot</h2>
+                        <h2 class="sticky" id="observations">Havainnot</h2>
                         <${DataTable} data=${OBSERVATIONS} />
                     </div>
 
                     <div>
-                        <h2 id="forecasts">Ennuste</h2>
+                        <h2 class="sticky" id="forecasts">Ennuste</h2>
                         <${DataTable} data=${FORECASTS} />
                     </div>
                 </div>
