@@ -132,8 +132,8 @@ export function Graph() {
         const obsChart = new Chart(obsChartRef.current, obsOptions);
         const foreChart = new Chart(foreChartRef.current, foreOptions);
 
-        obsChart.options.onHover = createHoverHandler(OBSERVATIONS);
-        foreChart.options.onHover = createHoverHandler(FORECASTS);
+        obsChart.options.onHover = createHoverHandler(OBSERVATIONS, true);
+        foreChart.options.onHover = createHoverHandler(FORECASTS, false);
 
         effect(() => {
             updateCharts(obsChart, foreChart);
@@ -168,8 +168,9 @@ export function Graph() {
 
 /**
  * @param {Signal<import("./data.js").WeatherData[]>} signal
+ * @param {boolean} reverse
  */
-function createHoverHandler(signal) {
+function createHoverHandler(signal, reverse) {
     /** @type {ReturnType<typeof setTimeout>} */
     // let timer;
 
@@ -197,10 +198,13 @@ function createHoverHandler(signal) {
             false,
         );
 
-        const index = points[0]?.index;
+        let index = points[0]?.index;
         if (index !== undefined) {
-            const reversedIndex = signal.value.length - index - 1;
-            const obs = signal.value[reversedIndex];
+            if (reverse) {
+                index = signal.value.length - index - 1;
+            }
+
+            const obs = signal.value[index];
             if (obs) {
                 console.log("value", obs.gust);
                 HOVERED_OBSERVATION.value = obs;

@@ -340,7 +340,6 @@ async function updateWeatherData() {
 
     const gusts = parseTimeSeries(doc, "obs-obs-1-1-windgust").reverse();
     const windSpeed = parseTimeSeries(doc, "obs-obs-1-1-windspeedms").reverse();
-
     const directions = parseTimeSeries(
         doc,
         "obs-obs-1-1-winddirection",
