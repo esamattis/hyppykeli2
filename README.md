@@ -7,4 +7,6 @@ Säädata haetaan suoraan CORssilla Ilmatieteen laitoksen APIsta ilman varsinais
 
 Deploy tapahtuu kun tämän repon `main` branchiin tehdään push. PR:t tervetulleita
 
-Ainoat kirjastot joita tässä käytetään ovat [Preact](https://preactjs.com/) ja [htm](https://github.com/developit/htm) sekä jossain vaihessa jokin graafien piirtämiseen. Muita vältetään mätänemisen välttämiseksi.
+
+Tää on [Preactilla](https://preactjs.com/) toteutettu Single-Page Appi. Apuna käytetään [htm](https://github.com/developit/htm)-kirjastoa, jotta ei tarvita
+bundleria käätämään JSX:ää. Graaffeja piirretään [Chart.js v3](https://www.chartjs.org/):lla. Ei oteta enempää kirjastoja mukaan, ylläpito taakan välttämiseksi.
