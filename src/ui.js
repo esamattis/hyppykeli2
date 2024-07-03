@@ -78,6 +78,7 @@ function Rows(props) {
                     >↑</span
                 >
             </td>
+            <td>${point.cloudCover?.toFixed(0) ?? "-1"}%</td>
             <td title=${point.time.toString()}>
                 ${point.time.toLocaleTimeString()}
             </td>
@@ -117,6 +118,7 @@ function DataTable(props) {
                     <th>Puuska</th>
                     <th>Tuuli</th>
                     <th>Suunta</th>
+                    <th>Pilvikatto</th>
                     <th>Aika</th>
                 </tr>
             </thead>

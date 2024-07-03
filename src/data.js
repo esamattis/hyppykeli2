@@ -12,6 +12,7 @@ import { signal } from "@preact/signals";
  * @property {number} gust
  * @property {number} speed
  * @property {number} direction
+ * @property {number|undefined} cloudCover
  * @property {Date} time
  */
 
@@ -366,6 +367,7 @@ export async function updateWeatherData() {
             gust: gust.value,
             speed: windSpeed[i]?.value ?? -1,
             direction: directions[i]?.value ?? -1,
+            cloudCover: undefined,
             time: gust.time,
         };
     });
@@ -395,7 +397,8 @@ export async function updateWeatherData() {
             timestep: 10,
             // parameters: FORECAST_PAREMETERS.join(","),
             // parameters: "WindGust",
-            parameters: "HourlyMaximumGust,WindDirection,WindSpeedMS",
+            parameters:
+                "HourlyMaximumGust,WindDirection,WindSpeedMS,MiddleAndLowCloudCover",
             // place: "Utti",
             latlon: coordinates,
         },
@@ -424,6 +427,11 @@ export async function updateWeatherData() {
         "mts-1-1-WindDirection",
     );
 
+    const cloudCoverForecasts = parseTimeSeries(
+        forecastXml,
+        "mts-1-1-MiddleAndLowCloudCover",
+    );
+
     /** @type {WeatherData[]} */
     const combinedForecasts = gustForecasts.map((gust, i) => {
         return {
@@ -431,6 +439,7 @@ export async function updateWeatherData() {
             direction: directionForecasts[i]?.value ?? -1,
             speed: speedForecasts[i]?.value ?? -1,
             time: gust.time,
+            cloudCover: cloudCoverForecasts[i]?.value,
         };
     });
 
