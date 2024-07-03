@@ -27,7 +27,8 @@ td {
 }
 
 .direction-value {
-    width: 100px;
+    width: 4ch;
+    display: inline-block;
     padding-right: 3px;
 }
 .direction {
