@@ -326,7 +326,8 @@ function Root() {
                 <h2>Pilvet</h2>
                 <${LatestMetar} />
 
-                <h2 id="latest">Tuuli</h2>
+                <div class="anchor" id="latest"></div>
+                <h2>Tuulet</h2>
 
                 <${Compass} />
 
@@ -336,12 +337,14 @@ function Root() {
 
                 <div class="colum-on-big-screen">
                     <div>
-                        <h2 class="sticky" id="observations">Havainnot</h2>
+                        <div class="anchor" id="observations"></div>
+                        <h2 class="sticky">Havainnot</h2>
                         <${DataTable} data=${OBSERVATIONS} />
                     </div>
 
                     <div>
-                        <h2 class="sticky" id="forecasts">Ennuste</h2>
+                        <div class="anchor" id="forecasts"></div>
+                        <h2 class="sticky">Ennuste</h2>
                         <${DataTable} data=${FORECASTS} />
                     </div>
                 </div>

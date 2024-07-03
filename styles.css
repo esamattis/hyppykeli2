@@ -185,3 +185,7 @@ dialog {
 .show-more {
     width: 20px;
 }
+
+.anchor {
+    height: 0;
+}
