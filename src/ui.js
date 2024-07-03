@@ -240,7 +240,10 @@ function LatestMetar() {
             <em class="metar">${latest.metar}</em>
         </p>
 
-        <small>Lentokentän korkeus meren pinnasta ${latest.elevation}M</small>
+        <small
+            >Lentokentän korkeus meren pinnasta
+            ${latest.elevation.toFixed(0)}M</small
+        >
     `;
 }
 
@@ -286,7 +289,7 @@ function Root() {
                       `
                     : "Ladataan..."}
 
-                <p>
+                <p class="disclaimer">
                     Tietojen käyttö omalla vastuulla. Ei takeita että tiedot
                     ovat oikein.
                 </p>

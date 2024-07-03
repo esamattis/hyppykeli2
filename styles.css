@@ -169,6 +169,11 @@ dialog {
     }
 }
 
+.disclaimer {
+    font-style: italic;
+    font-size: 80%;
+}
+
 .sticky {
     position: sticky;
     top: 0;
