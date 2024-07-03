@@ -11,9 +11,9 @@ import { FORECASTS, OBSERVATIONS, NAME, LATLONG } from "./data.js";
  * @param {Chart} fore
  */
 function updateCharts(obs, fore) {
-    obs.data.labels = OBSERVATIONS.value.map((point) =>
-        point.time.toLocaleTimeString(),
-    ).reverse();
+    obs.data.labels = OBSERVATIONS.value
+        .map((point) => point.time.toLocaleTimeString())
+        .reverse();
     fore.data.labels = FORECASTS.value.map((point) =>
         point.time.toLocaleTimeString(),
     );
