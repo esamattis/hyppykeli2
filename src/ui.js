@@ -246,7 +246,7 @@ function Root() {
                           Katso havaintoaseman${" "}
                           <a href="https://www.google.fi/maps/place/${LATLONG}"
                               >${STATION_NAME} sijainti</a
-                          >
+                          >.
                       `
                     : "Ladataan..."}
 
