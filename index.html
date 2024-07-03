@@ -37,6 +37,7 @@
             <h2>Luo droppis</h2>
 
             <form action="/dz">
+                <input type="text" name="icaocode" placeholder="ICAO" />
                 <input type="text" name="fmisid" placeholder="FMISID" />
                 <button>Luo</button>
             </form>
@@ -45,9 +46,11 @@
                 Hae havaintoaseman FMISID
                 <a href="https://www.ilmatieteenlaitos.fi/havaintoasemat"
                     >täältä</a
-                >. Tallenna luotu linkki vaikka bookmarkkeihin. Voit myös
+                >. <i>ICAO</i> on nelikirjaminen lentokentän tunnus (esim.
+                EFUT). Tallenna luotu linkki vaikka bookmarkkeihin. Voit myös
                 lähettää
                 <a
+                    class="ext"
                     href="https://github.com/esamattis/parempi.hyppykeli.fi/blob/main/index.html"
                     >Githubin PR</a
                 >:llä lisättäväksi ylempänä olevaan listaan.

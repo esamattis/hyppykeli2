@@ -105,9 +105,15 @@ p {
     font-size: 130%;
 }
 
+.ext,
+.ext:visited,
 a[href^="http"]:not([href*="hyppykeli.fi"]),
 a[href^="http"]:not([href*="hyppykeli.fi"]):visited {
     color: black;
     border-bottom: 1px dashed blue;
     text-decoration: none;
+}
+
+input[type="text"] {
+    width: 10ch;
 }
