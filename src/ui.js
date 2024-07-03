@@ -234,7 +234,7 @@ function LatestMetar() {
     if (latest?.clouds.length === 0) {
         return html`
             <p>
-                Ei pilvikerroksia.${" "}
+                Ei pilviä alle 1500M (CAVOK) ${" "}
                 <${FromNow} date=${latest.time} />
             </p>
 
@@ -251,7 +251,7 @@ function LatestMetar() {
                     html`<li>
                         <a href=${cloud.href}
                             >${CLOUD_TYPES[cloud.amount] ?? cloud.amount}</a
-                        >${" "} ${hectoFeetToMeters(cloud.base).toFixed(0)} M
+                        >${" "} ${hectoFeetToMeters(cloud.base).toFixed(0)}M
                         ${" "}
                     </li>`,
             )}
