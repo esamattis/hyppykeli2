@@ -126,47 +126,14 @@ export function Graph() {
             return;
         }
 
-        /** @type {ReturnType<typeof setTimeout>} */
-        let timer;
-
-        /**
-         * @param {MouseEvent} event
-         * @param {any} chartElement
-         */
-        const onHover = (event, chartElement) => {
-            clearTimeout(timer);
-            timer = setTimeout(() => {
-                HOVERED_OBSERVATION.value = undefined;
-            }, 10_000);
-
-            const points = obsChart.getElementsAtEventForMode(
-                event,
-                "index",
-                {
-                    axis: "x",
-                    intersect: false,
-                },
-                false,
-            );
-
-            const index = points[0]?.index;
-            if (index !== undefined) {
-                const reversedIndex = OBSERVATIONS.value.length - index - 1;
-                const obs = OBSERVATIONS.value[reversedIndex];
-                if (obs) {
-                    HOVERED_OBSERVATION.value = obs;
-                }
-            }
-        };
-
         const obsOptions = structuredClone(options);
         const foreOptions = structuredClone(options);
 
-        obsOptions.options.onHover = onHover;
-        foreOptions.options.onHover = onHover;
-
         const obsChart = new Chart(obsChartRef.current, obsOptions);
         const foreChart = new Chart(foreChartRef.current, foreOptions);
+
+        obsChart.options.onHover = createHoverHandler(OBSERVATIONS);
+        foreChart.options.onHover = createHoverHandler(FORECASTS);
 
         effect(() => {
             updateCharts(obsChart, foreChart);
@@ -188,8 +155,58 @@ export function Graph() {
             <canvas ref=${obsChartRef}></canvas>
         </div>
         <h2 id="forecast-graph">Ennusteet</h2>
-        <div class="chart">
+        <div class="chart" onMouseLeave=${onMouseLeaveObs}>
             <canvas ref=${foreChartRef}></canvas>
         </div>
     </div>`;
+}
+
+/**
+ * @typedef {import('@preact/signals').Signal<T>} Signal<T>
+ * @template {any} T
+ */
+
+/**
+ * @param {Signal<import("./data.js").WeatherData[]>} signal
+ */
+function createHoverHandler(signal) {
+    /** @type {ReturnType<typeof setTimeout>} */
+    // let timer;
+
+    /**
+     * @param {import("chart.js").ChartEvent} event
+     * @param {import("chart.js").ActiveElement[]} elements
+     * @param {Chart} chart
+     */
+    const onHover = (event, elements, chart) => {
+        // clearTimeout(timer);
+
+        // // Automatically clear hover after a timeout. On mobile devices the state can get stuck
+        // timer = setTimeout(() => {
+        //     HOVERED_OBSERVATION.value = undefined;
+        // }, 10_000);
+
+        const points = chart.getElementsAtEventForMode(
+            // @ts-ignore
+            event,
+            "index",
+            {
+                axis: "x",
+                intersect: false,
+            },
+            false,
+        );
+
+        const index = points[0]?.index;
+        if (index !== undefined) {
+            const reversedIndex = signal.value.length - index - 1;
+            const obs = signal.value[reversedIndex];
+            if (obs) {
+                console.log("value", obs.gust);
+                HOVERED_OBSERVATION.value = obs;
+            }
+        }
+    };
+
+    return onHover;
 }

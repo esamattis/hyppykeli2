@@ -273,7 +273,7 @@ async function updateWeatherData() {
                 starttime: obsStartTime.toISOString(),
                 icaocode,
             },
-            // "/example_data/metar.xml",
+            "/example_data/metar.xml",
         ).then((xml) => {
             if (!xml) {
                 addError(`Tuntematon lentokenttä tunnus ${icaocode}.`);
@@ -301,7 +301,7 @@ async function updateWeatherData() {
             parameters: OBSERVATION_PARAMETERS.join(","),
             fmisid,
         },
-        // "/example_data/observations.xml",
+        "/example_data/observations.xml",
     );
 
     if (!doc) {
