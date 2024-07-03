@@ -206,7 +206,6 @@ function createHoverHandler(signal, reverse) {
 
             const obs = signal.value[index];
             if (obs) {
-                console.log("value", obs.gust);
                 HOVERED_OBSERVATION.value = obs;
             }
         }
