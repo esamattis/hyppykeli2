@@ -15,21 +15,28 @@ import { Graph } from "./graph.js";
  */
 
 /**
+ * @param {number} gust
+ */
+function getWarningLevel(gust) {
+    let className = "ok";
+
+    if (gust >= 8) {
+        className = "warning";
+    }
+
+    if (gust >= 11) {
+        className = "danger";
+    }
+
+    return className;
+}
+
+/**
  * @param {Object} props
  * @param {Signal<WeatherData[]>} props.data
  */
 function Rows(props) {
     return props.data.value.map((point) => {
-        let className = "ok";
-
-        if (point.gust >= 8) {
-            className = "warning";
-        }
-
-        if (point.gust >= 11) {
-            className = "danger";
-        }
-
         // const clock24 = point.time.toLocaleTimeString([], {
         //     hour: "2-digit",
         //     minute: "2-digit",
@@ -37,7 +44,7 @@ function Rows(props) {
         // });
 
         return html`<tr>
-            <td class=${className}>${point.gust} m/s</td>
+            <td class=${getWarningLevel(point.gust)}>${point.gust} m/s</td>
             <td>${point.speed} m/s</td>
             <td>
                 <span class="direction-value">${point.direction}°</span>
@@ -76,11 +83,34 @@ function DataTable(props) {
     `;
 }
 
+function Latest() {
+    const latest = OBSERVATIONS.value[0];
+    if (!latest) {
+        return html`<p>Ladataan...</p>`;
+    }
+
+    return html`
+        <p>
+            Puuska
+            <span
+                class=${"latest-value latest-gust " +
+                getWarningLevel(latest.gust)}
+            >
+                ${" "}${latest.gust} m/s${" "}
+            </span>
+            Tuuli
+            <span class="latest-value latest-wind"
+                >${" "}${latest.speed} m/s${" "}</span
+            >
+        </p>
+    `;
+}
+
 function Root() {
     return html`
         <div>
             <div class="content">
-                <h1>
+                <h1 id="#top">
                     <a class="logo" href="/"> Hyppykeli</a> –${" "}
                     <span id="title">${NAME}</span>
                 </h1>
@@ -94,6 +124,10 @@ function Root() {
                     ovat oikein.
                 </p>
 
+                <h2 id="latest">Viimeisimmät havainnot</h2>
+
+                <${Latest} />
+
                 <${Graph} />
 
                 <h2 id="observations">Havainnot</h2>
@@ -104,6 +138,8 @@ function Root() {
             </div>
 
             <div class="sticky-footer">
+                <a href="#top">⬆️</a>
+                <span class="ball">ᐧ</span>
                 <a href="#observation-graph">Havainnot 📈</a>
                 <span class="ball">ᐧ</span>
                 <a href="#forecast-graph">Ennuste 📈</a>

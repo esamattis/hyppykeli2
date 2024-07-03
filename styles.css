@@ -98,3 +98,8 @@ p {
     height: clamp(350px, 70vh, 600px);
     border: 1px solid black;
 }
+
+.latest-value {
+    font-weight: bold;
+    font-size: 120%;
+}
