@@ -16,9 +16,30 @@ import { signal } from "@preact/signals";
  */
 
 /**
- * @type {Signal<string>}
+ * @typedef {Object} CloudLayer
+ * @property {number} base
+ * @property {string} amount
+ * @property {string} unit
+ * @property {string} href
  */
-export const NAME = signal("Loading...");
+
+/**
+ * @typedef {Object} MetarData
+ * @property {CloudLayer[]} clouds
+ * @property {string} metar
+ * @property {Date} time
+ * @property {number} elevation
+ */
+
+/**
+ * @type {Signal<string|undefined>}
+ */
+export const NAME = signal(undefined);
+
+/**
+ * @type {Signal<string | undefined>}
+ */
+export const STATION_NAME = signal(undefined);
 
 /**
  * @type {Signal<WeatherData[]>}
@@ -29,6 +50,11 @@ export const OBSERVATIONS = signal([]);
  * @type {Signal<WeatherData[]>}
  */
 export const FORECASTS = signal([]);
+
+/**
+ * @type {Signal<MetarData[] | undefined>}
+ */
+export const METARS = signal(undefined);
 
 /**
  * @type {Signal<string|null>}
@@ -53,10 +79,11 @@ const FORECAST_PAREMETERS = [
  * Makes a request to the FMI API with the given options.
  * @param {string} storedQuery - The stored query ID for the request.
  * @param {Object} params - The parameters for the request.
+ * @param {string} [mock]
  * @returns {Promise<Document>} The parsed XML document from the response.
  * @throws Will throw an error if the request fails.
  */
-export async function fmiRequest(storedQuery, params) {
+export async function fmiRequest(storedQuery, params, mock) {
     const url = new URL(`https://opendata.fmi.fi/wfs?request=getFeature`);
     url.searchParams.set("storedquery_id", storedQuery);
     for (const [k, v] of Object.entries(params)) {
@@ -64,7 +91,7 @@ export async function fmiRequest(storedQuery, params) {
     }
 
     try {
-        const response = await fetch(url);
+        const response = await fetch(mock ?? url);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -134,16 +161,99 @@ function parseTimeSeries(doc, id) {
     return pointsToTimeSeries(node);
 }
 
+/**
+ * @param {Document} xml
+ * @returns {MetarData[]}
+ */
+function parseClouds(xml) {
+    const members = Array.from(xml.querySelectorAll("member"));
+
+    return members.flatMap((member) => {
+        const time = new Date(
+            member.querySelector("timePosition")?.innerHTML ?? new Date(),
+        );
+
+        const elevation = Number(
+            member.querySelector("fieldElevation")?.innerHTML ?? -1,
+        );
+
+        const metar = member.querySelector("source input")?.innerHTML;
+
+        if (!metar) {
+            return [];
+        }
+
+        const cloudNodes = member
+            .querySelector("MeteorologicalAerodromeObservationRecord cloud")
+            ?.querySelectorAll("CloudLayer");
+
+        const clouds = Array.from(cloudNodes ?? []).flatMap((xml) => {
+            const base = xml.querySelector("base");
+            if (!base) {
+                return [];
+            }
+
+            const amountHref = xml
+                .querySelector("amount")
+                ?.getAttribute("xlink:href");
+
+            if (!amountHref) {
+                return [];
+            }
+
+            // https://codes.wmo.int/bufr4/codeflag/0-20-008/1
+            const amount = new URL(amountHref).pathname.split("/").pop();
+
+            if (!amount) {
+                return [];
+            }
+
+            return {
+                amount,
+                base: Number(base?.innerHTML),
+                unit: base?.getAttribute("uom") ?? "?",
+                href: amountHref,
+            };
+        });
+
+        return {
+            time,
+            elevation,
+            clouds,
+            metar,
+        };
+    });
+}
+
 async function updateWeatherData() {
     const url = new URL(location.href);
     const fmisid = url.searchParams.get("fmisid");
+    const icaocode = url.searchParams.get("icaocode");
     const obsRange = Number(url.searchParams.get("observation_range")) || 12;
     const forecastRange = Number(url.searchParams.get("forecast_range")) || 8;
+
+    NAME.value = icaocode ?? undefined;
 
     const obsStartTime = new Date();
     obsStartTime.setHours(obsStartTime.getHours() - obsRange, 0, 0, 0);
 
     const cacheBust = Math.floor(Date.now() / 30_000);
+
+    if (icaocode) {
+        fmiRequest(
+            "fmi::avi::observations::iwxxm",
+            {
+                cch: cacheBust,
+                starttime: obsStartTime.toISOString(),
+                icaocode,
+            },
+            // "/example_data/metar.xml",
+        ).then((xml) => {
+            const clouds = parseClouds(xml);
+            console.log("clouds", clouds);
+            METARS.value = clouds;
+        });
+    }
 
     const doc = await fmiRequest("fmi::observations::weather::timevaluepair", {
         cch: cacheBust,
@@ -164,7 +274,10 @@ async function updateWeatherData() {
         return;
     }
 
-    NAME.value = name;
+    STATION_NAME.value = name;
+    if (!NAME.value) {
+        NAME.value = name;
+    }
 
     const coordinates = doc
         .querySelector("pos")

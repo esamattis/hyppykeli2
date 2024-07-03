@@ -104,3 +104,10 @@ p {
     font-weight: bold;
     font-size: 130%;
 }
+
+a[href^="http"]:not([href*="hyppykeli.fi"]),
+a[href^="http"]:not([href*="hyppykeli.fi"]):visited {
+    color: black;
+    border-bottom: 1px dashed blue;
+    text-decoration: none;
+}

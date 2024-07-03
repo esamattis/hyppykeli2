@@ -2,7 +2,14 @@
 import { render } from "preact";
 import { useCallback, useEffect, useState } from "preact/hooks";
 import { html } from "htm/preact";
-import { FORECASTS, OBSERVATIONS, NAME, LATLONG } from "./data.js";
+import {
+    FORECASTS,
+    OBSERVATIONS,
+    NAME,
+    LATLONG,
+    METARS,
+    STATION_NAME,
+} from "./data.js";
 
 import { Graph } from "./graph.js";
 
@@ -106,23 +113,30 @@ function useInterval(setter) {
     return state;
 }
 
-function Latest() {
+/**
+ * @param {Date} date
+ */
+function formatFromNow(date) {
+    return new Intl.RelativeTimeFormat("fi").format(
+        Math.round(-(Date.now() - date.getTime()) / 1000 / 60),
+        "minutes",
+    );
+}
+
+function LatestGust() {
     const latest = OBSERVATIONS.value[0];
     const createFromNow = useCallback(() => {
         if (!latest) {
             return "";
         }
 
-        return new Intl.RelativeTimeFormat("fi").format(
-            Math.round(-(Date.now() - latest.time.getTime()) / 1000 / 60),
-            "minutes",
-        );
+        return formatFromNow(latest.time);
     }, [latest]);
 
     const fromNow = useInterval(createFromNow);
 
     if (!latest) {
-        return html`<p>Ladataan...</p>`;
+        return html`<p>Ladataan tuulitietoja...</p>`;
     }
 
     return html`
@@ -143,6 +157,74 @@ function Latest() {
     `;
 }
 
+/**
+ * @param {number} hectoMeters
+ * @returns {number}
+ */
+function hectoFeetToMeters(hectoMeters) {
+    return hectoMeters * 30.48;
+}
+
+// const CLOUDS = {
+//     NCD: "Ei pilviä",
+//     VV: "SUMUA PERKELE",
+//     NSC: "Yksittäisiä",
+//     FEW: "Muutamia",
+//     SCT: "Hajanaisia",
+//     BKN: "Rakoileva",
+//     OVC: "Täysi pilvikatto",
+// };
+
+/**
+ * @type {Record<string, string>}
+ */
+const CLOUD_TYPES = {
+    1: "Muutamia", // Few
+    2: "Hajanaisia", // Scattered
+    3: "Rikkonainen", // Broken
+    4: "Täysi pilvikatto", // Overcast
+};
+
+function LatestMetar() {
+    const latest = METARS.value?.at(-1);
+    if (!latest) {
+        return html`<p>Ladataan METAR-sanomaa...</p>`;
+    }
+
+    if (latest?.clouds.length === 0) {
+        return html`
+            <p>Ei pilvikerroksia. ${formatFromNow(latest.time)}</p>
+
+            <p>
+                <em class="metar">${latest.metar}</em>
+            </p>
+        `;
+    }
+
+    return html`
+        <p>Pilvikerrokset${" "}</p>
+
+        <ul>
+            ${latest.clouds.map(
+                (cloud, i) =>
+                    html`<li>
+                        <a href=${cloud.href}
+                            >${CLOUD_TYPES[cloud.amount] ?? cloud.amount}</a
+                        >${" "} ${hectoFeetToMeters(cloud.base)} M ${" "}
+                    </li>`,
+            )}
+        </ul>
+
+        <p>${formatFromNow(latest.time)}</p>
+
+        <p>
+            <em class="metar">${latest.metar}</em>
+        </p>
+
+        <small>Lentokentän korkeus meren pinnasta ${latest.elevation}M</small>
+    `;
+}
+
 function Root() {
     return html`
         <div>
@@ -152,9 +234,14 @@ function Root() {
                     <span id="title">${NAME}</span>
                 </h1>
 
-                <a href="https://www.google.fi/maps/place/${LATLONG}"
-                    >Katso havaintoaseman sijainti</a
-                >
+                ${STATION_NAME.value
+                    ? html`
+                          Katso havaintoaseman${" "}
+                          <a href="https://www.google.fi/maps/place/${LATLONG}"
+                              >${STATION_NAME} sijainti</a
+                          >
+                      `
+                    : "Ladataan..."}
 
                 <p>
                     Tietojen käyttö omalla vastuulla. Ei takeita että tiedot
@@ -163,7 +250,8 @@ function Root() {
 
                 <h2 id="latest">Viimeisimmät havainnot</h2>
 
-                <${Latest} />
+                <${LatestGust} />
+                <${LatestMetar} />
 
                 <${Graph} />
 
