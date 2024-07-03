@@ -16,6 +16,12 @@ import {
 import { Graph } from "./graph.js";
 import { Compass } from "./compass.js";
 
+NAME.subscribe((val) => {
+    if (val) {
+        document.title = val + " – Hyppykeli";
+    }
+});
+
 /**
  * @typedef {import('./data.js').WeatherData} WeatherData
  */
