@@ -37,6 +37,11 @@ import { signal } from "@preact/signals";
 export const NAME = signal(undefined);
 
 /**
+ * @type {Signal<number>}
+ */
+export const LOADING = signal(0);
+
+/**
  * @type {Signal<string | undefined>}
  */
 export const STATION_NAME = signal(undefined);
@@ -105,26 +110,31 @@ export async function fmiRequest(storedQuery, params, mock) {
         url.searchParams.set(k, v);
     }
 
-    const response = await fetch(mock ?? url);
-    if (response.status === 404) {
-        return;
-    }
-
-    if (!response.ok) {
-        return "error";
-    }
-
-    let data;
+    LOADING.value += 1;
     try {
-        const text = await response.text();
-        const parser = new DOMParser();
-        data = parser.parseFromString(text, "application/xml");
-    } catch (error) {
-        console.error("ERROR", url.toString(), error);
-        return "error";
-    }
+        const response = await fetch(mock ?? url);
+        if (response.status === 404) {
+            return;
+        }
 
-    return data;
+        if (!response.ok) {
+            return "error";
+        }
+
+        let data;
+        try {
+            const text = await response.text();
+            const parser = new DOMParser();
+            data = parser.parseFromString(text, "application/xml");
+        } catch (error) {
+            console.error("ERROR", url.toString(), error);
+            return "error";
+        }
+
+        return data;
+    } finally {
+        LOADING.value -= 1;
+    }
 }
 
 /**
@@ -255,7 +265,7 @@ function addError(msg) {
     ERRORS.value = [...ERRORS.value, msg];
 }
 
-async function updateWeatherData() {
+export async function updateWeatherData() {
     ERRORS.value = [];
     const url = new URL(location.href);
     const fmisid = url.searchParams.get("fmisid");

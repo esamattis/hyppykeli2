@@ -11,6 +11,8 @@ import {
     STATION_NAME,
     ERRORS,
     HOVERED_OBSERVATION,
+    updateWeatherData,
+    LOADING,
 } from "./data.js";
 
 import { Graph } from "./graph.js";
@@ -241,6 +243,19 @@ function LatestMetar() {
     `;
 }
 
+function UpdateButton() {
+    return html`
+        <button
+            disabled=${LOADING.value > 0}
+            onClick=${() => {
+                updateWeatherData();
+            }}
+        >
+            ${LOADING.value > 0 ? `Ladataan ${LOADING.value}...` : "Päivitä"}
+        </button>
+    `;
+}
+
 function Root() {
     const history = !!HOVERED_OBSERVATION.value;
     return html`
@@ -273,6 +288,10 @@ function Root() {
                 <p>
                     Tietojen käyttö omalla vastuulla. Ei takeita että tiedot
                     ovat oikein.
+                </p>
+
+                <p>
+                    <${UpdateButton} />
                 </p>
 
                 <h2>Pilvet</h2>
