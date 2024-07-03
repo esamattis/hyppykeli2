@@ -91,7 +91,10 @@ function Rows(props) {
                   <tr>
                       <td>
                           <div class="show-more">
-                              <button onClick=${() => setShowAll(true)}>
+                              <button
+                                  type="button"
+                                  onClick=${() => setShowAll(true)}
+                              >
                                   Näytä kaikki
                               </button>
                           </div>
