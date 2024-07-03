@@ -1,6 +1,6 @@
 // @ts-check
 import { render } from "preact";
-import { html } from "htm/preact";
+import { html, useCallback, useEffect, useState } from "htm/preact";
 import { FORECASTS, OBSERVATIONS, NAME, LATLONG } from "./data.js";
 
 import { Graph } from "./graph.js";
@@ -83,8 +83,43 @@ function DataTable(props) {
     `;
 }
 
+/**
+ * Set value returned by the setter function to the state every second.
+ *
+ * @param {() => T} setter
+ * @template {any} T
+ * @returns {T}
+ */
+function useInterval(setter) {
+    const [state, setState] = useState(/** @type {T} */ (setter()));
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setState(setter());
+        }, 1000);
+
+        return () => {
+            clearInterval(interval);
+        };
+    }, [setter]);
+
+    return state;
+}
+
 function Latest() {
     const latest = OBSERVATIONS.value[0];
+    const createFromNow = useCallback(() => {
+        if (!latest) {
+            return "";
+        }
+
+        return new Intl.RelativeTimeFormat("fi").format(
+            Math.round(-(Date.now() - latest.time.getTime()) / 1000 / 60),
+            "minutes",
+        );
+    }, [latest]);
+
+    const fromNow = useInterval(createFromNow);
+
     if (!latest) {
         return html`<p>Ladataan...</p>`;
     }
@@ -102,6 +137,7 @@ function Latest() {
             <span class="latest-value latest-wind"
                 >${" "}${latest.speed} m/s${" "}</span
             >
+            ${fromNow}
         </p>
     `;
 }
