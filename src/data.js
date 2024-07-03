@@ -217,7 +217,7 @@ async function updateWeatherData() {
             timestep: 10,
             // parameters: FORECAST_PAREMETERS.join(","),
             // parameters: "WindGust",
-            // parameters: "HourlyMaximumGust,WindDirection",
+            parameters: "HourlyMaximumGust,WindDirection,WindSpeedMS",
             // place: "Utti",
             latlon: coordinates,
         },
@@ -228,7 +228,7 @@ async function updateWeatherData() {
         "mts-1-1-HourlyMaximumGust",
     );
 
-    const speedForecasts = parseTimeSeries(forecastXml, "mts-1-1-WindSpeedM");
+    const speedForecasts = parseTimeSeries(forecastXml, "mts-1-1-WindSpeedMS");
 
     const directionForecasts = parseTimeSeries(
         forecastXml,
