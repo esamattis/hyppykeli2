@@ -150,10 +150,6 @@ dialog {
     font-family: monospace;
 }
 
-.compass {
-    background-color: white;
-}
-
 @media (min-width: 1024px) {
     .compass {
         position: fixed;

@@ -126,8 +126,6 @@ export function Graph() {
             return;
         }
 
-        const obsOptions = structuredClone(options);
-
         /** @type {ReturnType<typeof setTimeout>} */
         let timer;
 
@@ -161,13 +159,14 @@ export function Graph() {
             }
         };
 
+        const obsOptions = structuredClone(options);
+        const foreOptions = structuredClone(options);
+
         obsOptions.options.onHover = onHover;
+        foreOptions.options.onHover = onHover;
 
         const obsChart = new Chart(obsChartRef.current, obsOptions);
-        const foreChart = new Chart(
-            foreChartRef.current,
-            structuredClone(options),
-        );
+        const foreChart = new Chart(foreChartRef.current, foreOptions);
 
         effect(() => {
             updateCharts(obsChart, foreChart);
