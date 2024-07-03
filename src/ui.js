@@ -1,6 +1,7 @@
 // @ts-check
 import { render } from "preact";
-import { html, useCallback, useEffect, useState } from "htm/preact";
+import { useCallback, useEffect, useState } from "preact/hooks";
+import { html } from "htm/preact";
 import { FORECASTS, OBSERVATIONS, NAME, LATLONG } from "./data.js";
 
 import { Graph } from "./graph.js";
