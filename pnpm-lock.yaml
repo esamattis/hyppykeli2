@@ -20,6 +20,9 @@ dependencies:
   preact:
     specifier: ^10.22.0
     version: 10.22.0
+  prettier:
+    specifier: ^3.3.2
+    version: 3.3.2
   typescript:
     specifier: ^5.5.3
     version: 5.5.3
@@ -294,6 +297,12 @@ packages:
 
   /preact@10.22.0:
     resolution: {integrity: sha512-RRurnSjJPj4rp5K6XoP45Ui33ncb7e4H7WiOHVpjbkvqvA3U+N8Z6Qbo0AE6leGYBV66n8EhEaFixvIu3SkxFw==}
+    dev: false
+
+  /prettier@3.3.2:
+    resolution: {integrity: sha512-rAVeHYMcv8ATV5d508CFdn+8/pHPpXeIid1DdrPwXnaAdH7cqjVbpJaT5eq4yRAFU/lsbwYwSF/n5iNrdJHPQA==}
+    engines: {node: '>=14'}
+    hasBin: true
     dev: false
 
   /typescript@5.5.3:
