@@ -149,3 +149,16 @@ dialog {
     font-size: 70%;
     font-family: monospace;
 }
+
+.compass {
+    background-color: white;
+}
+
+@media (min-width: 1024px) {
+    .compass {
+        position: fixed;
+        top: 0;
+        right: 0;
+        flex-direction: column;
+    }
+}
