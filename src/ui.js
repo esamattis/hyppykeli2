@@ -114,27 +114,28 @@ function useInterval(setter) {
 }
 
 /**
- * @param {Date} date
+ * @param {Object} props
+ * @param {Date} [props.date]
  */
-function formatFromNow(date) {
-    return new Intl.RelativeTimeFormat("fi").format(
-        Math.round(-(Date.now() - date.getTime()) / 1000 / 60),
-        "minutes",
-    );
+function FromNow(props) {
+    const createFromNow = useCallback(() => {
+        if (!props.date) {
+            return "";
+        }
+
+        return new Intl.RelativeTimeFormat("fi").format(
+            Math.round(-(Date.now() - props.date.getTime()) / 1000 / 60),
+            "minutes",
+        );
+    }, [props.date]);
+
+    const fromNow = useInterval(createFromNow);
+
+    return html`<span class="from-now">${fromNow}</span> `;
 }
 
 function LatestGust() {
     const latest = OBSERVATIONS.value[0];
-    const createFromNow = useCallback(() => {
-        if (!latest) {
-            return "";
-        }
-
-        return formatFromNow(latest.time);
-    }, [latest]);
-
-    const fromNow = useInterval(createFromNow);
-
     if (!latest) {
         return html`<p>Ladataan tuulitietoja...</p>`;
     }
@@ -152,7 +153,7 @@ function LatestGust() {
             <span class="latest-value latest-wind"
                 >${" "}${latest.speed} m/s${" "}</span
             >
-            ${fromNow}
+            <${FromNow} date=${latest.time} />
         </p>
     `;
 }
@@ -187,13 +188,17 @@ const CLOUD_TYPES = {
 
 function LatestMetar() {
     const latest = METARS.value?.at(-1);
+
     if (!latest) {
         return html`<p>Ladataan METAR-sanomaa...</p>`;
     }
 
     if (latest?.clouds.length === 0) {
         return html`
-            <p>Ei pilvikerroksia. ${formatFromNow(latest.time)}</p>
+            <p>
+                Ei pilvikerroksia.
+                <${FromNow} date=${latest.time} />
+            </p>
 
             <p>
                 <em class="metar">${latest.metar}</em>
@@ -215,7 +220,9 @@ function LatestMetar() {
             )}
         </ul>
 
-        <p>${formatFromNow(latest.time)}</p>
+        <p>
+            <${FromNow} date=${latest.time} />
+        </p>
 
         <p>
             <em class="metar">${latest.metar}</em>
