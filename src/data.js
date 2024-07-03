@@ -94,6 +94,11 @@ const FORECAST_PAREMETERS = [
  * @throws Will throw an error if the request fails.
  */
 export async function fmiRequest(storedQuery, params, mock) {
+    const allowMock = new URL(location.href).searchParams.has("mock");
+    if (!allowMock) {
+        mock = undefined;
+    }
+
     const url = new URL(`https://opendata.fmi.fi/wfs?request=getFeature`);
     url.searchParams.set("storedquery_id", storedQuery);
     for (const [k, v] of Object.entries(params)) {
@@ -384,6 +389,7 @@ async function updateWeatherData() {
             // place: "Utti",
             latlon: coordinates,
         },
+        "/example_data/forecast.xml",
     );
 
     if (forecastXml === "error") {
