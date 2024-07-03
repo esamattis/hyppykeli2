@@ -117,3 +117,7 @@ a[href^="http"]:not([href*="hyppykeli.fi"]):visited {
 input[type="text"] {
     width: 10ch;
 }
+
+.errors p {
+    color: red;
+}

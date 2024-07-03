@@ -61,6 +61,11 @@ export const METARS = signal(undefined);
  */
 export const LATLONG = signal(null);
 
+/**
+ * @type {Signal<string[]>}
+ */
+export const ERRORS = signal([]);
+
 const OBSERVATION_PARAMETERS = [
     "winddirection",
     "windspeedms",
@@ -80,7 +85,7 @@ const FORECAST_PAREMETERS = [
  * @param {string} storedQuery - The stored query ID for the request.
  * @param {Object} params - The parameters for the request.
  * @param {string} [mock]
- * @returns {Promise<Document>} The parsed XML document from the response.
+ * @returns {Promise<Document|undefined|"error">} The parsed XML document from the response.
  * @throws Will throw an error if the request fails.
  */
 export async function fmiRequest(storedQuery, params, mock) {
@@ -90,18 +95,26 @@ export async function fmiRequest(storedQuery, params, mock) {
         url.searchParams.set(k, v);
     }
 
+    const response = await fetch(mock ?? url);
+    if (response.status === 404) {
+        return;
+    }
+
+    if (!response.ok) {
+        return "error";
+    }
+
+    let data;
     try {
-        const response = await fetch(mock ?? url);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
         const text = await response.text();
         const parser = new DOMParser();
-        const data = parser.parseFromString(text, "application/xml");
-        return data;
+        data = parser.parseFromString(text, "application/xml");
     } catch (error) {
-        throw error;
+        console.error("ERROR", url.toString(), error);
+        return "error";
     }
+
+    return data;
 }
 
 /**
@@ -225,7 +238,15 @@ function parseClouds(xml) {
     });
 }
 
+/**
+ * @param {string} msg
+ */
+function addError(msg) {
+    ERRORS.value = [...ERRORS.value, msg];
+}
+
 async function updateWeatherData() {
+    ERRORS.value = [];
     const url = new URL(location.href);
     const fmisid = url.searchParams.get("fmisid");
     const icaocode = url.searchParams.get("icaocode");
@@ -249,10 +270,21 @@ async function updateWeatherData() {
             },
             // "/example_data/metar.xml",
         ).then((xml) => {
+            if (!xml) {
+                addError(`Tuntematon lentokenttä tunnus ${icaocode}.`);
+                return;
+            }
+
+            if (xml === "error") {
+                addError(`Virhe METAR-sanomaa hakiessa kentälle ${icaocode}.`);
+                return;
+            }
+
             const clouds = parseClouds(xml);
-            console.log("clouds", clouds);
             METARS.value = clouds;
         });
+    } else {
+        addError("Lentokenttä tunnus (ICAO) puuttuu.");
     }
 
     const doc = await fmiRequest("fmi::observations::weather::timevaluepair", {
@@ -263,6 +295,16 @@ async function updateWeatherData() {
         fmisid,
     });
 
+    if (!doc) {
+        addError(`Havaintoasemaa ${fmisid} ei löytynyt.`);
+        return;
+    }
+
+    if (doc === "error") {
+        addError(`Virhe havaintoaseman ${fmisid} tietojen hakemisessa.`);
+        return;
+    }
+
     // <gml:name codeSpace="http://xml.fmi.fi/namespace/locationcode/name">Kouvola Utti lentoasema</gml:name>
     const name = xpath(
         doc,
@@ -270,7 +312,7 @@ async function updateWeatherData() {
     )?.innerHTML;
 
     if (!name) {
-        NAME.value = "Bad station?";
+        addError(`Havaintoasema ${fmisid} ei taida toimia tässä.`);
         return;
     }
 
@@ -335,6 +377,16 @@ async function updateWeatherData() {
             latlon: coordinates,
         },
     );
+
+    if (forecastXml === "error") {
+        addError("Virhe ennusteiden hakemisessa.");
+        return;
+    }
+
+    if (!forecastXml) {
+        addError("Ennusteita ei löytynyt");
+        return;
+    }
 
     const gustForecasts = parseTimeSeries(
         forecastXml,

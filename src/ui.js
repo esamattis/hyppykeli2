@@ -9,6 +9,7 @@ import {
     LATLONG,
     METARS,
     STATION_NAME,
+    ERRORS,
 } from "./data.js";
 
 import { Graph } from "./graph.js";
@@ -236,6 +237,16 @@ function Root() {
     return html`
         <div>
             <div class="content">
+                ${ERRORS.value.length > 0
+                    ? html`
+                          <div class="errors">
+                              ${ERRORS.value.map((error) => {
+                                  return html` <p>${error}</p> `;
+                              })}
+                          </div>
+                      `
+                    : null}
+
                 <h1 id="#top">
                     <a class="logo" href="/"> Hyppykeli</a> –${" "}
                     <span id="title">${NAME}</span>
