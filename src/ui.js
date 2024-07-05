@@ -257,37 +257,29 @@ function LatestMetar() {
         return html`<p>Ladataan METAR-sanomaa...</p>`;
     }
 
-    if (latest?.clouds.length === 0) {
-        return html`
-            <p>
-                Ei pilviä alle 1500M (CAVOK) ${" "}
-                <${FromNow} date=${latest.time} />
-            </p>
-
-            <p>
-                <span class="metar">${latest.metar}</span>
-            </p>
-        `;
-    }
-
     return html`
         <ul>
-            ${latest.clouds.map(
-                (cloud, i) =>
-                    html`<li>
-                        <a href=${cloud.href}
-                            >${CLOUD_TYPES[cloud.amount] ?? cloud.amount}</a
-                        >${" "} ${hectoFeetToMeters(cloud.base).toFixed(0)}M
-                        ${" "}
-                    </li>`,
-            )}
+            ${latest?.clouds.length === 0
+                ? html`<p>
+                      Ei pilviä alle 1500M (CAVOK) ${" "}
+                      <${FromNow} date=${latest.time} />
+                  </p>`
+                : latest.clouds.map(
+                      (cloud, i) =>
+                          html`<li>
+                              <a href=${cloud.href}
+                                  >${CLOUD_TYPES[cloud.amount] ??
+                                  cloud.amount}</a
+                              >${" "}
+                              ${hectoFeetToMeters(cloud.base).toFixed(0)}M
+                              ${" "}
+                          </li>`,
+                  )}
         </ul>
 
         <p>
             <${FromNow} date=${latest.time} />
-        </p>
-
-        <p>
+            <br />
             <em class="metar">${latest.metar}</em>
         </p>
     `;
