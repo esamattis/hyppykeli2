@@ -88,8 +88,10 @@ function updateCharts(obs, fore) {
         ...createWarningLines(FORECASTS.value),
     ];
 
-    obs.update();
-    fore.update();
+    // "none" disables the update animation.
+    // It is too flashy when the array is fully replaced.
+    obs.update("none");
+    fore.update("none");
 }
 
 export function Graph() {
