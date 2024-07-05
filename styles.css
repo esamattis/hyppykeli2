@@ -151,24 +151,25 @@ dialog {
     font-family: monospace;
 }
 
-.colum-on-big-screen {
+.as-rows-on-big-screen {
     display: flex;
     flex-direction: column;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 650px) {
     .compass {
         position: fixed;
         top: 0;
         right: 0;
         flex-direction: column;
     }
-}
-
-@media (min-width: 650px) {
-    .colum-on-big-screen {
+    .as-rows-on-big-screen {
         flex-direction: row;
     }
+}
+
+p {
+    max-width: 500px;
 }
 
 .disclaimer {

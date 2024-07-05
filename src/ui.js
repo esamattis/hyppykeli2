@@ -290,11 +290,6 @@ function LatestMetar() {
         <p>
             <em class="metar">${latest.metar}</em>
         </p>
-
-        <small
-            >Lentokentän korkeus meren pinnasta${" "}
-            ${latest.elevation.toFixed(0)}M</small
-        >
     `;
 }
 
@@ -313,6 +308,7 @@ function UpdateButton() {
 
 function Root() {
     const history = !!HOVERED_OBSERVATION.value;
+    const latestMetar = METARS.value?.[0];
     return html`
         <div>
             <div class="content">
@@ -331,37 +327,51 @@ function Root() {
                     <span id="title">${NAME}</span>
                 </h1>
 
-                ${STATION_NAME.value
-                    ? html`
-                          Katso havaintoaseman${" "}
-                          <a href="https://www.google.fi/maps/place/${LATLONG}"
-                              >${STATION_NAME} sijainti</a
-                          >.
-                      `
-                    : "Ladataan..."}
+                <p>
+                    ${STATION_NAME.value
+                        ? html`
+                              Katso havaintoaseman${" "}
+                              <a
+                                  href="https://www.google.fi/maps/place/${LATLONG}"
+                                  >${STATION_NAME} sijainti</a
+                              >.
+                          `
+                        : "Ladataan..."}
+                    ${latestMetar
+                        ? html`
+                              ${" "}Lentokentän korkeus meren pinnasta${" "}
+                              ${latestMetar.elevation.toFixed(0)}M. ${" "}
+                          `
+                        : null}
 
-                <p class="disclaimer">
-                    Tietojen käyttö omalla vastuulla. Ei takeita että tiedot
-                    ovat oikein.
+                    <span class="disclaimer">
+                        Tietojen käyttö omalla vastuulla. Ei takeita että tiedot
+                        ovat oikein.
+                    </span>
                 </p>
 
                 <p>
                     <${UpdateButton} />
                 </p>
 
-                <h2>Pilvet</h2>
-                <${LatestMetar} />
+                <div class="as-rows-on-big-screen">
+                    <div>
+                        <h2>Pilvet</h2>
+                        <${LatestMetar} />
+                    </div>
+                    <div>
+                        <div class="anchor" id="latest"></div>
+                        <h2>Tuulet</h2>
 
-                <div class="anchor" id="latest"></div>
-                <h2>Tuulet</h2>
+                        <${Compass} />
 
-                <${Compass} />
-
-                <${LatestGust} />
+                        <${LatestGust} />
+                    </div>
+                </div>
 
                 <${Graph} />
 
-                <div class="colum-on-big-screen">
+                <div class="as-rows-on-big-screen">
                     <div>
                         <div class="anchor" id="observations"></div>
                         <h2 class="sticky">Havainnot</h2>
