@@ -76,12 +76,7 @@ function ObservationRows(props) {
                 <td class=${getWarningLevel(point.gust)}>${point.gust} m/s</td>
                 <td>${point.speed} m/s</td>
                 <td>
-                    <span class="direction-value">${point.direction}°</span>
-                    <span
-                        class="direction"
-                        style=${{ "--direction": point.direction + "deg" }}
-                        >↑</span
-                    >
+                    <${WindDirection} direction=${point.direction} />
                 </td>
             </tr>
         `;
@@ -109,16 +104,29 @@ function ForecastRows(props) {
             <td class=${getWarningLevel(point.gust)}>${point.gust} m/s</td>
             <td>${point.speed} m/s</td>
             <td>
-                <span class="direction-value">${point.direction}°</span>
-                <span
-                    class="direction"
-                    style=${{ "--direction": point.direction + "deg" }}
-                    >↑</span
-                >
+                <${WindDirection} direction=${point.direction} />
             </td>
             <td>${point.cloudCover?.toFixed(0) ?? "-1"}%</td>
         </tr> `;
     });
+}
+
+/**
+ *
+ * @param {Object} props
+ * @param {number} props.direction
+ */
+function WindDirection(props) {
+    return html`
+        <span>
+            <span class="direction-value">${props.direction.toFixed(0)}°</span>
+            <span
+                class="direction"
+                style=${{ "--direction": props.direction + "deg" }}
+                >↑</span
+            >
+        </span>
+    `;
 }
 
 /**
