@@ -50,23 +50,71 @@ function getWarningLevel(gust) {
     return className;
 }
 
+function ObservationTHead() {
+    return html`
+        <tr>
+            <th>Puuska</th>
+            <th>Tuuli</th>
+            <th>Suunta</th>
+            <th>Aika</th>
+        </tr>
+    `;
+}
+
 /**
  * @param {Object} props
- * @param {Signal<WeatherData[]>} props.data
+ * @param {WeatherData[]} props.data
  */
-function Rows(props) {
-    const [showAll, setShowAll] = useState(false);
-    const data = showAll ? props.data.value : props.data.value.slice(0, 50);
+function ObservationRows(props) {
+    // const clock24 = point.time.toLocaleTimeString([], {
+    //     hour: "2-digit",
+    //     minute: "2-digit",
+    //     hour12: false,
+    // });
 
-    const showLoadMore = !showAll && props.data.value.length > data.length;
+    return props.data.map((point) => {
+        return html`
+            <tr>
+                <td class=${getWarningLevel(point.gust)}>${point.gust} m/s</td>
+                <td>${point.speed} m/s</td>
+                <td>
+                    <span class="direction-value">${point.direction}°</span>
+                    <span
+                        class="direction"
+                        style=${{ "--direction": point.direction + "deg" }}
+                        >↑</span
+                    >
+                </td>
+                <td title=${point.time.toString()}>
+                    ${point.time.toLocaleTimeString()}
+                </td>
+            </tr>
+        `;
+    });
+}
 
-    const rows = data.map((point) => {
-        // const clock24 = point.time.toLocaleTimeString([], {
-        //     hour: "2-digit",
-        //     minute: "2-digit",
-        //     hour12: false,
-        // });
+function ForecastTHead() {
+    return html`<tr>
+        <th>Puuska</th>
+        <th>Tuuli</th>
+        <th>Suunta</th>
+        <th>Pilvikatto</th>
+        <th>Aika</th>
+    </tr>`;
+}
 
+/**
+ * @param {Object} props
+ * @param {WeatherData[]} props.data
+ */
+function ForecastRows(props) {
+    // const clock24 = point.time.toLocaleTimeString([], {
+    //     hour: "2-digit",
+    //     minute: "2-digit",
+    //     hour12: false,
+    // });
+
+    return props.data.map((point) => {
         return html`<tr>
             <td class=${getWarningLevel(point.gust)}>${point.gust} m/s</td>
             <td>${point.speed} m/s</td>
@@ -84,48 +132,37 @@ function Rows(props) {
             </td>
         </tr> `;
     });
-
-    return html`
-        ${rows}
-        ${showLoadMore
-            ? html`
-                  <tr>
-                      <td>
-                          <div class="show-more">
-                              <button
-                                  type="button"
-                                  onClick=${() => setShowAll(true)}
-                              >
-                                  Näytä kaikki
-                              </button>
-                          </div>
-                      </td>
-                  </tr>
-              `
-            : null}
-    `;
 }
 
 /**
  * @param {Object} props
- * @param {Signal<WeatherData[]>} props.data
+ * @param {Signal<unknown[]>} props.data
+ * @param {any} props.Rows
+ * @param {any} props.thead
  */
 function DataTable(props) {
+    const [showAll, setShowAll] = useState(false);
+    const data = showAll ? props.data.value : props.data.value.slice(0, 50);
+    const showLoadMore = !showAll && props.data.value.length > data.length;
+
     return html`
         <table class="weather-table">
             <thead>
-                <tr>
-                    <th>Puuska</th>
-                    <th>Tuuli</th>
-                    <th>Suunta</th>
-                    <th>Pilvikatto</th>
-                    <th>Aika</th>
-                </tr>
+                ${props.thead}
             </thead>
             <tbody>
-                <${Rows} data=${props.data} />
+                <${props.Rows} data=${data} />
             </tbody>
         </table>
+        ${showLoadMore
+            ? html`
+                  <div class="show-more">
+                      <button type="button" onClick=${() => setShowAll(true)}>
+                          Näytä kaikki (${props.data.value.length})
+                      </button>
+                  </div>
+              `
+            : null}
     `;
 }
 
@@ -341,13 +378,21 @@ function Root() {
                     <div>
                         <div class="anchor" id="observations"></div>
                         <h2 class="sticky">Havainnot</h2>
-                        <${DataTable} data=${OBSERVATIONS} />
+                        <${DataTable}
+                            data=${OBSERVATIONS}
+                            thead=${html`<${ObservationTHead} />`}
+                            Rows=${ObservationRows}
+                        />
                     </div>
 
                     <div>
                         <div class="anchor" id="forecasts"></div>
                         <h2 class="sticky">Ennuste</h2>
-                        <${DataTable} data=${FORECASTS} />
+                        <${DataTable}
+                            data=${FORECASTS}
+                            thead=${html`<${ForecastTHead} />`}
+                            Rows=${ForecastRows}
+                        />
                     </div>
                 </div>
             </div>
