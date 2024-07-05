@@ -17,6 +17,7 @@ import {
 
 import { Graph } from "./graph.js";
 import { Compass } from "./compass.js";
+import { formatClock } from "./utils.js";
 
 NAME.subscribe((val) => {
     if (val) {
@@ -53,10 +54,10 @@ function getWarningLevel(gust) {
 function ObservationTHead() {
     return html`
         <tr>
+            <th>Kello</th>
             <th>Puuska</th>
             <th>Tuuli</th>
             <th>Suunta</th>
-            <th>Aika</th>
         </tr>
     `;
 }
@@ -66,15 +67,12 @@ function ObservationTHead() {
  * @param {WeatherData[]} props.data
  */
 function ObservationRows(props) {
-    // const clock24 = point.time.toLocaleTimeString([], {
-    //     hour: "2-digit",
-    //     minute: "2-digit",
-    //     hour12: false,
-    // });
-
     return props.data.map((point) => {
         return html`
             <tr>
+                <td title=${point.time.toString()}>
+                    ${formatClock(point.time)}
+                </td>
                 <td class=${getWarningLevel(point.gust)}>${point.gust} m/s</td>
                 <td>${point.speed} m/s</td>
                 <td>
@@ -85,9 +83,6 @@ function ObservationRows(props) {
                         >↑</span
                     >
                 </td>
-                <td title=${point.time.toString()}>
-                    ${point.time.toLocaleTimeString()}
-                </td>
             </tr>
         `;
     });
@@ -95,11 +90,11 @@ function ObservationRows(props) {
 
 function ForecastTHead() {
     return html`<tr>
+        <th>Kello</th>
         <th>Puuska</th>
         <th>Tuuli</th>
         <th>Suunta</th>
         <th>Pilvikatto</th>
-        <th>Aika</th>
     </tr>`;
 }
 
@@ -108,14 +103,9 @@ function ForecastTHead() {
  * @param {WeatherData[]} props.data
  */
 function ForecastRows(props) {
-    // const clock24 = point.time.toLocaleTimeString([], {
-    //     hour: "2-digit",
-    //     minute: "2-digit",
-    //     hour12: false,
-    // });
-
     return props.data.map((point) => {
         return html`<tr>
+            <td title=${point.time.toString()}>${formatClock(point.time)}</td>
             <td class=${getWarningLevel(point.gust)}>${point.gust} m/s</td>
             <td>${point.speed} m/s</td>
             <td>
@@ -127,9 +117,6 @@ function ForecastRows(props) {
                 >
             </td>
             <td>${point.cloudCover?.toFixed(0) ?? "-1"}%</td>
-            <td title=${point.time.toString()}>
-                ${point.time.toLocaleTimeString()}
-            </td>
         </tr> `;
     });
 }

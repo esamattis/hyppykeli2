@@ -11,6 +11,7 @@ import {
     LATLONG,
     HOVERED_OBSERVATION,
 } from "./data.js";
+import { formatClock } from "./utils.js";
 
 /**
  * @param {Chart} obs
@@ -18,11 +19,9 @@ import {
  */
 function updateCharts(obs, fore) {
     obs.data.labels = OBSERVATIONS.value
-        .map((point) => point.time.toLocaleTimeString())
+        .map((point) => formatClock(point.time))
         .reverse();
-    fore.data.labels = FORECASTS.value.map((point) =>
-        point.time.toLocaleTimeString(),
-    );
+    fore.data.labels = FORECASTS.value.map((point) => formatClock(point.time));
 
     const shared = {
         spanGaps: true,

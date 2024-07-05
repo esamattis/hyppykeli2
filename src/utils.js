@@ -32,3 +32,14 @@ export function Help(props) {
         </dialog>
     `;
 }
+
+/**
+ * @param {Date} date
+ */
+export function formatClock(date) {
+    return date.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+    });
+}
