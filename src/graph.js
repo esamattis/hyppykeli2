@@ -172,22 +172,12 @@ export function Graph() {
  * @param {boolean} reverse
  */
 function createHoverHandler(signal, reverse) {
-    /** @type {ReturnType<typeof setTimeout>} */
-    // let timer;
-
     /**
      * @param {import("chart.js").ChartEvent} event
      * @param {import("chart.js").ActiveElement[]} elements
      * @param {Chart} chart
      */
     const onHover = (event, elements, chart) => {
-        // clearTimeout(timer);
-
-        // // Automatically clear hover after a timeout. On mobile devices the state can get stuck
-        // timer = setTimeout(() => {
-        //     HOVERED_OBSERVATION.value = undefined;
-        // }, 10_000);
-
         const points = chart.getElementsAtEventForMode(
             // @ts-ignore
             event,

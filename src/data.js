@@ -77,6 +77,23 @@ export const LATLONG = signal(null);
  */
 export const ERRORS = signal([]);
 
+/** @type {ReturnType<typeof setTimeout>} */
+let timer;
+
+HOVERED_OBSERVATION.subscribe((value) => {
+    clearTimeout(timer);
+
+    timer = setTimeout(() => {
+        HOVERED_OBSERVATION.value = undefined;
+    }, 5_000);
+});
+
+document.addEventListener("click", (e) => {
+    if (e.target instanceof HTMLElement && !e.target.closest(".chart")) {
+        HOVERED_OBSERVATION.value = undefined;
+    }
+});
+
 const OBSERVATION_PARAMETERS = [
     "winddirection",
     "windspeedms",
