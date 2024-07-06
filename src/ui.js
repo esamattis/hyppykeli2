@@ -301,7 +301,7 @@ function UpdateButton() {
                 updateWeatherData();
             }}
         >
-            ${LOADING.value > 0 ? `Ladataan ${LOADING.value}...` : "Päivitä"}
+            ♻
         </button>
     `;
 }
@@ -348,10 +348,6 @@ function Root() {
                         Tietojen käyttö omalla vastuulla. Ei takeita että tiedot
                         ovat oikein.
                     </span>
-                </p>
-
-                <p>
-                    <${UpdateButton} />
                 </p>
 
                 <div class="as-rows-on-big-screen">
@@ -428,6 +424,12 @@ function Root() {
                         <div class="text">Ennuste</div>
                     </div>
                 </a>
+
+                <div class="item">
+                    <div class="wrap">
+                        <${UpdateButton} />
+                    </div>
+                </div>
             </div>
         </div>
     `;
