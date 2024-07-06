@@ -52,13 +52,6 @@ td {
     color: red;
 }
 
-.sticky-footer a {
-    margin-left: 10px;
-    margin-right: 10px;
-    text-align: center;
-    text-decoration: none;
-}
-
 .ball {
     display: inline-block;
     transform: scale(2);
@@ -67,11 +60,18 @@ td {
 p {
     line-height: 1.5;
 }
-
-.sticky-footer a {
+.sticky-footer .item .icon,
+.sticky-footer .item .text {
     display: flex;
-    height: 100%;
+    justify-content: center;
+}
+
+.sticky-footer .item {
+    display: flex;
+    justify-items: center;
     align-items: center;
+    text-decoration: none;
+    height: 100%;
 }
 
 .sticky-footer {
@@ -83,16 +83,8 @@ p {
     width: 100%;
     background-color: white;
     box-shadow: 0 -4px 2px -2px gray;
-}
-
-@media (max-width: 600px) {
-    .sticky-footer {
-        justify-content: space-around;
-    }
-
-    .ball {
-        display: none;
-    }
+    overflow-x: auto;
+    justify-content: space-around;
 }
 
 .chart {

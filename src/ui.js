@@ -395,15 +395,39 @@ function Root() {
             </div>
 
             <div class="sticky-footer">
-                <a href="#top">⬆️</a>
-                <span class="ball">ᐧ</span>
-                <a href="#observation-graph">Havainnot 📈</a>
-                <span class="ball">ᐧ</span>
-                <a href="#forecast-graph">Ennuste 📈</a>
-                <span class="ball">ᐧ</span>
-                <a href="#observations">Havainnot 🧾</a>
-                <span class="ball">ᐧ</span>
-                <a href="#forecasts">Ennuste 🧾</a>
+                <a class="item" href="#top">
+                    <div class="wrap">
+                        <div class="icon">⬆️</div>
+                    </div>
+                </a>
+
+                <a class="item" href="#observation-graph">
+                    <div class="wrap">
+                        <div class="icon">📈</div>
+                        <div class="text">Havainnot</div>
+                    </div>
+                </a>
+
+                <a class="item" href="#forecast-graph">
+                    <div class="wrap">
+                        <div class="icon">📈</div>
+                        <div class="text">Ennuste</div>
+                    </div>
+                </a>
+
+                <a class="item" href="#observations">
+                    <div class="wrap">
+                        <div class="icon">🧾</div>
+                        <div class="text">Havainnot</div>
+                    </div>
+                </a>
+
+                <a class="item" href="#forecasts">
+                    <div class="wrap">
+                        <div class="icon">🧾</div>
+                        <div class="text">Ennuste</div>
+                    </div>
+                </a>
             </div>
         </div>
     `;
