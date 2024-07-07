@@ -158,11 +158,16 @@ function ForecastRows(props) {
  *
  * @param {Object} props
  * @param {number} props.direction
+ * @param {boolean} props.value
  */
 function WindDirection(props) {
     return html`
         <span>
-            <span class="direction-value">${props.direction.toFixed(0)}°</span>
+            ${props.value !== false
+                ? html`<span class="direction-value">
+                      ${props.direction.toFixed(0)}°
+                  </span>`
+                : null}
             <span
                 class="direction"
                 style=${{ "--direction": props.direction + "deg" }}
@@ -265,14 +270,15 @@ function LatestWind() {
                 ${" "}${latest.gust} m/s${" "}
             </span>
             Tuuli
-            <span class="latest-value latest-wind"
-                >${" "}${latest.speed} m/s${" "}</span
-            >
+            <span class="latest-value latest-wind">
+                ${" "}${latest.speed} m/s${" "}
+            </span>
 
-            Suunta
-            <span class="latest-value latest-wind"
-                >${" "}${latest.direction}°${" "}</span
-            >
+            Suunta${" "}
+            <span class="latest-value latest-wind">
+                ${" "}${latest.direction}°${" "}
+            </span>
+            ${" "}
 
             <${FromNow} date=${latest.time} />
             <br />

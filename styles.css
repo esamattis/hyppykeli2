@@ -30,20 +30,6 @@ td {
     color: blue;
 }
 
-.direction-value {
-    width: 4ch;
-    display: inline-block;
-    padding-right: 3px;
-}
-
-.direction {
-    text-align: center;
-    width: 20px;
-    height: 20px;
-    display: inline-block;
-    transform: rotate(var(--direction));
-}
-
 .ok {
     color: green;
 }
@@ -251,4 +237,19 @@ h2 .date {
 
 .forecast-row .pie {
     margin-right: 1ch;
+}
+
+.direction-value {
+    width: 4ch;
+    display: inline-block;
+    padding-right: 3px;
+}
+
+.direction {
+    text-align: center;
+    font-size: 80%;
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    transform: rotate(var(--direction));
 }
