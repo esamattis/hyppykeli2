@@ -750,7 +750,9 @@ function Parachute() {
 function ForecastLocationInfo() {
     return html`
         Ennuste on haettu halueelle${" "}
-        <a href="https://www.google.fi/maps/place/${FORECAST_COORDINATES.value}"
+        <a
+            href="https://www.google.fi/maps/place/${FORECAST_COORDINATES.value ||
+            STATION_COORDINATES.value}"
             >${FORECAST_LOCATION_NAME.value}</a
         >.
     `;
@@ -785,9 +787,8 @@ export function Root() {
                                   href="https://www.google.fi/maps/place/${STATION_COORDINATES.value}"
                                   >${STATION_NAME} sijainti</a
                               >.${" "}
-                              ${FORECAST_COORDINATES.value
-                                  ? html`<${ForecastLocationInfo} />`
-                                  : null}
+
+                              <${ForecastLocationInfo} />
                           `
                         : "Ladataan..."}
                     ${latestMetar
