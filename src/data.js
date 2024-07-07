@@ -8,6 +8,10 @@ import { signal } from "@preact/signals";
  */
 
 /**
+ * @typedef {"fmi::avi::observations::iwxxm" | "fmi::observations::weather::timevaluepair" | "fmi::forecast::edited::weather::scandinavia::point::timevaluepair" } StoredQuery
+ */
+
+/**
  * @typedef {Object} WeatherData
  * @property {number} gust
  * @property {number} speed
@@ -78,9 +82,9 @@ export const LATLONG = signal(null);
 export const ERRORS = signal([]);
 
 /**
- * @type {Map<string, string>}
+ * @type {Signal<{ [K in StoredQuery]?: string}>}
  */
-export const RAW_DATA = new Map();
+export const RAW_DATA = signal({});
 
 /** @type {ReturnType<typeof setTimeout>} */
 let timer;
@@ -115,7 +119,7 @@ const FORECAST_PAREMETERS = [
 
 /**
  * Makes a request to the FMI API with the given options.
- * @param {string} storedQuery - The stored query ID for the request.
+ * @param {StoredQuery} storedQuery - The stored query ID for the request.
  * @param {Object} params - The parameters for the request.
  * @param {string} [mock]
  * @returns {Promise<Document|undefined|"error">} The parsed XML document from the response.
@@ -147,7 +151,10 @@ export async function fmiRequest(storedQuery, params, mock) {
         let data;
         try {
             const text = await response.text();
-            addRawData(storedQuery, text);
+            RAW_DATA.value = {
+                ...RAW_DATA.value,
+                [storedQuery]: text,
+            };
             const parser = new DOMParser();
             data = parser.parseFromString(text, "application/xml");
         } catch (error) {
@@ -287,16 +294,6 @@ function parseClouds(xml) {
  */
 export function addError(msg) {
     ERRORS.value = [...ERRORS.value, msg];
-}
-
-/**
- * Adds raw data to the RAW_DATA signal.
- * @param {string} name - The name of the data entry.
- * @param {string} data - The data to be added.
- */
-function addRawData(name, data) {
-    name = name.replaceAll("::", "_");
-    RAW_DATA.set(name, data);
 }
 
 export async function updateWeatherData() {

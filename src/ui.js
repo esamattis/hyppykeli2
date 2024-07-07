@@ -382,15 +382,36 @@ effect(() => {
     });
 });
 
-function downloadDataDumps() {
-    for (const [name, raw] of RAW_DATA.entries()) {
-        const date = new Date()
-            .toISOString()
-            .split("T")[0]
-            ?.replaceAll("-", "");
-        const clock = formatClock(new Date()).replace(":", "");
-        saveTextToFile(`hyppykeli_${date}-${clock}_${name}.xml`, raw);
+/**
+ * @param {SubmitEvent} e
+ */
+function downloadDataDump(e) {
+    e.preventDefault();
+
+    if (!(e.target instanceof HTMLFormElement)) {
+        return;
     }
+
+    const formData = new FormData(e.target);
+
+    const storedQuery = /** @type {import("./data.js").StoredQuery | null} */ (
+        formData.get("storedQuery")?.toString() ?? null
+    );
+
+    if (!storedQuery) {
+        return;
+    }
+
+    const raw = RAW_DATA.value[storedQuery];
+
+    if (!raw) {
+        return;
+    }
+
+    const name = storedQuery.replaceAll("::", "_");
+    const date = new Date().toISOString().split("T")[0]?.replaceAll("-", "");
+    const clock = formatClock(new Date()).replace(":", "");
+    saveTextToFile(`hyppykeli_${date}-${clock}_${name}.xml`, raw);
 }
 
 export function SideMenu() {
@@ -411,9 +432,14 @@ export function SideMenu() {
                 millä tavalla ne näkyi väärin. Laita kuvakaappaus mukaan myös.
             </p>
 
-            <button type="button" onClick=${downloadDataDumps}>
-                Lataa datadumpit
-            </button>
+            <form onSubmit=${downloadDataDump}>
+                <select name="storedQuery">
+                    ${Object.keys(RAW_DATA.value).map(
+                        (key) => html` <option value=${key}>${key}</option> `,
+                    )}
+                </select>
+                <button type="submit">Lataa</button>
+            </form>
         </div>
     `;
 }

@@ -194,6 +194,12 @@ p {
     box-shadow: -6px 0 2px -2px gray;
     transition: right 0.3s ease;
     padding: 40px;
+    padding-bottom: 100px;
+}
+
+.side-menu select {
+    width: 100%;
+    margin-bottom: 5px;
 }
 
 .menu-burger {
