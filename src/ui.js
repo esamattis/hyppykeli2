@@ -248,7 +248,7 @@ function FromNow(props) {
     return html`<span class="from-now">${fromNow}</span> `;
 }
 
-function LatestGust() {
+function LatestWind() {
     const history = !!HOVERED_OBSERVATION.value;
     const latest = HOVERED_OBSERVATION.value || OBSERVATIONS.value[0];
     if (!latest) {
@@ -268,6 +268,12 @@ function LatestGust() {
             <span class="latest-value latest-wind"
                 >${" "}${latest.speed} m/s${" "}</span
             >
+
+            Suunta
+            <span class="latest-value latest-wind"
+                >${" "}${latest.direction}°${" "}</span
+            >
+
             <${FromNow} date=${latest.time} />
             <br />
             <${GustTrend} />
@@ -749,7 +755,7 @@ export function Root() {
 
                         <${Compass} />
 
-                        <${LatestGust} />
+                        <${LatestWind} />
                     </div>
                 </div>
 
