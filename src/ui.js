@@ -100,8 +100,45 @@ function ForecastTHead() {
         <th>Puuska</th>
         <th>Tuuli</th>
         <th>Suunta</th>
-        <th>Pilvikatto</th>
+        <th>
+            Pilvet
+            <${Help} label="(L)">
+                Matalakerroksen (Low) pilvet jotka sijaitsevat yleensä alle 2 kilometrin (noin 6 500 jalan) korkeudella merenpinnasta.
+            </${Help}>
+        </th>
+        <th>
+            Pilvet
+            <${Help} label="(ML)">
+                Matalan ja keskikerroksen (MiddleAndLow) pilvet jotka sijaitsevat yleensä 2-7 kilometrin (noin 6 500-23 000 jalan) korkeudella merenpinnasta.
+            </${Help}>
+        </th>
+
     </tr>`;
+}
+
+/**
+ * @param {Object} props
+ * @param {WeatherData[]} props.data
+ */
+function ForecastRows(props) {
+    return props.data.map((point) => {
+        return html`<tr class="forecast-row">
+            <td title=${point.time.toString()}>${formatClock(point.time)}</td>
+            <td class=${getWarningLevel(point.gust)}>${point.gust} m/s</td>
+            <td>${point.speed} m/s</td>
+            <td>
+                <${WindDirection} direction=${point.direction} />
+            </td>
+            <td>
+                <${PieChart} percentage=${point.lowCloudCover ?? 0} />
+                ${point.lowCloudCover?.toFixed(0) ?? "-1"}%
+            </td>
+            <td>
+                <${PieChart} percentage=${point.middleCloudCover ?? 0} />
+                ${point.middleCloudCover?.toFixed(0) ?? "-1"}%
+            </td>
+        </tr> `;
+    });
 }
 
 /**
@@ -131,27 +168,6 @@ function PieChart({ percentage }) {
             />
         </svg>
     `;
-}
-
-/**
- * @param {Object} props
- * @param {WeatherData[]} props.data
- */
-function ForecastRows(props) {
-    return props.data.map((point) => {
-        return html`<tr class="forecast-row">
-            <td title=${point.time.toString()}>${formatClock(point.time)}</td>
-            <td class=${getWarningLevel(point.gust)}>${point.gust} m/s</td>
-            <td>${point.speed} m/s</td>
-            <td>
-                <${WindDirection} direction=${point.direction} />
-            </td>
-            <td>
-                <${PieChart} percentage=${point.cloudCover ?? 0} />
-                ${point.cloudCover?.toFixed(0) ?? "-1"}%
-            </td>
-        </tr> `;
-    });
 }
 
 /**

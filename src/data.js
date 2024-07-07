@@ -16,7 +16,8 @@ import { computed, signal } from "@preact/signals";
  * @property {number} gust
  * @property {number} speed
  * @property {number} direction
- * @property {number|undefined} cloudCover
+ * @property {number|undefined} lowCloudCover
+ * @property {number|undefined} middleCloudCover
  * @property {Date} time
  */
 
@@ -543,8 +544,9 @@ export async function updateWeatherData() {
             gust: gust.value,
             speed: windSpeed[i]?.value ?? -1,
             direction: directions[i]?.value ?? -1,
-            cloudCover: undefined,
             time: gust.time,
+            middleCloudCover: undefined,
+            lowCloudCover: undefined,
         };
     });
 
@@ -581,8 +583,14 @@ export async function updateWeatherData() {
             timestep: 10,
             // parameters: FORECAST_PAREMETERS.join(","),
             // parameters: "WindGust",
-            parameters:
-                "HourlyMaximumGust,WindDirection,WindSpeedMS,MiddleAndLowCloudCover",
+            // LowCloudCover, MiddleCloudCover, HighCloudCover, MiddleAndLowCloudCover
+            parameters: [
+                "HourlyMaximumGust",
+                "WindDirection",
+                "WindSpeedMS",
+                "LowCloudCover",
+                "MiddleAndLowCloudCover",
+            ].join(","),
             // place: "Utti",
             latlon: coordinates,
         },
@@ -613,6 +621,13 @@ export async function updateWeatherData() {
 
     const cloudCoverForecasts = parseTimeSeries(
         forecastXml,
+        // "mts-1-1-MiddleAndLowCloudCover",
+        "mts-1-1-LowCloudCover",
+    );
+
+    const middleCloudCoverForecasts = parseTimeSeries(
+        forecastXml,
+        // "mts-1-1-MiddleCloudCover",
         "mts-1-1-MiddleAndLowCloudCover",
     );
 
@@ -623,7 +638,8 @@ export async function updateWeatherData() {
             direction: directionForecasts[i]?.value ?? -1,
             speed: speedForecasts[i]?.value ?? -1,
             time: gust.time,
-            cloudCover: cloudCoverForecasts[i]?.value,
+            lowCloudCover: cloudCoverForecasts[i]?.value,
+            middleCloudCover: middleCloudCoverForecasts[i]?.value,
         };
     });
 
