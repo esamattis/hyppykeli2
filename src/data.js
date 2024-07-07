@@ -1,14 +1,10 @@
 // @ts-check
 // docs https://opendata.fmi.fi/wfs?service=WFS&version=2.0.0&request=describeStoredQueries&
-import { computed, signal } from "@preact/signals";
+import { signal } from "@preact/signals";
 
 /**
  * @typedef {import('@preact/signals').Signal<T>} Signal<T>
  * @template {any} T
- */
-
-/**
- * @typedef {"fmi::avi::observations::iwxxm" | "fmi::observations::weather::timevaluepair" | "fmi::forecast::edited::weather::scandinavia::point::timevaluepair" } StoredQuery
  */
 
 /**
@@ -47,11 +43,6 @@ export const NAME = signal(undefined);
 export const LOADING = signal(0);
 
 /**
- * @type {Signal<boolean>}
- */
-export const STALE_FORECASTS = signal(true);
-
-/**
  * @type {Signal<string | undefined>}
  */
 export const STATION_NAME = signal(undefined);
@@ -87,39 +78,22 @@ export const LATLONG = signal(null);
 export const ERRORS = signal([]);
 
 /**
- *  How many days in the future the forecast is for.
- *  0 = today, 1 = tomorrow, 2 = day after tomorrow, etc.
- *
- * @type {Signal<number>}
+ * @typedef {Object} WindVariations
+ * @property {number} variationRange
+ * @property {number} averageDirection
+ * @property {string} color
+ * @property {number} extraWidth
  */
-export const FORECAST_DAY = signal(0);
 
 /**
- * @type {Signal<Date>}
+ * @type {Signal<WindVariations|undefined>}
  */
-export const FORECAST_DATE = computed(() => {
-    const day = FORECAST_DAY.value;
-
-    STALE_FORECASTS.value = true;
-
-    if (day === 0) {
-        return new Date();
-    }
-
-    const date = new Date();
-    date.setDate(date.getDate() + day);
-    return date;
-});
-
-/**
- * @type {Signal<{ [K in StoredQuery]?: string}>}
- */
-export const RAW_DATA = signal({});
+export const WIND_VARIATIONS = signal(undefined);
 
 /** @type {ReturnType<typeof setTimeout>} */
 let timer;
 
-HOVERED_OBSERVATION.subscribe(() => {
+HOVERED_OBSERVATION.subscribe((value) => {
     clearTimeout(timer);
 
     timer = setTimeout(() => {
@@ -149,7 +123,7 @@ const FORECAST_PAREMETERS = [
 
 /**
  * Makes a request to the FMI API with the given options.
- * @param {StoredQuery} storedQuery - The stored query ID for the request.
+ * @param {string} storedQuery - The stored query ID for the request.
  * @param {Object} params - The parameters for the request.
  * @param {string} [mock]
  * @returns {Promise<Document|undefined|"error">} The parsed XML document from the response.
@@ -181,10 +155,6 @@ export async function fmiRequest(storedQuery, params, mock) {
         let data;
         try {
             const text = await response.text();
-            RAW_DATA.value = {
-                ...RAW_DATA.value,
-                [storedQuery]: text,
-            };
             const parser = new DOMParser();
             data = parser.parseFromString(text, "application/xml");
         } catch (error) {
@@ -322,7 +292,7 @@ function parseClouds(xml) {
 /**
  * @param {string} msg
  */
-export function addError(msg) {
+function addError(msg) {
     ERRORS.value = [...ERRORS.value, msg];
 }
 
@@ -331,12 +301,10 @@ export async function updateWeatherData() {
     const url = new URL(location.href);
     const fmisid = url.searchParams.get("fmisid");
     const icaocode = url.searchParams.get("icaocode");
-    const forecastDay = Number(url.searchParams.get("forecast_day")) || 0;
     const obsRange = Number(url.searchParams.get("observation_range")) || 12;
     const forecastRange = Number(url.searchParams.get("forecast_range")) || 8;
 
     NAME.value = icaocode ?? undefined;
-    FORECAST_DAY.value = forecastDay;
 
     const obsStartTime = new Date();
     obsStartTime.setHours(obsStartTime.getHours() - obsRange, 0, 0, 0);
@@ -436,6 +404,70 @@ export async function updateWeatherData() {
 
     OBSERVATIONS.value = combined;
 
+    // Calculate wind variations for the last 30 minutes
+    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+    const recentObservations = combined.filter(obs => obs.time >= thirtyMinutesAgo && obs.direction !== -1);
+    
+    if (recentObservations.length > 0) {
+        const directions = recentObservations.map(obs => obs.direction);
+        const speeds = recentObservations.map(obs => obs.speed);
+        const gusts = recentObservations.map(obs => obs.gust);
+        
+        // Calculate the average direction
+        const sumSin = directions.reduce((sum, dir) => sum + Math.sin(dir * Math.PI / 180), 0);
+        const sumCos = directions.reduce((sum, dir) => sum + Math.cos(dir * Math.PI / 180), 0);
+        const averageDirection = (Math.atan2(sumSin, sumCos) * 180 / Math.PI + 360) % 360;
+
+        // Calculate the variation range
+        let maxDiff = 0;
+        for (let i = 0; i < directions.length; i++) {
+            for (let j = i + 1; j < directions.length; j++) {
+                const dir1 = directions[i];
+                const dir2 = directions[j];
+                if (typeof dir1 === 'number' && typeof dir2 === 'number') {
+                    const diff = calculateDirectionDifference(dir1, dir2);
+                    if (diff > maxDiff) {
+                        maxDiff = diff;
+                    }
+                }
+            }
+        }
+        
+        const variationRange = maxDiff;
+
+        // Calculate speed variation
+        const averageSpeed = speeds.reduce((sum, speed) => sum + speed, 0) / speeds.length;
+        const maxGust = Math.max(...gusts);
+        const gustSpeedRatio = maxGust / averageSpeed;
+
+        // Determine color and width based on criteria
+        let color = 'green';
+        let extraWidth = 0;
+
+        if (gustSpeedRatio >= 2) {
+            color = 'red';
+            extraWidth = 20;
+        } else if (gustSpeedRatio >= 1.5) {
+            color = 'orange';
+            extraWidth = 10;
+        }
+
+        if (variationRange > 90) {
+            color = 'red';
+        } else if (variationRange >= 45 && color !== 'red') {
+            color = 'orange';
+        }
+        
+        WIND_VARIATIONS.value = {
+            variationRange,
+            averageDirection,
+            color,
+            extraWidth
+        };
+    } else {
+        WIND_VARIATIONS.value = undefined;
+    }
+
     const forecastStartTime = new Date();
     const forecastEndTime = new Date();
     forecastEndTime.setHours(
@@ -444,14 +476,6 @@ export async function updateWeatherData() {
         0,
         0,
     );
-
-    const day = FORECAST_DAY.value;
-    if (day > 0) {
-        forecastStartTime.setHours(7, 0, 0, 0);
-        forecastStartTime.setDate(forecastStartTime.getDate() + day);
-        forecastEndTime.setHours(21, 0, 0, 0);
-        forecastEndTime.setDate(forecastEndTime.getDate() + day);
-    }
 
     const forecastXml = await fmiRequest(
         // "fmi::forecast::hirlam::surface::point::timevaluepair",
@@ -492,10 +516,8 @@ export async function updateWeatherData() {
 
     const speedForecasts = parseTimeSeries(forecastXml, "mts-1-1-WindSpeedMS");
 
-    const directionForecasts = parseTimeSeries(
-        forecastXml,
-        "mts-1-1-WindDirection",
-    );
+    const directionForecasts =
+        parseTimeSeries(forecastXml, "mts-1-1-WindDirection");
 
     const cloudCoverForecasts = parseTimeSeries(
         forecastXml,
@@ -514,7 +536,6 @@ export async function updateWeatherData() {
     });
 
     FORECASTS.value = combinedForecasts;
-    STALE_FORECASTS.value = false;
 }
 
 updateWeatherData().then(() => {
@@ -547,3 +568,14 @@ window.addEventListener("pageshow", (event) => {
 });
 
 setInterval(updateWeatherData, 60000);
+
+/**
+ * Calculates the difference between two wind directions considering the circular nature of directions.
+ * @param {number} dir1 - First wind direction.
+ * @param {number} dir2 - Second wind direction.
+ * @returns {number} The minimum difference between the two directions.
+ */
+function calculateDirectionDifference(dir1, dir2) {
+    const diff = Math.abs(dir1 - dir2);
+    return Math.min(diff, 360 - diff);
+}
