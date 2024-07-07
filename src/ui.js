@@ -774,7 +774,16 @@ export function Root() {
                               <a
                                   href="https://www.google.fi/maps/place/${STATION_COORDINATES.value}"
                                   >${STATION_NAME} sijainti</a
-                              >.
+                              >.${" "}
+                              ${FORECAST_COORDINATES.value
+                                  ? html`
+                                        Ennuste on haettu kohtaan${" "}
+                                        <a
+                                            href="https://www.google.fi/maps/place/${FORECAST_COORDINATES.value}"
+                                            >${FORECAST_COORDINATES.value}</a
+                                        >.
+                                    `
+                                  : null}
                           `
                         : "Ladataan..."}
                     ${latestMetar
@@ -846,7 +855,7 @@ export function Root() {
                         </h2>
 
                         <p>
-                            Ennuste tehty alueelle${" "}
+                            Ennuste on haettu koordinaatteihin
                             <a
                                 href="https://www.google.fi/maps/place/${FORECAST_COORDINATES.value ??
                                 STATION_COORDINATES.value}"
