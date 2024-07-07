@@ -279,7 +279,7 @@ function parseClouds(xml) {
 /**
  * @param {string} msg
  */
-function addError(msg) {
+export function addError(msg) {
     ERRORS.value = [...ERRORS.value, msg];
 }
 

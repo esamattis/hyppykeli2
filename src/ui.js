@@ -13,6 +13,7 @@ import {
     HOVERED_OBSERVATION,
     updateWeatherData,
     LOADING,
+    addError,
 } from "./data.js";
 
 import { Graph } from "./graph.js";
@@ -311,6 +312,138 @@ function UpdateButton() {
     `;
 }
 
+/**
+ * @type {Signal<boolean>}
+ */
+export const MENU_OPEN = signal(false);
+
+// Close menu when clicking outside of it
+document.addEventListener("click", (e) => {
+    if (!MENU_OPEN.value) {
+        return;
+    }
+
+    if (
+        e.target instanceof HTMLElement &&
+        e.target.closest(".side-menu,.sticky-footer")
+    ) {
+        return;
+    }
+
+    MENU_OPEN.value = false;
+});
+
+/**
+ * @type {Signal<{title: string, href: string}[]>}
+ */
+export const OTHER_DZs = signal([]);
+
+// Load DZ lis when the menu is opened
+effect(() => {
+    if (!MENU_OPEN.value) {
+        return;
+    }
+
+    // load only once
+    if (OTHER_DZs.value.length > 0) {
+        return;
+    }
+
+    fetch("/").then(async (res) => {
+        if (!res.ok || res.status !== 200) {
+            addError("Virhe haettaessa muita DZ:ta");
+            return;
+        }
+
+        const html = await res.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+        const dzs = Array.from(doc.querySelectorAll(".dz-list a")).flatMap(
+            (a) => {
+                if (!(a instanceof HTMLAnchorElement)) {
+                    return [];
+                }
+
+                const title = a.textContent;
+                const href = a.href;
+
+                if (!title || !href) {
+                    return [];
+                }
+
+                const url = new URL(href);
+
+                return { title, href: `${url.pathname}?${url.search}` };
+            },
+        );
+
+        OTHER_DZs.value = dzs;
+    });
+});
+
+export function SideMenu() {
+    return html`
+        <div class="${MENU_OPEN.value ? "side-menu open" : "side-menu"}">
+            <${UpdateButton} />
+
+            <h2>DZs</h2>
+            ${OTHER_DZs.value.map(
+                (dz) => html`<p><a href=${dz.href}>${dz.title}</a></p>`,
+            )}
+        </div>
+    `;
+}
+
+export function StickyFooter() {
+    return html`
+        <div class="sticky-footer">
+            <a class="item" href="#top">
+                <div class="wrap">
+                    <div class="icon">⬆️</div>
+                </div>
+            </a>
+
+            <a class="item" href="#observation-graph">
+                <div class="wrap">
+                    <div class="icon">📈</div>
+                    <div class="text">Havainnot</div>
+                </div>
+            </a>
+
+            <a class="item" href="#forecast-graph">
+                <div class="wrap">
+                    <div class="icon">📈</div>
+                    <div class="text">Ennuste</div>
+                </div>
+            </a>
+
+            <a class="item" href="#observations">
+                <div class="wrap">
+                    <div class="icon">🧾</div>
+                    <div class="text">Havainnot</div>
+                </div>
+            </a>
+
+            <a class="item" href="#forecasts">
+                <div class="wrap">
+                    <div class="icon">🧾</div>
+                    <div class="text">Ennuste</div>
+                </div>
+            </a>
+
+            <button
+                class="menu-burger"
+                type="button"
+                onClick=${() => {
+                    MENU_OPEN.value = !MENU_OPEN.value;
+                }}
+            >
+                ☰
+            </button>
+        </div>
+    `;
+}
+
 export function Root() {
     const history = !!HOVERED_OBSERVATION.value;
     const latestMetar = METARS.value?.[0];
@@ -395,47 +528,8 @@ export function Root() {
                 </div>
             </div>
 
-            <div class="sticky-footer">
-                <a class="item" href="#top">
-                    <div class="wrap">
-                        <div class="icon">⬆️</div>
-                    </div>
-                </a>
-
-                <a class="item" href="#observation-graph">
-                    <div class="wrap">
-                        <div class="icon">📈</div>
-                        <div class="text">Havainnot</div>
-                    </div>
-                </a>
-
-                <a class="item" href="#forecast-graph">
-                    <div class="wrap">
-                        <div class="icon">📈</div>
-                        <div class="text">Ennuste</div>
-                    </div>
-                </a>
-
-                <a class="item" href="#observations">
-                    <div class="wrap">
-                        <div class="icon">🧾</div>
-                        <div class="text">Havainnot</div>
-                    </div>
-                </a>
-
-                <a class="item" href="#forecasts">
-                    <div class="wrap">
-                        <div class="icon">🧾</div>
-                        <div class="text">Ennuste</div>
-                    </div>
-                </a>
-
-                <div class="item">
-                    <div class="wrap">
-                        <${UpdateButton} />
-                    </div>
-                </div>
-            </div>
+            <${SideMenu} />
+            <${StickyFooter} />
         </div>
     `;
 }
