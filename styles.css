@@ -211,3 +211,7 @@ p {
 .side-menu.open {
     right: 0;
 }
+
+.hide {
+    display: none;
+}

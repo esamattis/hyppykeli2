@@ -387,6 +387,10 @@ effect(() => {
  */
 function downloadDataDump(e) {
     e.preventDefault();
+    let mode = "download";
+    if (e.submitter instanceof HTMLButtonElement) {
+        mode = e.submitter.value;
+    }
 
     if (!(e.target instanceof HTMLFormElement)) {
         return;
@@ -408,10 +412,21 @@ function downloadDataDump(e) {
         return;
     }
 
-    const name = storedQuery.replaceAll("::", "_");
-    const date = new Date().toISOString().split("T")[0]?.replaceAll("-", "");
-    const clock = formatClock(new Date()).replace(":", "");
-    saveTextToFile(`hyppykeli_${date}-${clock}_${name}.xml`, raw);
+    if (mode === "download") {
+        const name = storedQuery.replaceAll("::", "_");
+        const date = new Date()
+            .toISOString()
+            .split("T")[0]
+            ?.replaceAll("-", "");
+        const clock = formatClock(new Date()).replace(":", "");
+        saveTextToFile(`hyppykeli_${date}-${clock}_${name}.xml`, raw);
+    } else {
+        navigator.share({
+            title: "Hyppykeli",
+            text: "Hyppykeli",
+            url: `data:text/xml,${encodeURIComponent(raw)}`,
+        });
+    }
 }
 
 export function SideMenu() {
@@ -438,7 +453,20 @@ export function SideMenu() {
                         (key) => html` <option value=${key}>${key}</option> `,
                     )}
                 </select>
-                <button type="submit">Lataa</button>
+                <button type="submit" name="mode" value="download">
+                    Lataa
+                </button>
+                <button
+                    class=${
+                        // @ts-ignore
+                        navigator.share ? "" : "hidden"
+                    }
+                    type="submit"
+                    name="mode"
+                    value="share"
+                >
+                    Jaa
+                </button>
             </form>
         </div>
     `;
