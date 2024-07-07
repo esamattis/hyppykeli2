@@ -188,7 +188,7 @@ p {
     right: -100%;
     top: 0;
     bottom: 0px;
-    width: clamp(280px, 300px, 80vw);
+    width: clamp(250px, 300px, 70vw);
     overflow-y: auto;
     background-color: white;
     box-shadow: -6px 0 2px -2px gray;
