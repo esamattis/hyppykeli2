@@ -11,6 +11,7 @@ import {
     LATLONG,
     HOVERED_OBSERVATION,
     FORECAST_DATE,
+    STALE_FORECASTS,
 } from "./data.js";
 import { formatClock, formatDate } from "./utils.js";
 
@@ -164,7 +165,10 @@ export function Graph() {
             <span class="date"> ${formatDate(FORECAST_DATE.value)} </span>
         </h2>
 
-        <div class="chart" onMouseLeave=${onMouseLeaveObs}>
+        <div
+            class=${STALE_FORECASTS.value ? "chart stale" : "chart fresh"}
+            onMouseLeave=${onMouseLeaveObs}
+        >
             <canvas ref=${foreChartRef}></canvas>
         </div>
     </div>`;

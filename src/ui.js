@@ -17,6 +17,7 @@ import {
     RAW_DATA,
     FORECAST_DAY,
     FORECAST_DATE,
+    STALE_FORECASTS,
 } from "./data.js";
 
 import { Graph } from "./graph.js";
@@ -471,6 +472,27 @@ function spaNavigate(e) {
     updateWeatherData();
 }
 
+/**
+ * @param {Event} e
+ */
+function handleForecastDayChange(e) {
+    if (!(e.target instanceof HTMLInputElement)) {
+        return;
+    }
+
+    const value = new Date(e.target.value);
+    const dayDiff =
+        Math.floor(
+            (value.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
+        ) + 1;
+
+    const next = new URL(window.location.href);
+    next.searchParams.set("forecast_day", dayDiff.toString());
+
+    history.pushState({}, "", next.toString());
+    updateWeatherData();
+}
+
 export function SideMenu() {
     return html`
         <div class="${MENU_OPEN.value ? "side-menu open" : "side-menu"}">
@@ -483,16 +505,24 @@ export function SideMenu() {
 
             <h2>Ennuste</h2>
 
-            <a onClick=${spaNavigate} href="?forecast_day=1"
-                >Näytä huomisen ennuste</a
-            >
+            <p>
+                ${FORECAST_DAY.value === 0
+                    ? html`<a onClick=${spaNavigate} href="?forecast_day=1"
+                          >Näytä huomisen ennuste</a
+                      >`
+                    : html`<a onClick=${spaNavigate} href="?forecast_day=0"
+                          >Näytä tämän päivän ennuste</a
+                      >`}
+            </p>
 
             <form>
-                Hae ennuste päivälle:
+                Hae ennuste päivälle:${" "}
                 <input
                     type="date"
                     name="forecast_date"
-                    defaultValue=${new Date().toISOString().split("T")[0]}
+                    min=${new Date().toISOString().split("T")[0]}
+                    onInput=${handleForecastDayChange}
+                    value=${FORECAST_DATE.value.toISOString().split("T")[0]}
                 />
             </form>
 
@@ -656,7 +686,7 @@ export function Root() {
                         />
                     </div>
 
-                    <div>
+                    <div class=${STALE_FORECASTS.value ? "stale" : "fresh"}>
                         <div class="anchor" id="forecasts"></div>
                         <h2 class="sticky">
                             Ennuste

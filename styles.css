@@ -229,3 +229,12 @@ h2 .date {
     font-weight: normal;
     margin-left: 1ch;
 }
+
+.fresh {
+    transition: opacity 0.3s ease;
+    opacity: 1;
+}
+
+.stale {
+    opacity: 0.2;
+}

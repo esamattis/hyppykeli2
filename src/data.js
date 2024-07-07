@@ -47,6 +47,11 @@ export const NAME = signal(undefined);
 export const LOADING = signal(0);
 
 /**
+ * @type {Signal<boolean>}
+ */
+export const STALE_FORECASTS = signal(true);
+
+/**
  * @type {Signal<string | undefined>}
  */
 export const STATION_NAME = signal(undefined);
@@ -94,6 +99,9 @@ export const FORECAST_DAY = signal(0);
  */
 export const FORECAST_DATE = computed(() => {
     const day = FORECAST_DAY.value;
+
+    STALE_FORECASTS.value = true;
+
     if (day === 0) {
         return new Date();
     }
@@ -111,7 +119,7 @@ export const RAW_DATA = signal({});
 /** @type {ReturnType<typeof setTimeout>} */
 let timer;
 
-HOVERED_OBSERVATION.subscribe((value) => {
+HOVERED_OBSERVATION.subscribe(() => {
     clearTimeout(timer);
 
     timer = setTimeout(() => {
@@ -506,6 +514,7 @@ export async function updateWeatherData() {
     });
 
     FORECASTS.value = combinedForecasts;
+    STALE_FORECASTS.value = false;
 }
 
 updateWeatherData().then(() => {
