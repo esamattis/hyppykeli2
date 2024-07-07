@@ -22,7 +22,12 @@ import {
 
 import { Graph } from "./graph.js";
 import { Compass } from "./compass.js";
-import { formatClock, formatDate, saveTextToFile } from "./utils.js";
+import {
+    dateOffset,
+    formatClock,
+    formatDate,
+    saveTextToFile,
+} from "./utils.js";
 
 effect(() => {
     document.title = NAME.value + " – Hyppykeli";
@@ -521,6 +526,7 @@ export function SideMenu() {
                     type="date"
                     name="forecast_date"
                     min=${new Date().toISOString().split("T")[0]}
+                    max=${dateOffset(9).toISOString().split("T")[0]}
                     onInput=${handleForecastDayChange}
                     value=${FORECAST_DATE.value.toISOString().split("T")[0]}
                 />

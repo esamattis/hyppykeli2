@@ -70,3 +70,12 @@ export function saveTextToFile(filename, text) {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 }
+
+/**
+ * @param {number} offset
+ */
+export function dateOffset(offset) {
+    const date = new Date();
+    date.setDate(date.getDate() + offset);
+    return date;
+}
