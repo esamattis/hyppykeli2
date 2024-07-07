@@ -348,8 +348,10 @@ function UpdateButton() {
                 updateWeatherData();
             }}
         >
-            ♻
+            Päivitä
         </button>
+        <br />
+        <small> Tiedot päivitetään automaattisesti minuutin välein. </small>
     `;
 }
 
@@ -533,13 +535,6 @@ function handleForecastDayChange(e) {
 export function SideMenu() {
     return html`
         <div class="${MENU_OPEN.value ? "side-menu open" : "side-menu"}">
-            <${UpdateButton} />
-
-            <h2>DZs</h2>
-            ${OTHER_DZs.value.map(
-                (dz) => html`<p><a href=${dz.href}>${dz.title}</a></p>`,
-            )}
-
             <h2>Ennuste</h2>
 
             <p>
@@ -563,6 +558,15 @@ export function SideMenu() {
                     value=${FORECAST_DATE.value.toISOString().split("T")[0]}
                 />
             </form>
+
+            <p>
+                <${UpdateButton} />
+            </p>
+
+            <h2>DZs</h2>
+            ${OTHER_DZs.value.map(
+                (dz) => html`<p><a href=${dz.href}>${dz.title}</a></p>`,
+            )}
 
             <h2>Ongelmia?</h2>
 
