@@ -194,7 +194,12 @@ export const METARS = signal(undefined);
 /**
  * @type {Signal<string|null>}
  */
-export const LATLONG = signal(null);
+export const STATION_COORDINATES = signal(null);
+
+/**
+ * @type {Signal<string|null>}
+ */
+export const FORECAST_COORDINATES = signal(null);
 
 /**
  * @type {Signal<string[]>}
@@ -446,11 +451,18 @@ export async function updateWeatherData() {
     const url = new URL(location.href);
     const fmisid = url.searchParams.get("fmisid");
     const icaocode = url.searchParams.get("icaocode");
+    const lat = Number(url.searchParams.get("lat"));
+    const lon = Number(url.searchParams.get("lon"));
+    const customName = url.searchParams.get("name");
     const forecastDay = Number(url.searchParams.get("forecast_day")) || 0;
     const obsRange = Number(url.searchParams.get("observation_range")) || 12;
     const forecastRange = Number(url.searchParams.get("forecast_range")) || 8;
 
-    NAME.value = icaocode ?? undefined;
+    if (lat && lon) {
+        FORECAST_COORDINATES.value = `${lat},${lon}`;
+    }
+
+    NAME.value = customName || icaocode || undefined;
     FORECAST_DAY.value = forecastDay;
 
     const obsStartTime = new Date();
@@ -523,13 +535,9 @@ export async function updateWeatherData() {
         NAME.value = name;
     }
 
-    const coordinates = doc
-        .querySelector("pos")
-        ?.innerHTML.trim()
-        .split(/\s+/)
-        .join(",");
-
-    LATLONG.value = coordinates ?? null;
+    STATION_COORDINATES.value =
+        doc.querySelector("pos")?.innerHTML.trim().split(/\s+/).join(",") ??
+        null;
 
     const gusts = parseTimeSeries(doc, "obs-obs-1-1-windgust").reverse();
     const windSpeed = parseTimeSeries(doc, "obs-obs-1-1-windspeedms").reverse();
@@ -592,7 +600,7 @@ export async function updateWeatherData() {
                 "MiddleAndLowCloudCover",
             ].join(","),
             // place: "Utti",
-            latlon: coordinates,
+            latlon: FORECAST_COORDINATES.value ?? STATION_COORDINATES.value,
         },
         "/example_data/forecast.xml",
     );

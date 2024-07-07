@@ -34,6 +34,13 @@
                 <p>
                     <a href="/dz/?fmisid=101786&icaocode=EFOU">EFOU</a>
                 </p>
+
+                <p>
+                    <a
+                        href="/dz/?icaocode=EFHK&fmisid=100968&name=Meripuisto&lat=60.155125&lon=24.945773"
+                        >Meripuisto</a
+                    >
+                </p>
             </div>
 
             <p>
@@ -47,9 +54,24 @@
             <h2>Luo droppis</h2>
 
             <form action="/dz">
-                <input type="text" name="icaocode" placeholder="ICAO" />
-                <input type="text" name="fmisid" placeholder="FMISID" />
-                <button>Luo</button>
+                <fieldset>
+                    <legend>Foo</legend>
+                    <input type="text" name="icaocode" placeholder="ICAO" />
+                    <input type="text" name="fmisid" placeholder="FMISID" />
+                    <input type="text" name="name" placeholder="Nimi" />
+                </fieldset>
+
+                <fieldset>
+                    <legend>Ennusteen sijainti</legend>
+                    <input type="text" name="lat" placeholder="lat" />
+                    <input type="text" name="lon" placeholder="lon" />
+                    <small>
+                        Ei pakollinen. Käytetään havaintoaseman sijaintia jos ei
+                        annettu.
+                    </small>
+                </fieldset>
+
+                <button style="margin-top: 10px">Luo</button>
             </form>
 
             <p>

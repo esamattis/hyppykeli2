@@ -6,7 +6,8 @@ import {
     FORECASTS,
     OBSERVATIONS,
     NAME,
-    LATLONG,
+    STATION_COORDINATES,
+    FORECAST_COORDINATES,
     METARS,
     STATION_NAME,
     ERRORS,
@@ -771,7 +772,7 @@ export function Root() {
                         ? html`
                               Katso havaintoaseman${" "}
                               <a
-                                  href="https://www.google.fi/maps/place/${LATLONG}"
+                                  href="https://www.google.fi/maps/place/${STATION_COORDINATES.value}"
                                   >${STATION_NAME} sijainti</a
                               >.
                           `
@@ -843,6 +844,17 @@ export function Root() {
                                 ${humanDayText(FORECAST_DATE.value)}
                             </span>
                         </h2>
+
+                        <p>
+                            Ennuste tehty alueelle${" "}
+                            <a
+                                href="https://www.google.fi/maps/place/${FORECAST_COORDINATES.value ??
+                                STATION_COORDINATES.value}"
+                            >
+                                ${FORECAST_COORDINATES.value ??
+                                STATION_COORDINATES.value} </a
+                            >.
+                        </p>
 
                         <div class="side-scroll">
                             <${DataTable}
