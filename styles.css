@@ -113,6 +113,7 @@ input[type="text"] {
 
 .compass {
     display: flex;
+    z-index: 1000;
 }
 
 .historic {
