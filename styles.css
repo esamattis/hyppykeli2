@@ -139,7 +139,7 @@ dialog {
 }
 
 .help-content {
-    width: clamp(300px, 400px, 500px);
+    width: clamp(300px, 400px, 90vw);
 }
 
 .help {
