@@ -265,13 +265,20 @@ function LatestMetar() {
         return html`<p>Ladataan METAR-sanomaa...</p>`;
     }
 
+    let msg = "";
+
+    if (latest?.clouds.length === 0) {
+        if (latest.metar.includes("METAR")) {
+            msg = "Ei pilviä alle 1500M (CAVOK)";
+        } else {
+            msg = "Tietoa pilvistä";
+        }
+    }
+
     return html`
         <ul>
-            ${latest?.clouds.length === 0
-                ? html`<p>
-                      Ei pilviä alle 1500M (CAVOK) ${" "}
-                      <${FromNow} date=${latest.time} />
-                  </p>`
+            ${msg
+                ? html`<p>${msg}</p>`
                 : latest.clouds.map(
                       (cloud, i) =>
                           html`<li>
