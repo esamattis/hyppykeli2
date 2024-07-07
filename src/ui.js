@@ -18,6 +18,7 @@ import {
     FORECAST_DAY,
     FORECAST_DATE,
     STALE_FORECASTS,
+    GUST_TREND,
 } from "./data.js";
 
 import { Graph } from "./graph.js";
@@ -26,6 +27,8 @@ import {
     dateOffset,
     formatClock,
     formatDate,
+    Help,
+    humanDayText,
     saveTextToFile,
 } from "./utils.js";
 
@@ -252,6 +255,8 @@ function LatestGust() {
         return html`<p>Ladataan tuulitietoja...</p>`;
     }
 
+    const help = html`<${Help} label="?">Seuraavan tunnin ennustuksien keskiarvo.</${Help}>`;
+
     return html`
         <p class=${history ? "historic" : ""}>
             Puuska
@@ -266,6 +271,12 @@ function LatestGust() {
                 >${" "}${latest.speed} m/s${" "}</span
             >
             <${FromNow} date=${latest.time} />
+            <br />
+            ${GUST_TREND.value === 0
+                ? null
+                : GUST_TREND.value > 0
+                  ? html`Mahdollisesti voimistuva ↗ ${help}`
+                  : html`Mahdollisesti hveikkenevä ↘ ${help}`}
         </p>
     `;
 }
@@ -753,7 +764,8 @@ export function Root() {
                         <h2 class="sticky">
                             Ennuste
                             <span class="date">
-                                ${formatDate(FORECAST_DATE.value)}
+                                ${formatDate(FORECAST_DATE.value)} ${" "}
+                                ${humanDayText(FORECAST_DATE.value)}
                             </span>
                         </h2>
 

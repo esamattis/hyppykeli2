@@ -79,3 +79,25 @@ export function dateOffset(offset) {
     date.setDate(date.getDate() + offset);
     return date;
 }
+
+/**
+ * @param {Date} date
+ */
+export function humanDayText(date) {
+    const day = date.getDate();
+    const today = new Date().getDate();
+
+    if (day === today) {
+        return "tänään";
+    }
+
+    if (day === today + 1) {
+        return "huomenna";
+    }
+
+    if (day === today + 2) {
+        return "ylihuomenna";
+    }
+
+    return "";
+}

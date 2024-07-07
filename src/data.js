@@ -72,6 +72,31 @@ export const HOVERED_OBSERVATION = signal(undefined);
 export const FORECASTS = signal([]);
 
 /**
+ * @type {Signal<number>}
+ */
+export const GUST_TREND = computed(() => {
+    const maxAge = Date.now() + 1000 * 60 * 60;
+    const latestGust = OBSERVATIONS.value.at(-1)?.gust ?? 0;
+
+    const recentGusts = FORECASTS.value.flatMap((point) => {
+        if (point.time.getTime() <= maxAge) {
+            return point.gust;
+        }
+
+        return [];
+    });
+
+    if (recentGusts.length === 0) {
+        return 0;
+    }
+
+    const avg =
+        recentGusts.reduce((sum, gust) => sum + gust, 0) / recentGusts.length;
+
+    return -latestGust + avg;
+});
+
+/**
  * @type {Signal<MetarData[] | undefined>}
  */
 export const METARS = signal(undefined);

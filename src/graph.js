@@ -7,13 +7,11 @@ import { Chart } from "chart.js";
 import {
     FORECASTS,
     OBSERVATIONS,
-    NAME,
-    LATLONG,
     HOVERED_OBSERVATION,
     FORECAST_DATE,
     STALE_FORECASTS,
 } from "./data.js";
-import { formatClock, formatDate } from "./utils.js";
+import { formatClock, formatDate, humanDayText } from "./utils.js";
 
 /**
  * @param {Chart} obs
@@ -162,7 +160,10 @@ export function Graph() {
         </div>
         <h2 id="forecast-graph">
             Ennusteet
-            <span class="date"> ${formatDate(FORECAST_DATE.value)} </span>
+            <span class="date">
+                ${formatDate(FORECAST_DATE.value)} ${" "}
+                ${humanDayText(FORECAST_DATE.value)}
+            </span>
         </h2>
 
         <div
