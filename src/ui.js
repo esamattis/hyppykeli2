@@ -784,17 +784,21 @@ export function Root() {
                 <${Graph} />
 
                 <div class="as-rows-on-big-screen">
-                    <div class="anchor" id="observations"></div>
-                    <h2 class="sticky">
-                        Havainnot
-                        <span class="date"> ${formatDate(new Date())} </span>
-                    </h2>
-                    <div class="side-scroll">
-                        <${DataTable}
-                            data=${OBSERVATIONS}
-                            thead=${html`<${ObservationTHead} />`}
-                            Rows=${ObservationRows}
-                        />
+                    <div>
+                        <div class="anchor" id="observations"></div>
+                        <h2 class="sticky">
+                            Havainnot
+                            <span class="date">
+                                ${formatDate(new Date())}
+                            </span>
+                        </h2>
+                        <div class="side-scroll">
+                            <${DataTable}
+                                data=${OBSERVATIONS}
+                                thead=${html`<${ObservationTHead} />`}
+                                Rows=${ObservationRows}
+                            />
+                        </div>
                     </div>
 
                     <div class=${STALE_FORECASTS.value ? "stale" : "fresh"}>
