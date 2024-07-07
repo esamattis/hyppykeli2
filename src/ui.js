@@ -799,7 +799,9 @@ export function Root() {
                         />
                     </div>
 
-                    <div class=${STALE_FORECASTS.value ? "stale" : "fresh"}>
+                    <div
+                        class=${`side-scroll ${STALE_FORECASTS.value ? "stale" : "fresh"}`}
+                    >
                         <div class="anchor" id="forecasts"></div>
                         <h2 class="sticky">
                             Ennuste
