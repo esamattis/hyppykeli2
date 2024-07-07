@@ -16,8 +16,18 @@ a:visited {
     color: blue;
 }
 
-th {
+.weather-table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+.weather-table th {
     text-align: left;
+}
+
+.weather-table td,
+.weather-table th {
+    width: 68px;
 }
 
 .logo,
@@ -249,10 +259,6 @@ h2 .date {
     height: 20px;
     display: inline-block;
     transform: rotate(var(--direction));
-}
-
-.weather-table {
-    width: 500px;
 }
 
 .side-scroll {

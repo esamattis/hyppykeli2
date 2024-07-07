@@ -784,14 +784,12 @@ export function Root() {
                 <${Graph} />
 
                 <div class="as-rows-on-big-screen">
-                    <div>
-                        <div class="anchor" id="observations"></div>
-                        <h2 class="sticky">
-                            Havainnot
-                            <span class="date">
-                                ${formatDate(new Date())}
-                            </span>
-                        </h2>
+                    <div class="anchor" id="observations"></div>
+                    <h2 class="sticky">
+                        Havainnot
+                        <span class="date"> ${formatDate(new Date())} </span>
+                    </h2>
+                    <div class="side-scroll">
                         <${DataTable}
                             data=${OBSERVATIONS}
                             thead=${html`<${ObservationTHead} />`}
@@ -799,9 +797,7 @@ export function Root() {
                         />
                     </div>
 
-                    <div
-                        class=${`side-scroll ${STALE_FORECASTS.value ? "stale" : "fresh"}`}
-                    >
+                    <div class=${STALE_FORECASTS.value ? "stale" : "fresh"}>
                         <div class="anchor" id="forecasts"></div>
                         <h2 class="sticky">
                             Ennuste
@@ -811,11 +807,13 @@ export function Root() {
                             </span>
                         </h2>
 
-                        <${DataTable}
-                            data=${FORECASTS}
-                            thead=${html`<${ForecastTHead} />`}
-                            Rows=${ForecastRows}
-                        />
+                        <div class="side-scroll">
+                            <${DataTable}
+                                data=${FORECASTS}
+                                thead=${html`<${ForecastTHead} />`}
+                                Rows=${ForecastRows}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
