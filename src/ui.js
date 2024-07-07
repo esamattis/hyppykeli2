@@ -749,7 +749,7 @@ function Parachute() {
 
 function ForecastLocationInfo() {
     return html`
-        Ennuste on haettu halueelle${" "}
+        Ennuste on tehty alueelle${" "}
         <a
             href="https://www.google.fi/maps/place/${FORECAST_COORDINATES.value ||
             STATION_COORDINATES.value}"
@@ -782,10 +782,10 @@ export function Root() {
                 <p>
                     ${STATION_NAME.value
                         ? html`
-                              Katso havaintoaseman${" "}
+                              Tiedot haettu havaintoasemalta${" "}
                               <a
                                   href="https://www.google.fi/maps/place/${STATION_COORDINATES.value}"
-                                  >${STATION_NAME} sijainti</a
+                                  >${STATION_NAME}</a
                               >.${" "}
 
                               <${ForecastLocationInfo} />
