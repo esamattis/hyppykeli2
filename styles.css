@@ -126,9 +126,15 @@ svg .historic {
 }
 
 dialog {
-    max-width: 600px;
-    margin: 20px;
+    margin: 0 auto;
+    margin-top: 20px;
     font-weight: normal;
+    width: clamp(300px, 400px, 95vw);
+    white-space: wrap;
+}
+
+.help-content {
+    width: clamp(300px, 400px, 500px);
 }
 
 .help {
