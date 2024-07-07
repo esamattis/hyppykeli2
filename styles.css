@@ -215,3 +215,7 @@ p {
 .hide {
     display: none;
 }
+
+button[value="share"] {
+    margin-left: 1ch;
+}

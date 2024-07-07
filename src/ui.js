@@ -412,19 +412,23 @@ function downloadDataDump(e) {
         return;
     }
 
+    const date = new Date().toISOString().split("T")[0]?.replaceAll("-", "");
+    const clock = formatClock(new Date()).replace(":", "");
+
+    const name = storedQuery.replaceAll("::", "_");
+    const filename = `hyppykeli_${date}-${clock}_${name}.xml`;
+
     if (mode === "download") {
-        const name = storedQuery.replaceAll("::", "_");
-        const date = new Date()
-            .toISOString()
-            .split("T")[0]
-            ?.replaceAll("-", "");
-        const clock = formatClock(new Date()).replace(":", "");
-        saveTextToFile(`hyppykeli_${date}-${clock}_${name}.xml`, raw);
+        saveTextToFile(filename, raw);
     } else {
+        const file = new File([raw], filename, {
+            type: "application/xml",
+        });
+
         navigator.share({
             title: "Hyppykeli",
             text: "Hyppykeli",
-            url: `data:text/xml,${encodeURIComponent(raw)}`,
+            files: [file],
         });
     }
 }
