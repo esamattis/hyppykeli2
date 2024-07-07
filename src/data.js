@@ -71,6 +71,8 @@ export const HOVERED_OBSERVATION = signal(undefined);
  */
 export const FORECASTS = signal([]);
 
+export const WIND_VARIATIONS = signal(undefined);
+
 /**
  * @type {Signal<number>}
  */
@@ -461,6 +463,80 @@ export async function updateWeatherData() {
 
     OBSERVATIONS.value = combined;
 
+    // Calculate wind variations for the last 30 minutes
+    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+    const recentObservations = combined.filter(
+        (obs) => obs.time >= thirtyMinutesAgo && obs.direction !== -1,
+    );
+
+    if (recentObservations.length > 0) {
+        const directions = recentObservations.map((obs) => obs.direction);
+        const speeds = recentObservations.map((obs) => obs.speed);
+        const gusts = recentObservations.map((obs) => obs.gust);
+
+        // Calculate the average direction
+        const sumSin = directions.reduce(
+            (sum, dir) => sum + Math.sin((dir * Math.PI) / 180),
+            0,
+        );
+        const sumCos = directions.reduce(
+            (sum, dir) => sum + Math.cos((dir * Math.PI) / 180),
+            0,
+        );
+        const averageDirection =
+            ((Math.atan2(sumSin, sumCos) * 180) / Math.PI + 360) % 360;
+
+        // Calculate the variation range
+        let maxDiff = 0;
+        for (let i = 0; i < directions.length; i++) {
+            for (let j = i + 1; j < directions.length; j++) {
+                const dir1 = directions[i];
+                const dir2 = directions[j];
+                if (typeof dir1 === "number" && typeof dir2 === "number") {
+                    const diff = calculateDirectionDifference(dir1, dir2);
+                    if (diff > maxDiff) {
+                        maxDiff = diff;
+                    }
+                }
+            }
+        }
+
+        const variationRange = maxDiff;
+
+        // Calculate speed variation
+        const averageSpeed =
+            speeds.reduce((sum, speed) => sum + speed, 0) / speeds.length;
+        const maxGust = Math.max(...gusts);
+        const gustSpeedRatio = maxGust / averageSpeed;
+
+        // Determine color and width based on criteria
+        let color = "green";
+        let extraWidth = 0;
+
+        if (gustSpeedRatio >= 2) {
+            color = "red";
+            extraWidth = 20;
+        } else if (gustSpeedRatio >= 1.5) {
+            color = "orange";
+            extraWidth = 10;
+        }
+
+        if (variationRange > 90) {
+            color = "red";
+        } else if (variationRange >= 45 && color !== "red") {
+            color = "orange";
+        }
+
+        WIND_VARIATIONS.value = {
+            variationRange,
+            averageDirection,
+            color,
+            extraWidth,
+        };
+    } else {
+        WIND_VARIATIONS.value = undefined;
+    }
+
     const forecastStartTime = new Date();
     const forecastEndTime = new Date();
     forecastEndTime.setHours(
@@ -572,3 +648,14 @@ window.addEventListener("pageshow", (event) => {
 });
 
 setInterval(updateWeatherData, 60000);
+
+/**
+ * Calculates the difference between two wind directions considering the circular nature of directions.
+ * @param {number} dir1 - First wind direction.
+ * @param {number} dir2 - Second wind direction.
+ * @returns {number} The minimum difference between the two directions.
+ */
+function calculateDirectionDifference(dir1, dir2) {
+    const diff = Math.abs(dir1 - dir2);
+    return Math.min(diff, 360 - diff);
+}
