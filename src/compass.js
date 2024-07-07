@@ -59,12 +59,20 @@ export function Compass() {
             </svg>
 
             <${Help}>
-                Kompassin nuoli kertoo tuulen suunnan ja pituus tuulen puuskan. Oranssi
-                ympyrä on oppilasraja (8 m/s) ja musta ympyrä on kelppariraja (11 m/s).
-                Värillinen kaari osoittaa tuulen vaihtelun 30 minuutin aikana:
-                    • Vihreä: Oletusväri, kun vaihtelu on alle 45 astetta ja puuska on alle 50 % suurempi kuin keskimääräinen tuuli.
-                    • Oranssi: Kun vaihtelu on 45-90 astetta tai puuska on 50-100 % suurempi kuin keskimääräinen tuuli. Kaari on tässä tapauksessa 10px leveämpi.
-                    • Punainen: Kun vaihtelu on yli 90 astetta tai puuska on 100 % tai enemmän suurempi kuin keskimääräinen tuuli. Kaari on tässä tapauksessa 20px leveämpi.
+                <p>
+                    Kompassin nuoli kertoo tuulen suunnan ja pituus tuulen puuskan. Oranssi
+                    ympyrä on oppilasraja (8 m/s) ja musta ympyrä on kelppariraja (11 m/s).
+                </p>
+
+                <p>
+                    Värillinen kaari osoittaa tuulen vaihtelun 30 minuutin aikana:
+                </p>
+
+                <ul>
+                    <li>Vihreä: Oletusväri, kun vaihtelu on alle 45 astetta ja puuska on alle 50 % suurempi kuin keskimääräinen tuuli.</li>
+                    <li>Oranssi: Kun vaihtelu on 45-90 astetta tai puuska on 50-100 % suurempi kuin keskimääräinen tuuli. Kaari on tässä tapauksessa 10px leveämpi.</li>
+                    <li>Punainen: Kun vaihtelu on yli 90 astetta tai puuska on 100 % tai enemmän suurempi kuin keskimääräinen tuuli. Kaari on tässä tapauksessa 20px leveämpi.</li>
+                </ul>
             </${Help}>
         </div>
     `;
@@ -113,8 +121,8 @@ function WindVariations() {
     const endAngle = (averageDirection + variationRange / 2) % 360;
 
     // Convert angles to radians
-    const startRad = (startAngle - 90) * Math.PI / 180;
-    const endRad = (endAngle - 90) * Math.PI / 180;
+    const startRad = ((startAngle - 90) * Math.PI) / 180;
+    const endRad = ((endAngle - 90) * Math.PI) / 180;
 
     // Calculate the coordinates for the arc path
     const startOuterX = 200 + outerRadius * Math.cos(startRad);
@@ -132,9 +140,9 @@ function WindVariations() {
     return html`
         <g>
             <path
-                d=${`M ${startOuterX} ${startOuterY} 
+                d=${`M ${startOuterX} ${startOuterY}
                     A ${outerRadius} ${outerRadius} 0 ${longArc} 1 ${endOuterX} ${endOuterY}
-                    L ${startInnerX} ${startInnerY} 
+                    L ${startInnerX} ${startInnerY}
                     A ${innerRadius} ${innerRadius} 0 ${longArc} 0 ${endInnerX} ${endInnerY} Z`}
                 fill=${color}
                 fill-opacity="0.2"

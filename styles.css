@@ -204,6 +204,9 @@ p {
     height: 40px;
     width: 40px;
     font-size: 150%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .side-menu.open {
