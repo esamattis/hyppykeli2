@@ -1,5 +1,4 @@
 // @ts-check
-import { render } from "preact";
 import { useCallback, useEffect, useState } from "preact/hooks";
 import { html } from "htm/preact";
 import {
@@ -313,7 +312,7 @@ function UpdateButton() {
     `;
 }
 
-function Root() {
+export function Root() {
     const history = !!HOVERED_OBSERVATION.value;
     const latestMetar = METARS.value?.[0];
     return html`
@@ -441,9 +440,3 @@ function Root() {
         </div>
     `;
 }
-
-const root = document.getElementById("root");
-if (!root) {
-    throw new Error("Root element not found");
-}
-render(html`<${Root} />`, root);
