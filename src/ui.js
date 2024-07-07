@@ -374,7 +374,7 @@ effect(() => {
 
                 const url = new URL(href);
 
-                return { title, href: `${url.pathname}?${url.search}` };
+                return { title, href: `${url.pathname}${url.search}` };
             },
         );
 
