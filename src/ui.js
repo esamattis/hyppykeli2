@@ -425,11 +425,20 @@ function downloadDataDump(e) {
             type: "application/xml",
         });
 
-        navigator.share({
+        /**
+         * @type {ShareData}
+         */
+        const share = {
             title: "Hyppykeli datadump " + storedQuery,
             text: `Hyppykeli datadump ${storedQuery} ${date} ${clock}`,
             files: [file],
-        });
+        };
+
+        if (navigator.canShare(share)) {
+            alert("Jakaminen ei ole tuettu tässä selaimessa.");
+        } else {
+            navigator.share(share);
+        }
     }
 }
 
