@@ -383,7 +383,7 @@ effect(() => {
 });
 
 function downloadDataDumps() {
-    for (const [name, raw] of Object.entries(RAW_DATA.value)) {
+    for (const [name, raw] of RAW_DATA.entries()) {
         const date = new Date()
             .toISOString()
             .split("T")[0]

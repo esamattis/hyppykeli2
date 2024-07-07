@@ -78,9 +78,9 @@ export const LATLONG = signal(null);
 export const ERRORS = signal([]);
 
 /**
- * @type {Signal<Record<string, string>>}
+ * @type {Map<string, string>}
  */
-export const RAW_DATA = signal({});
+export const RAW_DATA = new Map();
 
 /** @type {ReturnType<typeof setTimeout>} */
 let timer;
@@ -296,11 +296,7 @@ export function addError(msg) {
  */
 function addRawData(name, data) {
     name = name.replaceAll("::", "_");
-
-    RAW_DATA.value = {
-        ...RAW_DATA.value,
-        [name]: data,
-    };
+    RAW_DATA.set(name, data);
 }
 
 export async function updateWeatherData() {
