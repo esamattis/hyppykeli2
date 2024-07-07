@@ -281,3 +281,40 @@ h2 .date {
     overflow-x: auto;
     width: 100%;
 }
+
+.icon-parachute {
+    height: 20px;
+}
+
+.scale {
+    transform: scale(2);
+}
+
+.rotate {
+    animation: rotate 2s linear infinite;
+}
+
+.swing {
+    animation: swing 2s ease-in-out infinite;
+}
+
+@keyframes swing {
+    0% {
+        transform: rotate(30deg);
+    }
+    50% {
+        transform: rotate(-30deg);
+    }
+    100% {
+        transform: rotate(30deg);
+    }
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

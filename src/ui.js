@@ -47,8 +47,10 @@ effect(() => {
 
 /**
  * @param {number} gust
+ * @returns {"ok" | "warning" | "danger"}
  */
 function getWarningLevel(gust) {
+    /** @type {"ok" | "warning" | "danger"} */
     let className = "ok";
 
     if (gust >= 8) {
@@ -722,6 +724,27 @@ function Anvil() {
     `;
 }
 
+function Parachute() {
+    const latestGust = OBSERVATIONS.value?.[0]?.gust ?? 0;
+    const level = getWarningLevel(latestGust);
+
+    let animation = "";
+    if (level === "warning") {
+        animation = "swing";
+    } else if (level === "danger") {
+        animation = "rotate";
+    }
+
+    return html`
+        <span class="scale">
+            <img
+                src="/assets/parachute.svg"
+                class="icon-parachute ${animation}"
+            />
+        </span>
+    `;
+}
+
 export function Root() {
     const history = !!HOVERED_OBSERVATION.value;
     const latestMetar = METARS.value?.[0];
@@ -775,9 +798,15 @@ export function Root() {
 
                         <${LatestMetar} />
                     </div>
+
                     <div>
                         <div class="anchor" id="latest"></div>
-                        <h2>Tuulet</h2>
+                        <h2 class="h2-with-icon">
+                            Tuulet
+                            <div style="width: 1ch"></div>
+
+                            <${Parachute} />
+                        </h2>
 
                         <${Compass} />
 
