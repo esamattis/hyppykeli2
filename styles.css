@@ -238,3 +238,13 @@ h2 .date {
 .stale {
     opacity: 0.2;
 }
+
+.h2-with-icon {
+    display: flex;
+    align-items: center;
+}
+
+.anvil {
+    height: 30px;
+    margin-left: 1ch;
+}

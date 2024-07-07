@@ -609,6 +609,22 @@ export function StickyFooter() {
     `;
 }
 
+function Anvil() {
+    const cb = METARS.value?.at(-1)?.metar?.includes("//////CB");
+    if (!cb) {
+        return;
+    }
+
+    return html`
+        <img
+            class="anvil"
+            alt="Ukkospilvi"
+            title="Ukkospilvi"
+            src="/assets/anvil.svg"
+        />
+    `;
+}
+
 export function Root() {
     const history = !!HOVERED_OBSERVATION.value;
     const latestMetar = METARS.value?.[0];
@@ -655,7 +671,11 @@ export function Root() {
 
                 <div class="as-rows-on-big-screen">
                     <div>
-                        <h2>Pilvet</h2>
+                        <h2 class="h2-with-icon">
+                            Pilvet
+                            <${Anvil} />
+                        </h2>
+
                         <${LatestMetar} />
                     </div>
                     <div>
