@@ -459,7 +459,7 @@ export function SideMenu() {
                 <button
                     class=${
                         // @ts-ignore
-                        navigator.share ? "" : "hidden"
+                        navigator.share ? "" : "hide"
                     }
                     type="submit"
                     name="mode"
