@@ -10,8 +10,9 @@ import {
     NAME,
     LATLONG,
     HOVERED_OBSERVATION,
+    FORECAST_DATE,
 } from "./data.js";
-import { formatClock } from "./utils.js";
+import { formatClock, formatDate } from "./utils.js";
 
 /**
  * @param {Chart} obs
@@ -151,11 +152,18 @@ export function Graph() {
     };
 
     return html`<div class="graphs">
-        <h2 id="observation-graph">Havainnot</h2>
+        <h2 id="observation-graph">
+            Havainnot
+            <span class="date"> ${formatDate(FORECAST_DATE.value)} </span>
+        </h2>
         <div class="chart" onMouseLeave=${onMouseLeaveObs}>
             <canvas ref=${obsChartRef}></canvas>
         </div>
-        <h2 id="forecast-graph">Ennusteet</h2>
+        <h2 id="forecast-graph">
+            Ennusteet
+            <span class="date"> ${formatDate(FORECAST_DATE.value)} </span>
+        </h2>
+
         <div class="chart" onMouseLeave=${onMouseLeaveObs}>
             <canvas ref=${foreChartRef}></canvas>
         </div>

@@ -1,6 +1,6 @@
 // @ts-check
 // docs https://opendata.fmi.fi/wfs?service=WFS&version=2.0.0&request=describeStoredQueries&
-import { signal } from "@preact/signals";
+import { computed, signal } from "@preact/signals";
 
 /**
  * @typedef {import('@preact/signals').Signal<T>} Signal<T>
@@ -80,6 +80,28 @@ export const LATLONG = signal(null);
  * @type {Signal<string[]>}
  */
 export const ERRORS = signal([]);
+
+/**
+ *  How many days in the future the forecast is for.
+ *  0 = today, 1 = tomorrow, 2 = day after tomorrow, etc.
+ *
+ * @type {Signal<number>}
+ */
+export const FORECAST_DAY = signal(0);
+
+/**
+ * @type {Signal<Date>}
+ */
+export const FORECAST_DATE = computed(() => {
+    const day = FORECAST_DAY.value;
+    if (day === 0) {
+        return new Date();
+    }
+
+    const date = new Date();
+    date.setDate(date.getDate() + day);
+    return date;
+});
 
 /**
  * @type {Signal<{ [K in StoredQuery]?: string}>}
@@ -301,10 +323,12 @@ export async function updateWeatherData() {
     const url = new URL(location.href);
     const fmisid = url.searchParams.get("fmisid");
     const icaocode = url.searchParams.get("icaocode");
+    const forecastDay = Number(url.searchParams.get("forecast_day")) || 0;
     const obsRange = Number(url.searchParams.get("observation_range")) || 12;
     const forecastRange = Number(url.searchParams.get("forecast_range")) || 8;
 
     NAME.value = icaocode ?? undefined;
+    FORECAST_DAY.value = forecastDay;
 
     const obsStartTime = new Date();
     obsStartTime.setHours(obsStartTime.getHours() - obsRange, 0, 0, 0);
@@ -412,6 +436,14 @@ export async function updateWeatherData() {
         0,
         0,
     );
+
+    const day = FORECAST_DAY.value;
+    if (day > 0) {
+        forecastStartTime.setHours(7, 0, 0, 0);
+        forecastStartTime.setDate(forecastStartTime.getDate() + day);
+        forecastEndTime.setHours(21, 0, 0, 0);
+        forecastEndTime.setDate(forecastEndTime.getDate() + day);
+    }
 
     const forecastXml = await fmiRequest(
         // "fmi::forecast::hirlam::surface::point::timevaluepair",

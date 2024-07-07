@@ -45,6 +45,13 @@ export function formatClock(date) {
 }
 
 /**
+ * @param {Date} date
+ */
+export function formatDate(date) {
+    return date.toLocaleDateString("fi-FI");
+}
+
+/**
  * Save a text string to a file on the user's computer.
  *
  * @param {string} filename - The name of the file to be saved.

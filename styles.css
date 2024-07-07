@@ -223,3 +223,9 @@ p {
 button[value="share"] {
     margin-left: 1ch;
 }
+
+h2 .date {
+    font-size: 70%;
+    font-weight: normal;
+    margin-left: 1ch;
+}

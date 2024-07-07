@@ -15,11 +15,13 @@ import {
     LOADING,
     addError,
     RAW_DATA,
+    FORECAST_DAY,
+    FORECAST_DATE,
 } from "./data.js";
 
 import { Graph } from "./graph.js";
 import { Compass } from "./compass.js";
-import { formatClock, saveTextToFile } from "./utils.js";
+import { formatClock, formatDate, saveTextToFile } from "./utils.js";
 
 effect(() => {
     document.title = NAME.value + " – Hyppykeli";
@@ -442,6 +444,33 @@ function downloadDataDump(e) {
     }
 }
 
+/**
+ * Navigate to a link without reloading the page
+ *
+ * @param {Event} e
+ */
+function spaNavigate(e) {
+    if (!(e.target instanceof HTMLAnchorElement)) {
+        return;
+    }
+
+    e.preventDefault();
+
+    const next = new URL(window.location.href);
+    const target = new URL(e.target.href);
+
+    if (next.origin !== target.origin) {
+        return;
+    }
+
+    for (const [key, value] of target.searchParams) {
+        next.searchParams.set(key, value);
+    }
+
+    history.pushState({}, "", next.toString());
+    updateWeatherData();
+}
+
 export function SideMenu() {
     return html`
         <div class="${MENU_OPEN.value ? "side-menu open" : "side-menu"}">
@@ -451,6 +480,21 @@ export function SideMenu() {
             ${OTHER_DZs.value.map(
                 (dz) => html`<p><a href=${dz.href}>${dz.title}</a></p>`,
             )}
+
+            <h2>Ennuste</h2>
+
+            <a onClick=${spaNavigate} href="?forecast_day=1"
+                >Näytä huomisen ennuste</a
+            >
+
+            <form>
+                Hae ennuste päivälle:
+                <input
+                    type="date"
+                    name="forecast_date"
+                    defaultValue=${new Date().toISOString().split("T")[0]}
+                />
+            </form>
 
             <h2>Ongelmia?</h2>
 
@@ -599,7 +643,12 @@ export function Root() {
                 <div class="as-rows-on-big-screen">
                     <div>
                         <div class="anchor" id="observations"></div>
-                        <h2 class="sticky">Havainnot</h2>
+                        <h2 class="sticky">
+                            Havainnot
+                            <span class="date">
+                                ${formatDate(new Date())}
+                            </span>
+                        </h2>
                         <${DataTable}
                             data=${OBSERVATIONS}
                             thead=${html`<${ObservationTHead} />`}
@@ -609,7 +658,13 @@ export function Root() {
 
                     <div>
                         <div class="anchor" id="forecasts"></div>
-                        <h2 class="sticky">Ennuste</h2>
+                        <h2 class="sticky">
+                            Ennuste
+                            <span class="date">
+                                ${formatDate(FORECAST_DATE.value)}
+                            </span>
+                        </h2>
+
                         <${DataTable}
                             data=${FORECASTS}
                             thead=${html`<${ForecastTHead} />`}
