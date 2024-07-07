@@ -103,18 +103,50 @@ function ForecastTHead() {
 
 /**
  * @param {Object} props
+ * @param {number} props.percentage
+ */
+function PieChart({ percentage }) {
+    const adjustedPercentage = Math.min(100, Math.max(0, percentage));
+    const angle = (adjustedPercentage / 100) * 360;
+    const largeArcFlag = angle > 180 ? 1 : 0;
+    const endX = 50 + 50 * Math.cos(((angle - 90) * Math.PI) / 180);
+    const endY = 50 + 50 * Math.sin(((angle - 90) * Math.PI) / 180);
+
+    return html`
+        <svg class="pie" width="20" height="20" viewBox="0 0 100 100">
+            <circle
+                cx="50"
+                cy="50"
+                r="50"
+                fill="white"
+                stroke="black"
+                stroke-width="1"
+            />
+            <path
+                d=${`M 50 50 L 50 0 A 50 50 0 ${largeArcFlag} 1 ${endX} ${endY} Z`}
+                fill="black"
+            />
+        </svg>
+    `;
+}
+
+/**
+ * @param {Object} props
  * @param {WeatherData[]} props.data
  */
 function ForecastRows(props) {
     return props.data.map((point) => {
-        return html`<tr>
+        return html`<tr class="forecast-row">
             <td title=${point.time.toString()}>${formatClock(point.time)}</td>
             <td class=${getWarningLevel(point.gust)}>${point.gust} m/s</td>
             <td>${point.speed} m/s</td>
             <td>
                 <${WindDirection} direction=${point.direction} />
             </td>
-            <td>${point.cloudCover?.toFixed(0) ?? "-1"}%</td>
+            <td>
+                <${PieChart} percentage=${point.cloudCover ?? 0} />
+                ${point.cloudCover?.toFixed(0) ?? "-1"}%
+            </td>
         </tr> `;
     });
 }

@@ -248,3 +248,7 @@ h2 .date {
     height: 30px;
     margin-left: 1ch;
 }
+
+.forecast-row .pie {
+    margin-right: 1ch;
+}
