@@ -1,4 +1,5 @@
 // @ts-check
+import { effect, signal } from "@preact/signals";
 import { useCallback, useEffect, useState } from "preact/hooks";
 import { html } from "htm/preact";
 import {
@@ -18,10 +19,8 @@ import { Graph } from "./graph.js";
 import { Compass } from "./compass.js";
 import { formatClock } from "./utils.js";
 
-NAME.subscribe((val) => {
-    if (val) {
-        document.title = val + " – Hyppykeli";
-    }
+effect(() => {
+    document.title = NAME.value + " – Hyppykeli";
 });
 
 /**
