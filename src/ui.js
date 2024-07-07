@@ -557,6 +557,7 @@ function handleForecastDayChange(e) {
 export function SideMenu() {
     return html`
         <div class="${MENU_OPEN.value ? "side-menu open" : "side-menu"}">
+            <h1>${NAME.value}</h1>
             <h2>Ennuste</h2>
 
             <p>
