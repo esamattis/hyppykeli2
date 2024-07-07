@@ -20,6 +20,7 @@ import {
     FORECAST_DATE,
     STALE_FORECASTS,
     GUST_TREND,
+    FORECAST_LOCATION_NAME,
 } from "./data.js";
 
 import { Graph } from "./graph.js";
@@ -746,6 +747,15 @@ function Parachute() {
     `;
 }
 
+function ForecastLocationInfo() {
+    return html`
+        Ennuste on haettu halueelle${" "}
+        <a href="https://www.google.fi/maps/place/${FORECAST_COORDINATES.value}"
+            >${FORECAST_LOCATION_NAME.value}</a
+        >.
+    `;
+}
+
 export function Root() {
     const history = !!HOVERED_OBSERVATION.value;
     const latestMetar = METARS.value?.[0];
@@ -776,13 +786,7 @@ export function Root() {
                                   >${STATION_NAME} sijainti</a
                               >.${" "}
                               ${FORECAST_COORDINATES.value
-                                  ? html`
-                                        Ennuste on haettu kohtaan${" "}
-                                        <a
-                                            href="https://www.google.fi/maps/place/${FORECAST_COORDINATES.value}"
-                                            >${FORECAST_COORDINATES.value}</a
-                                        >.
-                                    `
+                                  ? html`<${ForecastLocationInfo} />`
                                   : null}
                           `
                         : "Ladataan..."}
@@ -855,14 +859,7 @@ export function Root() {
                         </h2>
 
                         <p>
-                            Ennuste on haettu koordinaatteihin
-                            <a
-                                href="https://www.google.fi/maps/place/${FORECAST_COORDINATES.value ??
-                                STATION_COORDINATES.value}"
-                            >
-                                ${FORECAST_COORDINATES.value ??
-                                STATION_COORDINATES.value} </a
-                            >.
+                            <${ForecastLocationInfo} />
                         </p>
 
                         <div class="side-scroll">

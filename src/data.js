@@ -202,6 +202,11 @@ export const STATION_COORDINATES = signal(null);
 export const FORECAST_COORDINATES = signal(null);
 
 /**
+ * @type {Signal<string|null>}
+ */
+export const FORECAST_LOCATION_NAME = signal(null);
+
+/**
  * @type {Signal<string[]>}
  */
 export const ERRORS = signal([]);
@@ -638,6 +643,11 @@ export async function updateWeatherData() {
         // "mts-1-1-MiddleCloudCover",
         "mts-1-1-MiddleAndLowCloudCover",
     );
+
+    const locationCollection = forecastXml.querySelector("LocationCollection");
+    const locationName = locationCollection?.querySelector("name")?.innerHTML;
+    const regionName = locationCollection?.querySelector("region")?.innerHTML;
+    FORECAST_LOCATION_NAME.value = `${locationName}, ${regionName}`;
 
     /** @type {WeatherData[]} */
     const combinedForecasts = gustForecasts.map((gust, i) => {
