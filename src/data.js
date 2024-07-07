@@ -165,7 +165,7 @@ export const WIND_VARIATIONS = computed(() => {
  */
 export const GUST_TREND = computed(() => {
     const maxAge = Date.now() + 1000 * 60 * 60;
-    const latestGust = OBSERVATIONS.value.at(-1)?.gust ?? 0;
+    const latestGust = OBSERVATIONS.value[0]?.gust ?? 0;
 
     const recentGusts = FORECASTS.value.flatMap((point) => {
         if (point.time.getTime() <= maxAge) {
