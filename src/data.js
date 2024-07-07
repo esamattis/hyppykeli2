@@ -71,6 +71,17 @@ export const HOVERED_OBSERVATION = signal(undefined);
  */
 export const FORECASTS = signal([]);
 
+/**
+ * @typedef {Object} WindVariations
+ * @property {number} variationRange
+ * @property {number} averageDirection
+ * @property {string} color
+ * @property {number} extraWidth
+ */
+
+/**
+ * @type {Signal<WindVariations | undefined>}
+ */
 export const WIND_VARIATIONS = signal(undefined);
 
 /**
