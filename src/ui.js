@@ -426,8 +426,8 @@ function downloadDataDump(e) {
         });
 
         navigator.share({
-            title: "Hyppykeli",
-            text: "Hyppykeli",
+            title: "Hyppykeli datadump " + storedQuery,
+            text: `Hyppykeli datadump ${storedQuery} ${date} ${clock}`,
             files: [file],
         });
     }
