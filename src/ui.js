@@ -255,8 +255,6 @@ function LatestGust() {
         return html`<p>Ladataan tuulitietoja...</p>`;
     }
 
-    const help = html`<${Help} label="?">Seuraavan tunnin ennustuksien keskiarvo.</${Help}>`;
-
     return html`
         <p class=${history ? "historic" : ""}>
             Puuska
@@ -272,12 +270,25 @@ function LatestGust() {
             >
             <${FromNow} date=${latest.time} />
             <br />
-            ${GUST_TREND.value === 0
-                ? null
-                : GUST_TREND.value > 0
-                  ? html`Mahdollisesti voimistuva ↗ ${help}`
-                  : html`Mahdollisesti hveikkenevä ↘ ${help}`}
+            <${GustTrend} />
         </p>
+    `;
+}
+
+function GustTrend() {
+    const trend = GUST_TREND.value;
+    if (Math.abs(trend) < 1) {
+        return;
+    }
+
+    const help = html`<${Help} label="?">Seuraavan tunnin ennustuksien keskiarvon erotuksesta päätelty (${trend.toFixed(1)} m/s).</${Help}>`;
+
+    return html`
+        <div title=${`Ero ${trend.toFixed(1)}m/s`}>
+            ${trend > 0
+                ? html`Mahdollisesti voimistuva ↗ ${help}`
+                : html`Mahdollisesti heikkenevä ↘ ${help}`}
+        </div>
     `;
 }
 
