@@ -43,3 +43,23 @@ export function formatClock(date) {
         hour12: false,
     });
 }
+
+/**
+ * Save a text string to a file on the user's computer.
+ *
+ * @param {string} filename - The name of the file to be saved.
+ * @param {string} text - The text content to be saved in the file.
+ */
+export function saveTextToFile(filename, text) {
+    const blob = new Blob([text], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+
+    a.click();
+
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}

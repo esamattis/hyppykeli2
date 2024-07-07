@@ -77,6 +77,11 @@ export const LATLONG = signal(null);
  */
 export const ERRORS = signal([]);
 
+/**
+ * @type {Signal<Record<string, string>>}
+ */
+export const RAW_DATA = signal({});
+
 /** @type {ReturnType<typeof setTimeout>} */
 let timer;
 
@@ -142,6 +147,7 @@ export async function fmiRequest(storedQuery, params, mock) {
         let data;
         try {
             const text = await response.text();
+            addRawData(storedQuery, text);
             const parser = new DOMParser();
             data = parser.parseFromString(text, "application/xml");
         } catch (error) {
@@ -281,6 +287,20 @@ function parseClouds(xml) {
  */
 export function addError(msg) {
     ERRORS.value = [...ERRORS.value, msg];
+}
+
+/**
+ * Adds raw data to the RAW_DATA signal.
+ * @param {string} name - The name of the data entry.
+ * @param {string} data - The data to be added.
+ */
+function addRawData(name, data) {
+    name = name.replaceAll("::", "_");
+
+    RAW_DATA.value = {
+        ...RAW_DATA.value,
+        [name]: data,
+    };
 }
 
 export async function updateWeatherData() {

@@ -14,11 +14,12 @@ import {
     updateWeatherData,
     LOADING,
     addError,
+    RAW_DATA,
 } from "./data.js";
 
 import { Graph } from "./graph.js";
 import { Compass } from "./compass.js";
-import { formatClock } from "./utils.js";
+import { formatClock, saveTextToFile } from "./utils.js";
 
 effect(() => {
     document.title = NAME.value + " – Hyppykeli";
@@ -381,6 +382,17 @@ effect(() => {
     });
 });
 
+function downloadDataDumps() {
+    for (const [name, raw] of Object.entries(RAW_DATA.value)) {
+        const date = new Date()
+            .toISOString()
+            .split("T")[0]
+            ?.replaceAll("-", "");
+        const clock = formatClock(new Date()).replace(":", "");
+        saveTextToFile(`hyppykeli_${date}-${clock}_${name}.xml`, raw);
+    }
+}
+
 export function SideMenu() {
     return html`
         <div class="${MENU_OPEN.value ? "side-menu open" : "side-menu"}">
@@ -390,6 +402,18 @@ export function SideMenu() {
             ${OTHER_DZs.value.map(
                 (dz) => html`<p><a href=${dz.href}>${dz.title}</a></p>`,
             )}
+
+            <h2>Ongelmia?</h2>
+
+            <p>
+                Näkyykö tiedot jotenkin väärin? Lataa alla olevasta napista
+                datadumpit ja lähetä ne Esalle hyppykeli@esamatti.fi ja kerro
+                millä tavalla ne näkyi väärin. Laita kuvakaappaus mukaan myös.
+            </p>
+
+            <button type="button" onClick=${downloadDataDumps}>
+                Lataa datadumpit
+            </button>
         </div>
     `;
 }
