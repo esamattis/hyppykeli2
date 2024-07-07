@@ -24,7 +24,7 @@ import {
 } from "./data.js";
 
 import { Graph } from "./graph.js";
-import { Compass } from "./compass.js";
+import { Compass, FullScreenCompass } from "./compass.js";
 import {
     dateOffset,
     formatClock,
@@ -761,6 +761,12 @@ function ForecastLocationInfo() {
 export function Root() {
     const history = !!HOVERED_OBSERVATION.value;
     const latestMetar = METARS.value?.[0];
+    const isCompassView = window.location.hash === '#compass';
+
+    if (isCompassView) {
+        return html`<${FullScreenCompass} />`;
+    }
+
     return html`
         <div>
             <div class="content">

@@ -78,6 +78,32 @@ export function Compass() {
     `;
 }
 
+export function FullScreenCompass() {
+    return html`
+        <div class="fullscreen-compass">
+            <svg
+                width="100%"
+                height="100%"
+                viewBox="0 0 400 400"
+                preserveAspectRatio="xMidYMid meet"
+                xmlns="http://www.w3.org/2000/svg">
+
+                <!-- Circle for compass outline -->
+                <circle cx="200" cy="200" r="150" stroke="black" stroke-width="2" fill="none" />
+                <circle cx="200" cy="200" r="109.09" stroke="orange" stroke-width="2" fill="none" />
+
+                <!-- Directions Text -->
+                <text x="200" y="40" font-size="40" text-anchor="middle" fill="black">N</text>
+                <text x="20" y="210" font-size="40" text-anchor="middle" fill="black">W</text>
+                <text x="200" y="390" font-size="40" text-anchor="middle" fill="black">S</text>
+                <text x="380" y="210" font-size="40" text-anchor="middle" fill="black">E</text>
+                <${Needle} />
+                <${WindVariations} />
+            </svg>
+        </div>
+    `;
+}
+
 function Needle() {
     const history = !!HOVERED_OBSERVATION.value;
     const point = HOVERED_OBSERVATION.value ?? OBSERVATIONS.value[0];
