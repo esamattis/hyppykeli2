@@ -3,6 +3,10 @@ body {
     padding: 0;
 }
 
+button {
+    padding: 5px;
+}
+
 .content {
     margin: 10px;
     margin-bottom: 100px;
