@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Parempi Hyppykeli</title>
         <link rel="stylesheet" href="/styles.css" />
+        <link rel="preconnect" href="https://opendata.fmi.fi/" />
 
         <script type="importmap">
             {
@@ -25,6 +26,8 @@
             import "./graph.js";
             import "./compass.js";
             import "htm/preact";
+            import "preact/hooks";
+            import "@preact/signals";
 
             // init the app
             import { Root } from "./ui.js";
