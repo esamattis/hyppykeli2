@@ -83,23 +83,23 @@ function mockLatestObservation(original) {
         return;
     }
 
-    const custom_gust = url.searchParams.get("gust");
-    const custom_speed = url.searchParams.get("speed");
-    const custom_direction = url.searchParams.get("direction");
+    const customGust = url.searchParams.get("gust");
+    const customSpeed = url.searchParams.get("speed");
+    const customDirection = url.searchParams.get("direction");
 
-    let latest = original;
+    let mock = original;
 
-    latest = {
+    mock = {
         lowCloudCover: undefined,
         middleCloudCover: undefined,
         time: new Date(),
-        ...latest,
-        gust: Number(custom_gust) || latest?.gust || 0,
-        speed: Number(custom_speed) || latest?.speed || 0,
-        direction: Number(custom_direction) || latest?.direction || 0,
+        ...mock,
+        gust: Number(customGust) || mock?.gust || 0,
+        speed: Number(customSpeed) || mock?.speed || 0,
+        direction: Number(customDirection) || mock?.direction || 0,
     };
 
-    return latest;
+    return mock;
 }
 
 /**
