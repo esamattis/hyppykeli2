@@ -73,6 +73,36 @@ export const HOVERED_OBSERVATION = signal(undefined);
 export const FORECASTS = signal([]);
 
 /**
+ * @param {WeatherData | undefined} original
+ * @returns {WeatherData|undefined}
+ */
+function mockLatestObservation(original) {
+    const url = new URL(location.href);
+    // Allow testing only on dev sites
+    if (url.hostname.endsWith("hyppykeli.fi")) {
+        return;
+    }
+
+    const custom_gust = url.searchParams.get("gust");
+    const custom_speed = url.searchParams.get("speed");
+    const custom_direction = url.searchParams.get("direction");
+
+    let latest = original;
+
+    latest = {
+        lowCloudCover: undefined,
+        middleCloudCover: undefined,
+        time: new Date(),
+        ...latest,
+        gust: Number(custom_gust) || latest?.gust || 0,
+        speed: Number(custom_speed) || latest?.speed || 0,
+        direction: Number(custom_direction) || latest?.direction || 0,
+    };
+
+    return latest;
+}
+
+/**
  * @typedef {Object} WindVariations
  * @property {number} variationRange
  * @property {number} averageDirection
@@ -562,6 +592,11 @@ export async function updateWeatherData() {
             lowCloudCover: undefined,
         };
     });
+
+    const mock = mockLatestObservation(combined[0]);
+    if (mock) {
+        combined[0] = mock;
+    }
 
     OBSERVATIONS.value = combined;
 
