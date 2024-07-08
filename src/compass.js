@@ -188,11 +188,11 @@ function WindVariations() {
     const outerRadius = radius + arcWidth / 2;
     const innerRadius = radius - arcWidth / 2;
 
-    // Calculate the start and end angles for the arc
-    const startAngle = (averageDirection - variationRange / 2 + 360) % 360;
-    const endAngle = (averageDirection + variationRange / 2) % 360;
+    // Calculate the start and end angles for the arc (180-degree swap)
+    const startAngle = (averageDirection + 180 - variationRange / 2 + 360) % 360;
+    const endAngle = (averageDirection + 180 + variationRange / 2) % 360;
 
-    // Convert angles to radians
+    // Convert angles to radians (no change in offset as it's for SVG coordinates)
     const startRad = ((startAngle - 90) * Math.PI) / 180;
     const endRad = ((endAngle - 90) * Math.PI) / 180;
 
