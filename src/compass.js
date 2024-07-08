@@ -119,7 +119,7 @@ function Needle() {
             <polygon
                 points=${`200,${needleLength} 190,200 210,200`}
                 fill="red"
-                transform=${`rotate(${point.direction}, 200, 200)`}
+                transform=${`rotate(${point.direction - 180}, 200, 200)`}
             />
             <!-- Center Point -->
             <circle cx="200" cy="200" r="10" fill="black" />

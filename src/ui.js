@@ -194,7 +194,7 @@ function WindDirection(props) {
                 : null}
             <span
                 class="direction"
-                style=${{ "--direction": props.direction + "deg" }}
+                style=${{ "--direction": props.direction - 180 + "deg" }}
                 >↑</span
             >
         </span>
