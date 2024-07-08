@@ -163,7 +163,7 @@ function Needle() {
     return html`
         <g className="${history ? "historic" : ""}">
             <polygon
-                points=${`200,${needleLength} 190,200 210,200`}
+                points=${`190,${needleLength} 210,${needleLength} 220,200 180,200`}
                 fill="red"
                 transform=${`rotate(${point.direction - 180}, 200, 200)`}
             />
