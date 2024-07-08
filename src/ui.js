@@ -761,7 +761,7 @@ function ForecastLocationInfo() {
 export function Root() {
     const history = !!HOVERED_OBSERVATION.value;
     const latestMetar = METARS.value?.[0];
-    const isCompassView = window.location.hash === '#compass';
+    const isCompassView = window.location.hash === "#compass";
 
     if (isCompassView) {
         return html`<${FullScreenCompass} />`;
