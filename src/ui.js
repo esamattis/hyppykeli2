@@ -304,7 +304,8 @@ function LatestWind() {
             </span>
             ${" "}
 
-            <${FromNow} date=${latest.time} />
+            <br />
+            <${FromNow} date=${latest.time} />(klo ${latest.time.toTimeString().split(' ')[0]})
             <br />
             <${GustTrend} />
         </p>
@@ -391,7 +392,7 @@ function LatestMetar() {
         </ul>
 
         <p>
-            <${FromNow} date=${latest.time} />
+            <${FromNow} date=${latest.time} />(klo ${latest.time.toTimeString().split(' ')[0]})
             <br />
             <em class="metar">${latest.metar}</em>
         </p>
