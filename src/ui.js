@@ -366,7 +366,7 @@ function LatestMetar() {
     let msg = "";
 
     if (latest?.clouds.length === 0) {
-        if (latest.metar.includes("METAR")) {
+        if (latest.metar.includes("CAVOK")) {
             msg = "Ei pilviä alle 1500M (CAVOK)";
         } else {
             msg = "Ei tietoa pilvistä";
