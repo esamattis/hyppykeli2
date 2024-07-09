@@ -11,6 +11,7 @@ import { computed, signal } from "@preact/signals";
  * @typedef {"fmi::avi::observations::iwxxm" | "fmi::observations::weather::timevaluepair" | "fmi::forecast::edited::weather::scandinavia::point::timevaluepair" } StoredQuery
  */
 
+
 /**
  * @typedef {Object} WeatherData
  * @property {number} gust
@@ -169,12 +170,14 @@ export const WIND_VARIATIONS = computed(() => {
     let color = "green";
     let extraWidth = 0;
 
+    if (maxGust > 4) {
     if (gustSpeedRatio >= 2) {
         color = "red";
         extraWidth = 20;
     } else if (gustSpeedRatio >= 1.5) {
         color = "orange";
         extraWidth = 10;
+    }
     }
 
     if (variationRange > 90) {
