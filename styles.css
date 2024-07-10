@@ -22,6 +22,14 @@ a:visited {
     border-collapse: collapse;
 }
 
+.side-scroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+    width: 100%;
+    position: relative;
+    white-space: nowrap;
+}
+
 .weather-table th {
     text-align: left;
 }
@@ -30,9 +38,18 @@ a:visited {
 .weather-table th {
     width: 68px;
     white-space: nowrap;
+    background-color: white;
 }
 
-.weather-table tbody tr:hover {
+.weather-table td:first-of-type,
+.weather-table th:first-of-type {
+    position: sticky;
+    width: 5ch;
+    left: 0;
+}
+
+.weather-table tbody tr:hover th,
+.weather-table tbody tr:hover td {
     background-color: #e9e9e9;
 }
 
@@ -278,12 +295,6 @@ h2 .date {
     height: 20px;
     display: inline-block;
     transform: rotate(var(--direction));
-}
-
-.side-scroll {
-    overflow-x: auto;
-    overflow-y: hidden;
-    width: 100%;
 }
 
 .icon-parachute {
