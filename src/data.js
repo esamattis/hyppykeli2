@@ -491,7 +491,7 @@ export async function updateWeatherData() {
     const customName = url.searchParams.get("name");
     const forecastDay = Number(url.searchParams.get("forecast_day")) || 0;
     const obsRange = Number(url.searchParams.get("observation_range")) || 12;
-    const forecastRange = Number(url.searchParams.get("forecast_range")) || 8;
+    const forecastRange = Number(url.searchParams.get("forecast_range")) || 12;
 
     if (lat && lon) {
         FORECAST_COORDINATES.value = `${lat},${lon}`;
