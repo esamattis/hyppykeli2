@@ -1,6 +1,5 @@
 // @ts-check
 import { html } from "htm/preact";
-import { h, render } from "preact";
 import { useState, useEffect } from "preact/hooks";
 import { STATION_COORDINATES } from "./data.js";
 
@@ -18,6 +17,10 @@ function getTimeRange() {
     return { start, end };
 }
 
+/**
+ * @param {string} coordinates
+ * @returns {Promise<OpenMeteoWeatherData | null>}
+ */
 async function fetchDataWithCoordinates(coordinates) {
     const { start, end } = getTimeRange();
     const [latitude, longitude] = coordinates.split(",").map(Number);
@@ -38,6 +41,10 @@ async function fetchDataWithCoordinates(coordinates) {
     return await response.json();
 }
 
+/**
+ * @param {string} coordinates
+ * @returns {Promise<OpenMeteoWeatherData | null>}
+ */
 async function fetchDataWithCache(coordinates) {
     const cachedData = localStorage.getItem("ECMWFWindAloft");
     const cachedTime = localStorage.getItem("ECMWFWindAloftTime");
@@ -67,6 +74,10 @@ async function fetchDataWithCache(coordinates) {
     return newData;
 }
 
+/**
+ * @param {OpenMeteoHourlyData} hourly
+ * @return {FormattedTableData}
+ */
 function formatTableData(hourly) {
     const pressureLevels = [
         { pressure: "600 hPa", height: "4200 m" },
@@ -76,11 +87,12 @@ function formatTableData(hourly) {
         { pressure: "1000 hPa", height: "110 m" },
     ];
 
+    /** @type {number[]} */
     const timeSlots = [6, 9, 12, 15, 18, 21];
-    const now = new Date();
-    const currentHour = now.getHours();
 
+    /** @type {Record<string, AverageWindSpeeds>} */
     const todayData = {};
+    /** @type {Record<string, AverageWindSpeeds>} */
     const tomorrowData = {};
 
     timeSlots.forEach((slot) => {
@@ -91,6 +103,12 @@ function formatTableData(hourly) {
     return { pressureLevels, todayData, tomorrowData };
 }
 
+/**
+ * @param {OpenMeteoHourlyData} hourly
+ * @param {number} targetHour
+ * @param {number} dayOffset
+ * @returns {AverageWindSpeeds}
+ */
 function getAverageData(hourly, targetHour, dayOffset) {
     const relevantIndices = [0, 1, 2]
         .map((i) => {
@@ -105,15 +123,22 @@ function getAverageData(hourly, targetHour, dayOffset) {
         })
         .filter((index) => index !== -1);
 
+    /**
+     * @type {OpenMeteoPressureLevel[]}
+     */
     const pressureLevels = ["1000", "925", "850", "700", "600"];
+
+    /**
+     * @type {AverageWindSpeeds}
+     */
     const result = {};
 
     pressureLevels.forEach((level) => {
         const speeds = relevantIndices.map(
-            (i) => hourly[`windspeed_${level}hPa`][i],
+            (i) => hourly[`windspeed_${level}hPa`]?.[i] ?? 0,
         );
         const directions = relevantIndices.map(
-            (i) => hourly[`winddirection_${level}hPa`][i],
+            (i) => hourly[`winddirection_${level}hPa`]?.[i] ?? 0,
         );
 
         result[level] = {
@@ -127,8 +152,12 @@ function getAverageData(hourly, targetHour, dayOffset) {
 }
 
 export function OpenMeteoTool() {
-    const [data, setData] = useState(null);
-    const [coordinates, setCoordinates] = useState(null);
+    const [data, setData] = useState(
+        /** @type {FormattedTableData | null} */ (null),
+    );
+    const [coordinates, setCoordinates] = useState(
+        /** @type {string | null} */ (null),
+    );
 
     useEffect(() => {
         const unsubscribe = STATION_COORDINATES.subscribe((value) => {
@@ -158,16 +187,25 @@ export function OpenMeteoTool() {
         }
     }, [coordinates]);
 
+    /**
+     * @param {number} speed
+     */
     const getWindSpeedClass = (speed) => {
         if (speed < 8) return "wind-low";
         if (speed <= 11) return "wind-medium";
         return "wind-high";
     };
 
+    /**
+     * @param {number|string} num
+     */
     function roundToNearestFive(num) {
-        return Math.round(num / 5) * 5;
+        return Math.round(Number(num) / 5) * 5;
     }
 
+    /**
+     * @param {number} direction
+     */
     function getWindArrow(direction) {
         const arrow = "➤";
         const rotationDegree = direction + 90; // Lisätään 90 astetta, jotta nuoli osoittaa oikeaan suuntaan
@@ -177,6 +215,10 @@ export function OpenMeteoTool() {
         >`;
     }
 
+    /**
+     * @param {string} title
+     * @param {Record<string, AverageWindSpeeds>} tableData
+     */
     const renderTable = (title, tableData) => {
         if (!tableData) return null;
 
@@ -200,8 +242,8 @@ export function OpenMeteoTool() {
                     </tr>
                 </thead>
                 <tbody>
-                    ${data.pressureLevels.map(({ pressure, height }) => {
-                        const level = pressure.split(" ")[0];
+                    ${data?.pressureLevels.map(({ pressure, height }) => {
+                        const level = pressure.split(" ")[0] ?? "6";
                         return html`
                             <tr>
                                 <td class="pressure-cell">${height}</td>
