@@ -42,8 +42,6 @@ interface OpenMeteoHourlyData {
     winddirection_600hPa: number[];
 }
 
-type TimeSlots = 6 | 9 | 12 | 15 | 18 | 21;
-
 interface FormattedTableData {
     pressureLevels: {
         pressure: string;

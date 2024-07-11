@@ -87,7 +87,7 @@ function formatTableData(hourly) {
         { pressure: "1000 hPa", height: "110 m" },
     ];
 
-    /** @type {TimeSlots[]} */
+    /** @type {number[]} */
     const timeSlots = [6, 9, 12, 15, 18, 21];
 
     /** @type {Record<string, AverageWindSpeeds>} */
