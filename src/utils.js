@@ -101,3 +101,29 @@ export function humanDayText(date) {
 
     return "";
 }
+
+/**
+ * Calculates the difference between two wind directions considering the circular nature of directions.
+ * @param {number} dir1 - First wind direction.
+ * @param {number} dir2 - Second wind direction.
+ * @returns {number} The minimum difference between the two directions.
+ */
+export function calculateDirectionDifference(dir1, dir2) {
+    const diff = Math.abs(dir1 - dir2);
+    return Math.min(diff, 360 - diff);
+}
+
+/**
+ * @param {Object | undefined} ob
+ */
+export function removeNullish(ob) {
+    if (!ob) {
+        return {};
+    }
+
+    return Object.fromEntries(
+        Object.entries(ob).filter(
+            ([_, value]) => value !== null && value !== undefined,
+        ),
+    );
+}
