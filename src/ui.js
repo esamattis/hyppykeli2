@@ -21,6 +21,9 @@ import {
     STALE_FORECASTS,
     GUST_TREND,
     FORECAST_LOCATION_NAME,
+    QUERY_PARAMS,
+    navigateQs,
+    getQs,
 } from "./data.js";
 
 import { Graph } from "./graph.js";
@@ -550,30 +553,40 @@ function downloadDataDump(e) {
 }
 
 /**
+ * @param {import("./data.js").QueryParams} params
+ */
+function updatedQs(params) {
+    const newParams = new URLSearchParams({ ...QUERY_PARAMS.value, ...params });
+    return "?" + newParams.toString();
+}
+
+/**
  * Navigate to a link without reloading the page
  *
- * @param {Event} e
+ * @param {MouseEvent} e
  */
-function spaNavigate(e) {
+function handleLinkClick(e) {
     if (!(e.target instanceof HTMLAnchorElement)) {
+        return;
+    }
+
+    if (e.target.target === "_blank") {
+        return;
+    }
+
+    if (e.metaKey || e.ctrlKey) {
+        return;
+    }
+
+    if (e.button !== 0) {
         return;
     }
 
     e.preventDefault();
 
-    const next = new URL(window.location.href);
     const target = new URL(e.target.href);
-
-    if (next.origin !== target.origin) {
-        return;
-    }
-
-    for (const [key, value] of target.searchParams) {
-        next.searchParams.set(key, value);
-    }
-
-    history.pushState({}, "", next.toString());
-    updateWeatherData();
+    const foo = Object.fromEntries(target.searchParams);
+    navigateQs(foo, "replace");
 }
 
 /**
@@ -590,11 +603,7 @@ function handleForecastDayChange(e) {
             (value.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
         ) + 1;
 
-    const next = new URL(window.location.href);
-    next.searchParams.set("forecast_day", dayDiff.toString());
-
-    history.pushState({}, "", next.toString());
-    updateWeatherData();
+    navigateQs({ forecast_day: dayDiff.toString() }, "merge");
 }
 
 export function SideMenu() {
@@ -605,10 +614,14 @@ export function SideMenu() {
 
             <p>
                 ${FORECAST_DAY.value === 0
-                    ? html`<a onClick=${spaNavigate} href="?forecast_day=1"
+                    ? html`<a
+                          onClick=${handleLinkClick}
+                          href="${getQs({ forecast_day: "1" })}"
                           >Näytä huomisen ennuste</a
                       >`
-                    : html`<a onClick=${spaNavigate} href="?forecast_day=0"
+                    : html`<a
+                          onClick=${handleLinkClick}
+                          href="${getQs({ forecast_day: undefined })}"
                           >Näytä tämän päivän ennuste</a
                       >`}
             </p>

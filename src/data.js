@@ -1,6 +1,7 @@
 // @ts-check
 // docs https://opendata.fmi.fi/wfs?service=WFS&version=2.0.0&request=describeStoredQueries&
 import { computed, signal } from "@preact/signals";
+import { calculateDirectionDifference, removeNullish } from "./utils.js";
 
 /**
  * @typedef {import('@preact/signals').Signal<T>} Signal<T>
@@ -10,7 +11,6 @@ import { computed, signal } from "@preact/signals";
 /**
  * @typedef {"fmi::avi::observations::iwxxm" | "fmi::observations::weather::timevaluepair" | "fmi::forecast::edited::weather::scandinavia::point::timevaluepair" } StoredQuery
  */
-
 
 /**
  * @typedef {Object} WeatherData
@@ -36,6 +36,20 @@ import { computed, signal } from "@preact/signals";
  * @property {string} metar
  * @property {Date} time
  * @property {number} elevation
+ */
+
+/**
+ * @typedef {Object} QueryParams
+ * @property {string} [fmisid]
+ * @property {string} [icaocode]
+ * @property {string} [lat]
+ * @property {string} [lon]
+ * @property {string} [name]
+ * @property {string} [observation_range]
+ * @property {string} [forecast_day]
+ * @property {string} [forecast_range]
+ * @property {string} [direction]
+ * @property {string} [gust]
  */
 
 /**
@@ -171,13 +185,13 @@ export const WIND_VARIATIONS = computed(() => {
     let extraWidth = 0;
 
     if (maxGust > 4) {
-    if (gustSpeedRatio >= 2) {
-        color = "red";
-        extraWidth = 20;
-    } else if (gustSpeedRatio >= 1.5) {
-        color = "orange";
-        extraWidth = 10;
-    }
+        if (gustSpeedRatio >= 2) {
+            color = "red";
+            extraWidth = 20;
+        } else if (gustSpeedRatio >= 1.5) {
+            color = "orange";
+            extraWidth = 10;
+        }
     }
 
     if (variationRange > 90) {
@@ -250,7 +264,19 @@ export const ERRORS = signal([]);
  *
  * @type {Signal<number>}
  */
-export const FORECAST_DAY = signal(0);
+export const FORECAST_DAY = computed(() => {
+    const day = QUERY_PARAMS.value.forecast_day;
+    return day ? Number(day) : 0;
+});
+
+/**
+ * Current URLSearchParams (query string) in the location bar
+ *
+ * @type {Signal<QueryParams>}
+ */
+export const QUERY_PARAMS = signal(
+    Object.fromEntries(new URLSearchParams(location.search)),
+);
 
 /**
  * @type {Signal<Date>}
@@ -486,22 +512,19 @@ export function addError(msg) {
 
 export async function updateWeatherData() {
     ERRORS.value = [];
-    const url = new URL(location.href);
-    const fmisid = url.searchParams.get("fmisid");
-    const icaocode = url.searchParams.get("icaocode");
-    const lat = Number(url.searchParams.get("lat"));
-    const lon = Number(url.searchParams.get("lon"));
-    const customName = url.searchParams.get("name");
-    const forecastDay = Number(url.searchParams.get("forecast_day")) || 0;
-    const obsRange = Number(url.searchParams.get("observation_range")) || 12;
-    const forecastRange = Number(url.searchParams.get("forecast_range")) || 12;
+    const fmisid = QUERY_PARAMS.value.fmisid;
+    const icaocode = QUERY_PARAMS.value.icaocode;
+    const lat = Number(QUERY_PARAMS.value.lat);
+    const lon = Number(QUERY_PARAMS.value.lon);
+    const customName = QUERY_PARAMS.value.name;
+    const obsRange = Number(QUERY_PARAMS.value.observation_range) || 12;
+    const forecastRange = Number(QUERY_PARAMS.value.forecast_range) || 12;
 
     if (lat && lon) {
         FORECAST_COORDINATES.value = `${lat},${lon}`;
     }
 
     NAME.value = customName || icaocode || undefined;
-    FORECAST_DAY.value = forecastDay;
 
     const obsStartTime = new Date();
     obsStartTime.setHours(obsStartTime.getHours() - obsRange, 0, 0, 0);
@@ -703,6 +726,47 @@ export async function updateWeatherData() {
     STALE_FORECASTS.value = false;
 }
 
+/**
+ * Update the query string in the url bar and update the global QUERY_PARAMS signal.
+ *
+ * @param {QueryParams} params
+ * @param {"merge" | "replace"} [mode]
+ */
+export function navigateQs(params, mode) {
+    if (!mode || mode === "merge") {
+        QUERY_PARAMS.value = {
+            ...QUERY_PARAMS.value,
+            ...params,
+        };
+    } else {
+        QUERY_PARAMS.value = params;
+    }
+
+    const qs = new URLSearchParams(removeNullish(QUERY_PARAMS.value));
+    history.pushState(null, "", `?${qs}`);
+}
+
+/**
+ * Get query string for for <a href> rendering
+ *
+ * @param {QueryParams} [params]
+ * @param {"merge" | "replace"} [mode]
+ */
+export function getQs(params, mode) {
+    let query;
+
+    if (!mode || mode === "merge") {
+        query = {
+            ...QUERY_PARAMS.value,
+            ...params,
+        };
+    } else {
+        query = params;
+    }
+
+    return "?" + new URLSearchParams(removeNullish(query)).toString();
+}
+
 updateWeatherData().then(() => {
     const fragment = location.hash;
     if (!fragment) {
@@ -734,13 +798,6 @@ window.addEventListener("pageshow", (event) => {
 
 setInterval(updateWeatherData, 60000);
 
-/**
- * Calculates the difference between two wind directions considering the circular nature of directions.
- * @param {number} dir1 - First wind direction.
- * @param {number} dir2 - Second wind direction.
- * @returns {number} The minimum difference between the two directions.
- */
-function calculateDirectionDifference(dir1, dir2) {
-    const diff = Math.abs(dir1 - dir2);
-    return Math.min(diff, 360 - diff);
-}
+QUERY_PARAMS.subscribe(() => {
+    updateWeatherData();
+});
