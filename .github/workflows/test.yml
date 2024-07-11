@@ -29,4 +29,7 @@ jobs:
               run: pnpm install
 
             - name: Run TypeScript typecheck
-              run: npm run tsc
+              run: pnpm run tsc
+
+            - name: Check formatting (auto fix with `npm run prettier`)
+              run: pnpm run prettier-check
