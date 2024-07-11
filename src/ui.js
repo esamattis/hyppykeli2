@@ -2,6 +2,7 @@
 import { effect, signal } from "@preact/signals";
 import { useCallback, useEffect, useState } from "preact/hooks";
 import { html } from "htm/preact";
+import { OpenMeteoTool } from "./om.js";
 import {
     FORECASTS,
     OBSERVATIONS,
@@ -898,6 +899,7 @@ export function Root() {
                         </div>
                     </div>
                 </div>
+                <${OpenMeteoTool} />
             </div>
 
             <${SideMenu} />
