@@ -3,19 +3,14 @@ import { html } from "htm/preact";
 import { HOVERED_OBSERVATION, OBSERVATIONS, WIND_VARIATIONS } from "./data.js";
 import { Help } from "./utils.js";
 
-/**
- * Linearly converts a value from one range to another range in a reversed manner.
- *
- * @param {number} value - The value to be converted, originally in the input range.
- * @param {number} inMin - The minimum value of the input range.
- * @param {number} inMax - The maximum value of the input range.
- * @param {number} outMin - The minimum value of the output range.
- * @param {number} outMax - The maximum value of the output range.
- * @returns {number} The converted value in the reversed output range.
- */
-function convertRangeReversed(value, inMin, inMax, outMin, outMax) {
-    return ((inMax - value) / (inMax - inMin)) * (outMax - outMin) + outMin;
-}
+// Constants for needle length calculation
+const MIN_NEEDLE_LENGTH = 30;
+const MAX_NEEDLE_LENGTH = 170;
+const STUDENT_LIMIT_LENGTH = 110;
+const INSTRUCTOR_LIMIT_LENGTH = 150;
+const STUDENT_WIND_SPEED = 8;
+const INSTRUCTOR_WIND_SPEED = 11;
+const MAX_WIND_SPEED = 11.9;
 
 /**
  * Linearly converts a value from one range to another range.
@@ -31,9 +26,28 @@ function convertRange(value, inMin, inMax, outMin, outMax) {
     return ((value - inMin) / (inMax - inMin)) * (outMax - outMin) + outMin;
 }
 
+/**
+ * Calculates the needle length based on wind gust speed
+ * @param {number} gust - Wind gust speed in m/s
+ * @returns {number} Needle length in pixels
+ */
+function calculateNeedleLength(gust) {
+    if (gust == 0) {
+        return MIN_NEEDLE_LENGTH;
+    } else if (gust <= STUDENT_WIND_SPEED) {
+        return Math.max(MIN_NEEDLE_LENGTH, convertRange(gust, 0, STUDENT_WIND_SPEED, MIN_NEEDLE_LENGTH, STUDENT_LIMIT_LENGTH));
+    } else if (gust <= INSTRUCTOR_WIND_SPEED) {
+        return convertRange(gust, STUDENT_WIND_SPEED, INSTRUCTOR_WIND_SPEED, STUDENT_LIMIT_LENGTH, INSTRUCTOR_LIMIT_LENGTH);
+    } else if (gust <= MAX_WIND_SPEED) {
+        return convertRange(gust, INSTRUCTOR_WIND_SPEED, MAX_WIND_SPEED, INSTRUCTOR_LIMIT_LENGTH, MAX_NEEDLE_LENGTH);
+    } else {
+        return MAX_NEEDLE_LENGTH;
+    }
+}
+
 export function Compass() {
-    const circle = 150;
-    const studentCirle = convertRange(8, 0, 11, 0, circle);
+    const circle = INSTRUCTOR_LIMIT_LENGTH;
+    const studentCircle = STUDENT_LIMIT_LENGTH;
     // prettier-ignore
     return html`
         <div class="compass">
@@ -45,7 +59,7 @@ export function Compass() {
 
               <!-- Circle for compass outline -->
               <circle cx="200" cy="200" r=${circle} stroke="black" stroke-width="2" fill="none" />
-              <circle cx="200" cy="200" r=${studentCirle} stroke="orange" stroke-width="2" fill="none" />
+              <circle cx="200" cy="200" r=${studentCircle} stroke="orange" stroke-width="2" fill="none" />
 
               <!-- Directions Text -->
               <text x="200" y="40" font-size="40" text-anchor="middle" fill="black">N</text>
@@ -79,6 +93,8 @@ export function Compass() {
 }
 
 export function FullScreenCompass() {
+    const circle = INSTRUCTOR_LIMIT_LENGTH;
+    const studentCircle = STUDENT_LIMIT_LENGTH;
     return html`
         <div class="fullscreen-compass">
             <svg
@@ -92,7 +108,7 @@ export function FullScreenCompass() {
                 <circle
                     cx="200"
                     cy="200"
-                    r="150"
+                    r="${circle}"
                     stroke="black"
                     stroke-width="2"
                     fill="none"
@@ -100,7 +116,7 @@ export function FullScreenCompass() {
                 <circle
                     cx="200"
                     cy="200"
-                    r="109.09"
+                    r="${studentCircle}"
                     stroke="orange"
                     stroke-width="2"
                     fill="none"
@@ -158,13 +174,14 @@ function Needle() {
         return null;
     }
 
-    const needleLength = convertRangeReversed(point.gust, 0, 11, 50, 170);
+    const needleLength = calculateNeedleLength(point.gust);
+    const needleColor = point.gust > MAX_WIND_SPEED ? "black" : "red";
 
     return html`
         <g className="${history ? "historic" : ""}">
             <polygon
-                points=${`190,${needleLength} 210,${needleLength} 220,200 180,200`}
-                fill="red"
+                points=${`190,${200 - needleLength} 210,${200 - needleLength} 220,200 180,200`}
+                fill=${needleColor}
                 transform=${`rotate(${point.direction - 180}, 200, 200)`}
             />
             <!-- Center Point -->
@@ -183,7 +200,7 @@ function WindVariations() {
     }
 
     const { variationRange, averageDirection, color, extraWidth } = variations;
-    const radius = 150; // Radius of the compass circle
+    const radius = INSTRUCTOR_LIMIT_LENGTH; // Radius of the compass circle
     const arcWidth = BASE_ARC_WIDTH + (extraWidth || 0);
     const outerRadius = radius + arcWidth / 2;
     const innerRadius = radius - arcWidth / 2;
