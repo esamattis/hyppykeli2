@@ -1,7 +1,17 @@
 // @ts-check
 import { html } from "htm/preact";
-import { useState, useEffect } from "preact/hooks";
-import { STATION_COORDINATES } from "./data.js";
+import { FORECAST_COORDINATES, STATION_COORDINATES } from "./data.js";
+import { effect, signal } from "@preact/signals";
+
+/**
+ * @type {Signal<OpenMeteoWeatherData | null>}
+ */
+const OM_DATA = signal(null);
+
+// Refetch data on coordinates changes
+effect(() => {
+    fetchDataWithCache();
+});
 
 function getTimeRange() {
     const now = new Date();
@@ -25,11 +35,6 @@ async function fetchDataWithCoordinates(coordinates) {
     const { start, end } = getTimeRange();
     const [latitude, longitude] = coordinates.split(",").map(Number);
 
-    if (isNaN(latitude) || isNaN(longitude)) {
-        console.error("Virheelliset koordinaatit:", coordinates);
-        return null;
-    }
-
     const response = await fetch(
         `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=windspeed_1000hPa,windspeed_925hPa,windspeed_850hPa,windspeed_700hPa,windspeed_600hPa,winddirection_1000hPa,winddirection_925hPa,winddirection_850hPa,winddirection_700hPa,winddirection_600hPa&start=${start}&end=${end}`,
     );
@@ -42,10 +47,14 @@ async function fetchDataWithCoordinates(coordinates) {
 }
 
 /**
- * @param {string} coordinates
- * @returns {Promise<OpenMeteoWeatherData | null>}
+ * @returns {Promise<void>}
  */
-async function fetchDataWithCache(coordinates) {
+async function fetchDataWithCache() {
+    const coordinates = FORECAST_COORDINATES.value ?? STATION_COORDINATES.value;
+    if (!coordinates) {
+        return;
+    }
+
     const cachedData = localStorage.getItem("ECMWFWindAloft");
     const cachedTime = localStorage.getItem("ECMWFWindAloftTime");
     const cachedCoordinates = localStorage.getItem("ECMWFWindAloftCoordinates");
@@ -58,7 +67,8 @@ async function fetchDataWithCache(coordinates) {
 
         if (cachedCoordinates === coordinates && cachedHour === currentHour) {
             console.log("Käytetään välimuistissa olevaa dataa");
-            return JSON.parse(cachedData);
+            OM_DATA.value = JSON.parse(cachedData);
+            return;
         }
     }
 
@@ -71,7 +81,7 @@ async function fetchDataWithCache(coordinates) {
         localStorage.setItem("ECMWFWindAloftCoordinates", coordinates);
     }
 
-    return newData;
+    OM_DATA.value = newData;
 }
 
 /**
@@ -152,40 +162,7 @@ function getAverageData(hourly, targetHour, dayOffset) {
 }
 
 export function OpenMeteoTool() {
-    const [data, setData] = useState(
-        /** @type {FormattedTableData | null} */ (null),
-    );
-    const [coordinates, setCoordinates] = useState(
-        /** @type {string | null} */ (null),
-    );
-
-    useEffect(() => {
-        const unsubscribe = STATION_COORDINATES.subscribe((value) => {
-            if (value) {
-                setCoordinates(value);
-            }
-        });
-
-        // Aseta koordinaatit URL:sta, jos ne ovat saatavilla
-        const urlParams = new URLSearchParams(window.location.search);
-        const lat = urlParams.get("lat");
-        const lon = urlParams.get("lon");
-        if (lat && lon) {
-            setCoordinates(`${lat},${lon}`);
-        }
-
-        return () => unsubscribe();
-    }, []);
-
-    useEffect(() => {
-        if (coordinates) {
-            fetchDataWithCache(coordinates).then((rawData) => {
-                if (rawData && rawData.hourly) {
-                    setData(formatTableData(rawData.hourly));
-                }
-            });
-        }
-    }, [coordinates]);
+    const data = OM_DATA.value ? formatTableData(OM_DATA.value.hourly) : null;
 
     /**
      * @param {number} speed
