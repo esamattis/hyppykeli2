@@ -28,6 +28,7 @@ import { Graph } from "./graph.js";
 import { Compass, FullScreenCompass } from "./compass.js";
 import {
     dateOffset,
+    ErrorBoundary,
     formatClock,
     formatDate,
     Help,
@@ -879,7 +880,10 @@ export function Root() {
                         </div>
                     </div>
                 </div>
-                <${OpenMeteoTool} />
+
+                <${ErrorBoundary}>
+                    <${OpenMeteoTool} />
+                </${ErrorBoundary}>
             </div>
 
             <${SideMenu} />
