@@ -792,15 +792,17 @@ export function Root() {
     return html`
         <div>
             <div class="content">
-                ${ERRORS.value.length > 0
-                    ? html`
-                          <div class="errors">
-                              ${ERRORS.value.map((error) => {
-                                  return html` <p>${error}</p> `;
-                              })}
-                          </div>
-                      `
-                    : null}
+                ${
+                    ERRORS.value.length > 0
+                        ? html`
+                              <div class="errors">
+                                  ${ERRORS.value.map((error) => {
+                                      return html` <p>${error}</p> `;
+                                  })}
+                              </div>
+                          `
+                        : null
+                }
 
                 <h1 id="#top">
                     <a class="logo" href="/"> Hyppykeli</a> –${" "}
@@ -808,23 +810,27 @@ export function Root() {
                 </h1>
 
                 <p>
-                    ${STATION_NAME.value
-                        ? html`
-                              Tiedot haettu havaintoasemalta${" "}
-                              <a
-                                  href="https://www.google.fi/maps/place/${STATION_COORDINATES.value}"
-                                  >${STATION_NAME}</a
-                              >.${" "}
+                    ${
+                        STATION_NAME.value
+                            ? html`
+                                  Tiedot haettu havaintoasemalta${" "}
+                                  <a
+                                      href="https://www.google.fi/maps/place/${STATION_COORDINATES.value}"
+                                      >${STATION_NAME}</a
+                                  >.${" "}
 
-                              <${ForecastLocationInfo} />
-                          `
-                        : "Ladataan..."}
-                    ${latestMetar
-                        ? html`
-                              ${" "}Lentokentän korkeus meren pinnasta${" "}
-                              ${latestMetar.elevation.toFixed(0)}M. ${" "}
-                          `
-                        : null}
+                                  <${ForecastLocationInfo} />
+                              `
+                            : "Ladataan..."
+                    }
+                    ${
+                        latestMetar
+                            ? html`
+                                  ${" "}Lentokentän korkeus meren pinnasta${" "}
+                                  ${latestMetar.elevation.toFixed(0)}M. ${" "}
+                              `
+                            : null
+                    }
 
                     <span class="disclaimer">
                         Tietojen käyttö omalla vastuulla. Ei takeita että tiedot

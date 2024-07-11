@@ -35,11 +35,32 @@ function calculateNeedleLength(gust) {
     if (gust == 0) {
         return MIN_NEEDLE_LENGTH;
     } else if (gust <= STUDENT_WIND_SPEED) {
-        return Math.max(MIN_NEEDLE_LENGTH, convertRange(gust, 0, STUDENT_WIND_SPEED, MIN_NEEDLE_LENGTH, STUDENT_LIMIT_LENGTH));
+        return Math.max(
+            MIN_NEEDLE_LENGTH,
+            convertRange(
+                gust,
+                0,
+                STUDENT_WIND_SPEED,
+                MIN_NEEDLE_LENGTH,
+                STUDENT_LIMIT_LENGTH,
+            ),
+        );
     } else if (gust <= INSTRUCTOR_WIND_SPEED) {
-        return convertRange(gust, STUDENT_WIND_SPEED, INSTRUCTOR_WIND_SPEED, STUDENT_LIMIT_LENGTH, INSTRUCTOR_LIMIT_LENGTH);
+        return convertRange(
+            gust,
+            STUDENT_WIND_SPEED,
+            INSTRUCTOR_WIND_SPEED,
+            STUDENT_LIMIT_LENGTH,
+            INSTRUCTOR_LIMIT_LENGTH,
+        );
     } else if (gust <= MAX_WIND_SPEED) {
-        return convertRange(gust, INSTRUCTOR_WIND_SPEED, MAX_WIND_SPEED, INSTRUCTOR_LIMIT_LENGTH, MAX_NEEDLE_LENGTH);
+        return convertRange(
+            gust,
+            INSTRUCTOR_WIND_SPEED,
+            MAX_WIND_SPEED,
+            INSTRUCTOR_LIMIT_LENGTH,
+            MAX_NEEDLE_LENGTH,
+        );
     } else {
         return MAX_NEEDLE_LENGTH;
     }
@@ -206,7 +227,8 @@ function WindVariations() {
     const innerRadius = radius - arcWidth / 2;
 
     // Calculate the start and end angles for the arc (180-degree swap)
-    const startAngle = (averageDirection + 180 - variationRange / 2 + 360) % 360;
+    const startAngle =
+        (averageDirection + 180 - variationRange / 2 + 360) % 360;
     const endAngle = (averageDirection + 180 + variationRange / 2) % 360;
 
     // Convert angles to radians (no change in offset as it's for SVG coordinates)
