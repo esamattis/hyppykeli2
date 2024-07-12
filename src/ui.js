@@ -78,6 +78,7 @@ function ObservationTHead() {
             <th>Puuska</th>
             <th>Tuuli</th>
             <th>Suunta</th>
+            <th>Lämpötila</th>
         </tr>
     `;
 }
@@ -98,6 +99,7 @@ function ObservationRows(props) {
                 <td>
                     <${WindDirection} direction=${point.direction} />
                 </td>
+                <td>${point.temperature.toFixed(1)} °C</td>
             </tr>
         `;
     });
@@ -125,6 +127,13 @@ function ForecastTHead() {
                 </p>
             </${Help}>
         </th>
+        <th>
+            Sade t.
+            <${Help} label="?">
+            Sateen todenäköisyys prosentteina.
+            </${Help}>
+        </th>
+        <th>Lämpötila</th>
 
     </tr>`;
 }
@@ -150,6 +159,8 @@ function ForecastRows(props) {
                 <${PieChart} percentage=${point.middleCloudCover ?? 0} />
                 ${point.middleCloudCover?.toFixed(0) ?? "-1"}%
             </td>
+            <td>${point.rain?.toFixed(0)}%</td>
+            <td>${point.temperature?.toFixed(1)} °C</td>
         </tr> `;
     });
 }
@@ -415,6 +426,7 @@ function UpdateButton() {
         <button
             disabled=${LOADING.value > 0}
             onClick=${() => {
+                MENU_OPEN.value = false;
                 updateWeatherData();
             }}
         >
@@ -451,7 +463,7 @@ document.addEventListener("click", (e) => {
  */
 export const OTHER_DZs = signal([]);
 
-// Load DZ lis when the menu is opened
+// Load DZ list when the menu is opened
 effect(() => {
     if (!MENU_OPEN.value) {
         return;
@@ -609,8 +621,24 @@ function handleForecastDayChange(e) {
 }
 
 export function SideMenu() {
+    /**
+     * @param {MouseEvent} e
+     */
+    const closeMenuOnLinkClick = (e) => {
+        if (!(e.target instanceof HTMLElement)) {
+            return;
+        }
+
+        if (e.target instanceof HTMLAnchorElement || e.target?.closest("a")) {
+            MENU_OPEN.value = false;
+        }
+    };
+
     return html`
-        <div class="${MENU_OPEN.value ? "side-menu open" : "side-menu"}">
+        <div
+            class="${MENU_OPEN.value ? "side-menu open" : "side-menu"}"
+            onClick=${closeMenuOnLinkClick}
+        >
             <h1>${NAME.value}</h1>
             <h2>Ennuste</h2>
 
@@ -643,6 +671,14 @@ export function SideMenu() {
             <p>
                 <${UpdateButton} />
             </p>
+
+            <h2>Osiot</h2>
+
+            <p><a href="#observation-graph">Havainnot 📈</a></p>
+            <p><a href="#forecast-graph">Ennusteet 📈</a></p>
+            <p><a href="#observations">Havainnot 🧾</a></p>
+            <p><a href="#forecasts">Ennusteet 🧾</a></p>
+            <p><a href="#high">Ylätuuliennusteet</a></p>
 
             <h2>DZs</h2>
             ${OTHER_DZs.value.map(
@@ -694,28 +730,21 @@ export function StickyFooter() {
             <a class="item" href="#observation-graph">
                 <div class="wrap">
                     <div class="icon">📈</div>
-                    <div class="text">Havainnot</div>
-                </div>
-            </a>
-
-            <a class="item" href="#forecast-graph">
-                <div class="wrap">
-                    <div class="icon">📈</div>
-                    <div class="text">Ennuste</div>
+                    <div class="text">Kaaviot</div>
                 </div>
             </a>
 
             <a class="item" href="#observations">
                 <div class="wrap">
                     <div class="icon">🧾</div>
-                    <div class="text">Havainnot</div>
+                    <div class="text">Taulukot</div>
                 </div>
             </a>
 
-            <a class="item" href="#forecasts">
+            <a class="item" href="#high">
                 <div class="wrap">
-                    <div class="icon">🧾</div>
-                    <div class="text">Ennuste</div>
+                    <div class="icon">💨</div>
+                    <div class="text">Ylätuulet</div>
                 </div>
             </a>
 

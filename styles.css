@@ -36,7 +36,7 @@ a:visited {
 
 .weather-table td,
 .weather-table th {
-    width: 68px;
+    width: 73px;
     white-space: nowrap;
     background-color: white;
 }
@@ -45,6 +45,7 @@ a:visited {
 .weather-table th:first-of-type {
     position: sticky;
     width: 5ch;
+    z-index: 10;
     left: 0;
 }
 
@@ -205,6 +206,7 @@ p {
     position: sticky;
     top: 0;
     background-color: white;
+    z-index: 50;
 }
 
 .show-more {
@@ -290,6 +292,7 @@ h2 .date {
     width: 4ch;
     display: inline-block;
     padding-right: 3px;
+    z-index: -1;
 }
 
 .direction {
