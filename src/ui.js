@@ -716,8 +716,32 @@ export function SideMenu() {
                     Jaa
                 </button>
             </form>
+
+            <h2>Muokkaa näkymää</h2>
+            <p class="disclaimer">
+                Lisää omaa CSS:ää sivulle. Tämä on kokeellinen ominaisuus ja
+                saattaa rikkoa sivun ulkoasun.
+            </p>
+            <${CSSEditor} />
         </div>
     `;
+}
+
+function CSSEditor() {
+    return html`<form class="css-editor">
+        ${Object.entries(QUERY_PARAMS.value).map(
+            ([key, value]) => html`
+                <input type="hidden" name=${key} value=${value} />
+            `,
+        )}
+
+        <textarea name="css">
+            ${QUERY_PARAMS.value.css || ""}
+        </textarea
+        >
+
+        <button type="submit">Submit</button>
+    </form>`;
 }
 
 export function StickyFooter() {
@@ -840,7 +864,7 @@ export function Root() {
                     <span id="title">${NAME}</span>
                 </h1>
 
-                <p>
+                <p class="info">
                     ${
                         STATION_NAME.value
                             ? html`
@@ -870,7 +894,8 @@ export function Root() {
                 </p>
 
                 <div class="as-rows-on-big-screen">
-                    <div class="big-screen-row">
+
+                    <div class="clouds big-screen-row">
                         <h2 class="h2-with-icon">
                             Pilvet
                             <${Anvil} />
@@ -879,7 +904,7 @@ export function Root() {
                         <${LatestMetar} />
                     </div>
 
-                    <div class="big-screen-row">
+                    <div class="winds big-screen-row">
                         <div class="anchor" id="latest"></div>
                         <h2 class="h2-with-icon">
                             Tuulet
@@ -897,7 +922,7 @@ export function Root() {
                 <${Graph} />
 
                 <div class="as-rows-on-big-screen">
-                    <div>
+                    <div class="observations">
                         <div class="anchor" id="observations"></div>
                         <h2 class="sticky">
                             Havainnot
@@ -914,7 +939,7 @@ export function Root() {
                         </div>
                     </div>
 
-                    <div class=${STALE_FORECASTS.value ? "stale" : "fresh"}>
+                    <div class=${"forecasts " + (STALE_FORECASTS.value ? "stale" : "fresh")}>
                         <div class="anchor" id="forecasts"></div>
                         <h2 class="sticky">
                             Ennuste
@@ -938,20 +963,33 @@ export function Root() {
                     </div>
                 </div>
 
-                <div class="anchor" id="high"></div>
-                <h2>ECMWF Ylätuuliennusteet</h2>
-                <p>
-                    Lähde <a href="https://open-meteo.com/">Open-Meteo</a> API.
-                </p>
-                <div class="side-scroll">
-                    <${ErrorBoundary}>
-                        <${OpenMeteoTool} />
-                    </${ErrorBoundary}>
+                <div class="high-winds">
+                    <div class="anchor" id="high"></div>
+                    <h2>ECMWF Ylätuuliennusteet</h2>
+                    <p>
+                        Lähde <a href="https://open-meteo.com/">Open-Meteo</a> API.
+                    </p>
+                    <div class="side-scroll">
+                        <${ErrorBoundary}>
+                            <${OpenMeteoTool} />
+                        </${ErrorBoundary}>
+                    </div>
                 </div>
-
             </div>
             <${SideMenu} />
             <${StickyFooter} />
+
+           ${
+               QUERY_PARAMS.value.css
+                   ? html`<style
+                         dangerouslySetInnerHTML=${{
+                             __html: QUERY_PARAMS.value.css,
+                         }}
+                     ></style>`
+                   : null
+           }
+
+
         </div>
     `;
 }

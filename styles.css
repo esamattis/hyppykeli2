@@ -364,3 +364,8 @@ h2 .date {
     text-decoration: none;
     color: black;
 }
+
+.css-editor textarea {
+    width: 100%;
+    height: 30ch;
+}

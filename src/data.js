@@ -52,6 +52,7 @@ import { calculateDirectionDifference, removeNullish } from "./utils.js";
  * @property {string} [forecast_range]
  * @property {string} [direction]
  * @property {string} [gust]
+ * @property {string} [css]
  */
 
 /**
