@@ -78,6 +78,7 @@ function ObservationTHead() {
             <th>Puuska</th>
             <th>Tuuli</th>
             <th>Suunta</th>
+            <th>Lämpötila</th>
         </tr>
     `;
 }
@@ -98,6 +99,7 @@ function ObservationRows(props) {
                 <td>
                     <${WindDirection} direction=${point.direction} />
                 </td>
+                <td>${point.temperature.toFixed(1)} °C</td>
             </tr>
         `;
     });
@@ -126,11 +128,12 @@ function ForecastTHead() {
             </${Help}>
         </th>
         <th>
-        Sade
-        <${Help} label="?">
-           Sateen todenäköisyys prosentteina.
-        </${Help}>
+            Sade
+            <${Help} label="?">
+            Sateen todenäköisyys prosentteina.
+            </${Help}>
         </th>
+        <th>Lämpötila</th>
 
     </tr>`;
 }
@@ -157,6 +160,7 @@ function ForecastRows(props) {
                 ${point.middleCloudCover?.toFixed(0) ?? "-1"}%
             </td>
             <td>${point.rain?.toFixed(0)}%</td>
+            <td>${point.temperature?.toFixed(1)} °C</td>
         </tr> `;
     });
 }

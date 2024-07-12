@@ -17,6 +17,7 @@ import { calculateDirectionDifference, removeNullish } from "./utils.js";
  * @property {number} gust
  * @property {number} speed
  * @property {number} direction
+ * @property {number} temperature
  * @property {number} [rain]
  * @property {number|undefined} lowCloudCover
  * @property {number|undefined} middleCloudCover
@@ -113,6 +114,7 @@ function mockLatestObservation(original) {
         gust: Number(customGust) || mock?.gust || 0,
         speed: Number(customSpeed) || mock?.speed || 0,
         direction: Number(customDirection) || mock?.direction || 0,
+        temperature: mock?.temperature || 0,
     };
 
     return mock;
@@ -317,20 +319,6 @@ document.addEventListener("click", (e) => {
         HOVERED_OBSERVATION.value = undefined;
     }
 });
-
-const OBSERVATION_PARAMETERS = [
-    "winddirection",
-    "windspeedms",
-    "windgust",
-    "n_man",
-];
-
-const FORECAST_PAREMETERS = [
-    "winddirection",
-    "windspeedms",
-    "windgust",
-    "maximumwind",
-];
 
 /**
  * Makes a request to the FMI API with the given options.
@@ -565,7 +553,7 @@ export async function updateWeatherData() {
             cch: cacheBust,
             starttime: obsStartTime.toISOString(),
             // endtime:
-            parameters: OBSERVATION_PARAMETERS.join(","),
+            parameters: ["winddirection", "windspeedms", "windgust", "t2m"],
             fmisid,
         },
         "/example_data/observations.xml",
@@ -580,6 +568,11 @@ export async function updateWeatherData() {
         addError(`Virhe havaintoaseman ${fmisid} tietojen hakemisessa.`);
         return;
     }
+
+    // const allFeatures = Array.from(
+    //     doc.querySelectorAll("SF_SpatialSamplingFeature"),
+    // ).map((el) => el.getAttribute("gml:id"));
+    // console.log(allFeatures.join(", "));
 
     // <gml:name codeSpace="http://xml.fmi.fi/namespace/locationcode/name">Kouvola Utti lentoasema</gml:name>
     const name = xpath(
@@ -608,6 +601,8 @@ export async function updateWeatherData() {
         "obs-obs-1-1-winddirection",
     ).reverse();
 
+    const temperatures = parseTimeSeries(doc, "obs-obs-1-1-t2m").reverse();
+
     /** @type {WeatherData[]} */
     const combined = gusts.map((gust, i) => {
         return {
@@ -617,6 +612,7 @@ export async function updateWeatherData() {
             time: gust.time,
             middleCloudCover: undefined,
             lowCloudCover: undefined,
+            temperature: temperatures[i]?.value ?? -99,
         };
     });
 
@@ -659,14 +655,14 @@ export async function updateWeatherData() {
             // parameters: FORECAST_PAREMETERS.join(","),
             // parameters: "WindGust",
             // LowCloudCover, MiddleCloudCover, HighCloudCover, MiddleAndLowCloudCover
-            parameters: [
-                "HourlyMaximumGust",
-                "WindDirection",
-                "WindSpeedMS",
-                "LowCloudCover",
-                "MiddleAndLowCloudCover",
-                "PoP", // precipitation probability
-            ].join(","),
+            // parameters: [
+            //     "HourlyMaximumGust",
+            //     "WindDirection",
+            //     "WindSpeedMS",
+            //     "LowCloudCover",
+            //     "MiddleAndLowCloudCover",
+            //     "PoP", // precipitation probability
+            // ].join(","),
             // place: "Utti",
             latlon: FORECAST_COORDINATES.value ?? STATION_COORDINATES.value,
         },
@@ -696,6 +692,12 @@ export async function updateWeatherData() {
     const speedForecasts = parseTimeSeries(forecastXml, "mts-1-1-WindSpeedMS");
 
     const popForecasts = parseTimeSeries(forecastXml, "mts-1-1-PoP");
+
+    const temperatureForecasts = parseTimeSeries(
+        forecastXml,
+        "mts-1-1-Temperature",
+    );
+
 
     const directionForecasts = parseTimeSeries(
         forecastXml,
@@ -729,6 +731,7 @@ export async function updateWeatherData() {
             lowCloudCover: cloudCoverForecasts[i]?.value,
             middleCloudCover: middleCloudCoverForecasts[i]?.value,
             rain: popForecasts[i]?.value,
+            temperature: temperatureForecasts[i]?.value ?? -99,
         };
     });
 
