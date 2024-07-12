@@ -415,6 +415,7 @@ function UpdateButton() {
         <button
             disabled=${LOADING.value > 0}
             onClick=${() => {
+                MENU_OPEN.value = false;
                 updateWeatherData();
             }}
         >
