@@ -675,9 +675,9 @@ export function SideMenu() {
             <h2>Osiot</h2>
 
             <p><a href="#observation-graph">Havainnot 📈</a></p>
+            <p><a href="#forecast-graph">Ennusteet 📈</a></p>
             <p><a href="#observations">Havainnot 🧾</a></p>
             <p><a href="#forecasts">Ennusteet 🧾</a></p>
-            <p><a href="#forecast-graph">Ennusteet 📈</a></p>
             <p><a href="#high">Ylätuuliennusteet</a></p>
 
             <h2>DZs</h2>
