@@ -161,17 +161,41 @@ function getAverageData(hourly, targetHour, dayOffset) {
     return result;
 }
 
+// Määritellään muuttujat värityslogiikalle
+const onCanopyHeights = ["110 m", "800 m"];
+const freeFallHeights = ["1500 m", "3000 m", "4200 m"];
+
+const onCanopySpeedLimits = [8, 11]; // m/s
+const freeFallSpeedLimits = [8, 13, 18]; // m/s
+
+const windSpeedClasses = [
+    "wind-low",
+    "wind-medium",
+    "wind-high",
+    "wind-very-high",
+];
+
+/**
+ * @param {number} speed
+ * @param {string} height
+ */
+const getWindSpeedClass = (speed, height) => {
+    if (onCanopyHeights.includes(height)) {
+        if (speed < onCanopySpeedLimits[0]) return windSpeedClasses[0];
+        if (speed < onCanopySpeedLimits[1]) return windSpeedClasses[1];
+        if (speed < 13) return windSpeedClasses[2]; // Oranssi 11-12 m/s
+        return windSpeedClasses[3]; // Punainen 13 m/s ja yli
+    } else if (freeFallHeights.includes(height)) {
+        if (speed < freeFallSpeedLimits[0]) return windSpeedClasses[0];
+        if (speed < freeFallSpeedLimits[1]) return windSpeedClasses[1];
+        if (speed < freeFallSpeedLimits[2]) return windSpeedClasses[2];
+        return windSpeedClasses[3];
+    }
+    return "";
+};
+
 export function OpenMeteoTool() {
     const data = OM_DATA.value ? formatTableData(OM_DATA.value.hourly) : null;
-
-    /**
-     * @param {number} speed
-     */
-    const getWindSpeedClass = (speed) => {
-        if (speed < 8) return "wind-low";
-        if (speed <= 11) return "wind-medium";
-        return "wind-high";
-    };
 
     /**
      * @param {number|string} num
@@ -199,8 +223,23 @@ export function OpenMeteoTool() {
     const renderTable = (title, tableData) => {
         if (!tableData) return null;
 
-        const now = new Date();
-        const currentHour = now.getHours();
+        const currentHour = new Date().getHours();
+        const blockStartHour = Math.floor(currentHour / 3) * 3;
+
+        /**
+         * @param {string} hour
+         * @returns {string}
+         */
+        function getColumnClass(hour) {
+            if (title === "Tänään") {
+                if (parseInt(hour) === blockStartHour) {
+                    return "current-column";
+                } else if (parseInt(hour) < blockStartHour) {
+                    return "past-column";
+                }
+            }
+            return "";
+        }
 
         return html`
             <table class="wind-table">
@@ -214,7 +253,11 @@ export function OpenMeteoTool() {
                         <th>Korkeus</th>
                         ${Object.keys(tableData).map(
                             (hour) =>
-                                html`<th class="time-header">${hour}:00</th>`,
+                                html`<th
+                                    class="time-header ${getColumnClass(hour)}"
+                                >
+                                    ${hour}:00
+                                </th>`,
                         )}
                     </tr>
                 </thead>
@@ -226,17 +269,14 @@ export function OpenMeteoTool() {
                                 <td class="pressure-cell">${height}</td>
                                 ${Object.entries(tableData).map(
                                     ([hour, hourData]) => {
-                                        const isPast =
-                                            title === "Tänään" &&
-                                            parseInt(hour) <= currentHour;
-                                        const cellClass = isPast
-                                            ? "past-cell"
-                                            : "";
+                                        const columnClass =
+                                            getColumnClass(hour);
                                         return hourData[level]
                                             ? html` <td
-                                                  class="wind-cell ${cellClass} ${getWindSpeedClass(
+                                                  class="wind-cell ${columnClass} ${getWindSpeedClass(
                                                       hourData[level].speed /
                                                           3.6,
+                                                      height,
                                                   )}"
                                               >
                                                   <div class="wind-speed">
@@ -262,7 +302,7 @@ export function OpenMeteoTool() {
                                                       )}
                                                   </div>
                                               </td>`
-                                            : html`<td class="${cellClass}">
+                                            : html`<td class="${columnClass}">
                                                   -
                                               </td>`;
                                     },
@@ -289,7 +329,7 @@ export function OpenMeteoTool() {
                 .wind-table th,
                 .wind-table td {
                     border: 1px solid #ddd;
-                    padding: 8px;
+                    padding: 2px;
                     text-align: center;
                 }
                 .wind-table th {
@@ -303,7 +343,7 @@ export function OpenMeteoTool() {
                     font-weight: bold;
                 }
                 .wind-cell {
-                    padding: 4px;
+                    padding: 2px;
                 }
                 .wind-speed {
                     font-weight: bold;
@@ -312,15 +352,18 @@ export function OpenMeteoTool() {
                     color: #666;
                 }
                 .wind-low {
-                    background-color: #90ee90;
+                    background-color: #90ee90; /* vihreä */
                 }
                 .wind-medium {
-                    background-color: #ffa500;
+                    background-color: #ffff00; /* keltainen */
                 }
                 .wind-high {
-                    background-color: #ff6347;
+                    background-color: #ffa500; /* oranssi */
                 }
-                .past-cell {
+                .wind-very-high {
+                    background-color: #ff6347; /* punainen */
+                }
+                .past-column {
                     opacity: 0.5;
                 }
                 .wind-direction {
@@ -331,6 +374,17 @@ export function OpenMeteoTool() {
                 .wind-direction span {
                     margin-left: 4px;
                     font-size: 14px;
+                }
+                .wind-table th.current-column,
+                .wind-table td.current-column {
+                    border-left: 2px solid #333;
+                    border-right: 2px solid #333;
+                }
+                .wind-table th.current-column {
+                    border-top: 2px solid #333;
+                }
+                .wind-table tr:last-child td.current-column {
+                    border-bottom: 2px solid #333;
                 }
             </style>
             ${renderTable("Tänään", data.todayData)}
