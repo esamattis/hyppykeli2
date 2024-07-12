@@ -660,6 +660,13 @@ export function SideMenu() {
                 <${UpdateButton} />
             </p>
 
+            <h2>Osiot</h2>
+
+            <p><a href="#observation-graph">Havainnot 📈</a></p>
+            <p><a href="#observations">Havainnot 🧾</a></p>
+            <p><a href="#forecasts">Ennusteet 🧾</a></p>
+            <p><a href="#forecast-graph">Ennusteet 📈</a></p>
+
             <h2>DZs</h2>
             ${OTHER_DZs.value.map(
                 (dz) => html`<p><a href=${dz.href}>${dz.title}</a></p>`,
