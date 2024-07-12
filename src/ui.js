@@ -452,7 +452,7 @@ document.addEventListener("click", (e) => {
  */
 export const OTHER_DZs = signal([]);
 
-// Load DZ lis when the menu is opened
+// Load DZ list when the menu is opened
 effect(() => {
     if (!MENU_OPEN.value) {
         return;
@@ -667,6 +667,7 @@ export function SideMenu() {
             <p><a href="#observations">Havainnot 🧾</a></p>
             <p><a href="#forecasts">Ennusteet 🧾</a></p>
             <p><a href="#forecast-graph">Ennusteet 📈</a></p>
+            <p><a href="#high">Ylätuuliennusteet</a></p>
 
             <h2>DZs</h2>
             ${OTHER_DZs.value.map(
@@ -718,28 +719,21 @@ export function StickyFooter() {
             <a class="item" href="#observation-graph">
                 <div class="wrap">
                     <div class="icon">📈</div>
-                    <div class="text">Havainnot</div>
-                </div>
-            </a>
-
-            <a class="item" href="#forecast-graph">
-                <div class="wrap">
-                    <div class="icon">📈</div>
-                    <div class="text">Ennuste</div>
+                    <div class="text">Kaaviot</div>
                 </div>
             </a>
 
             <a class="item" href="#observations">
                 <div class="wrap">
                     <div class="icon">🧾</div>
-                    <div class="text">Havainnot</div>
+                    <div class="text">Taulukot</div>
                 </div>
             </a>
 
-            <a class="item" href="#forecasts">
+            <a class="item" href="#high">
                 <div class="wrap">
-                    <div class="icon">🧾</div>
-                    <div class="text">Ennuste</div>
+                    <div class="icon">💨</div>
+                    <div class="text">Ylätuulet</div>
                 </div>
             </a>
 
