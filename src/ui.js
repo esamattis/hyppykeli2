@@ -907,13 +907,17 @@ export function Root() {
                     </div>
                 </div>
 
-                <${ErrorBoundary}>
-                    <${OpenMeteoTool} />
-                </${ErrorBoundary}>
-            </div>
+                <div class="anchor" id="high"></div>
+                <h2>ECMWF Ylätuuliennusteet</h2>
+                <div class="side-scroll">
+                    <${ErrorBoundary}>
+                        <${OpenMeteoTool} />
+                    </${ErrorBoundary}>
+                </div>
 
-            <${SideMenu} />
-            <${StickyFooter} />
+                <${SideMenu} />
+                <${StickyFooter} />
+            </div>
         </div>
     `;
 }

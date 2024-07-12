@@ -281,7 +281,6 @@ export function OpenMeteoTool() {
 
     return html`
         <div>
-            <h1>ECMWF Ylätuuliennusteet</h1>
             <style>
                 .wind-table {
                     border-collapse: collapse;
