@@ -165,9 +165,6 @@ function getAverageData(hourly, targetHour, dayOffset) {
 const onCanopyHeights = ["110 m", "800 m"];
 const freeFallHeights = ["1500 m", "3000 m", "4200 m"];
 
-const onCanopySpeedLimits = [8, 11]; // m/s
-const freeFallSpeedLimits = [8, 13, 18]; // m/s
-
 const windSpeedClasses = [
     "wind-low",
     "wind-medium",
@@ -181,14 +178,14 @@ const windSpeedClasses = [
  */
 const getWindSpeedClass = (speed, height) => {
     if (onCanopyHeights.includes(height)) {
-        if (speed < onCanopySpeedLimits[0]) return windSpeedClasses[0];
-        if (speed < onCanopySpeedLimits[1]) return windSpeedClasses[1];
+        if (speed < 8) return windSpeedClasses[0];
+        if (speed < 11) return windSpeedClasses[1];
         if (speed < 13) return windSpeedClasses[2]; // Oranssi 11-12 m/s
         return windSpeedClasses[3]; // Punainen 13 m/s ja yli
     } else if (freeFallHeights.includes(height)) {
-        if (speed < freeFallSpeedLimits[0]) return windSpeedClasses[0];
-        if (speed < freeFallSpeedLimits[1]) return windSpeedClasses[1];
-        if (speed < freeFallSpeedLimits[2]) return windSpeedClasses[2];
+        if (speed < 8) return windSpeedClasses[0];
+        if (speed < 13) return windSpeedClasses[1];
+        if (speed < 18) return windSpeedClasses[2];
         return windSpeedClasses[3];
     }
     return "";
