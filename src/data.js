@@ -418,7 +418,7 @@ function xpath(doc, path) {
 function pointsToTimeSeries(node) {
     return Array.from(node.querySelectorAll("point")).map((point) => {
         return {
-            value: Number(point.querySelector("value")?.innerHTML ?? 0),
+            value: Number(point.querySelector("value")?.innerHTML ?? 0) || -1,
             time: new Date(
                 point.querySelector("time")?.innerHTML ?? new Date(),
             ),
