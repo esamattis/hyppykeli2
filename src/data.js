@@ -541,13 +541,13 @@ export async function updateWeatherData() {
             },
             "/example_data/metar.xml",
         ).then((xml) => {
-            if (!xml) {
-                addError(`Tuntematon lentokenttä tunnus ${icaocode}.`);
+            if (xml === "error") {
+                addError(`Virhe METAR-sanomaa hakiessa kentälle ${icaocode}.`);
                 return;
             }
 
-            if (xml === "error") {
-                addError(`Virhe METAR-sanomaa hakiessa kentälle ${icaocode}.`);
+            if (!xml || !xml.querySelector("member")) {
+                addError(`Tuntematon lentokentän tunnus ${icaocode}.`);
                 return;
             }
 
