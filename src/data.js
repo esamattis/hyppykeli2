@@ -767,33 +767,6 @@ export function getQs(params, mode) {
     return "?" + new URLSearchParams(removeNullish(query)).toString();
 }
 
-async function initData() {
-    // make the initial fetch
-    await updateWeatherData();
-
-    // listen to query string changes and refretch the data on changes
-    QUERY_PARAMS.subscribe(() => {
-        updateWeatherData();
-    });
-
-    // Scroll to url fragment after the intial data is loaded
-    // since anchor positions change after the data load
-    const fragment = location.hash;
-    if (!fragment) {
-        return;
-    }
-
-    let element;
-
-    try {
-        element = document.querySelector(fragment);
-    } catch (error) {}
-
-    if (element) {
-        element.scrollIntoView();
-    }
-}
-
 document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") {
         updateWeatherData();
@@ -808,4 +781,24 @@ window.addEventListener("pageshow", (event) => {
 
 setInterval(updateWeatherData, 60000);
 
-initData();
+// listen to query string changes and refretch the data on changes
+QUERY_PARAMS.subscribe(() => {
+    updateWeatherData().then(() => {
+        // Scroll to url fragment after the intial data is loaded
+        // since anchor positions change after the data load
+        const fragment = location.hash;
+        if (!fragment) {
+            return;
+        }
+
+        let element;
+
+        try {
+            element = document.querySelector(fragment);
+        } catch (error) {}
+
+        if (element) {
+            element.scrollIntoView();
+        }
+    });
+});
