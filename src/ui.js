@@ -609,8 +609,24 @@ function handleForecastDayChange(e) {
 }
 
 export function SideMenu() {
+    /**
+     * @param {MouseEvent} e
+     */
+    const closeMenuOnLinkClick = (e) => {
+        if (!(e.target instanceof HTMLElement)) {
+            return;
+        }
+
+        if (e.target instanceof HTMLAnchorElement || e.target?.closest("a")) {
+            MENU_OPEN.value = false;
+        }
+    };
+
     return html`
-        <div class="${MENU_OPEN.value ? "side-menu open" : "side-menu"}">
+        <div
+            class="${MENU_OPEN.value ? "side-menu open" : "side-menu"}"
+            onClick=${closeMenuOnLinkClick}
+        >
             <h1>${NAME.value}</h1>
             <h2>Ennuste</h2>
 
