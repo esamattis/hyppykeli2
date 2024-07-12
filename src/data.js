@@ -17,6 +17,7 @@ import { calculateDirectionDifference, removeNullish } from "./utils.js";
  * @property {number} gust
  * @property {number} speed
  * @property {number} direction
+ * @property {number} [rain]
  * @property {number|undefined} lowCloudCover
  * @property {number|undefined} middleCloudCover
  * @property {Date} time
@@ -664,6 +665,7 @@ export async function updateWeatherData() {
                 "WindSpeedMS",
                 "LowCloudCover",
                 "MiddleAndLowCloudCover",
+                "PoP", // precipitation probability
             ].join(","),
             // place: "Utti",
             latlon: FORECAST_COORDINATES.value ?? STATION_COORDINATES.value,
@@ -687,6 +689,8 @@ export async function updateWeatherData() {
     );
 
     const speedForecasts = parseTimeSeries(forecastXml, "mts-1-1-WindSpeedMS");
+
+    const popForecasts = parseTimeSeries(forecastXml, "mts-1-1-PoP");
 
     const directionForecasts = parseTimeSeries(
         forecastXml,
@@ -719,6 +723,7 @@ export async function updateWeatherData() {
             time: gust.time,
             lowCloudCover: cloudCoverForecasts[i]?.value,
             middleCloudCover: middleCloudCoverForecasts[i]?.value,
+            rain: popForecasts[i]?.value,
         };
     });
 

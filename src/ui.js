@@ -125,6 +125,12 @@ function ForecastTHead() {
                 </p>
             </${Help}>
         </th>
+        <th>
+        Sade
+        <${Help} label="?">
+           Sateen todenäköisyys prosentteina.
+        </${Help}>
+        </th>
 
     </tr>`;
 }
@@ -150,6 +156,7 @@ function ForecastRows(props) {
                 <${PieChart} percentage=${point.middleCloudCover ?? 0} />
                 ${point.middleCloudCover?.toFixed(0) ?? "-1"}%
             </td>
+            <td>${point.rain?.toFixed(0)}%</td>
         </tr> `;
     });
 }
