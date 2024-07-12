@@ -128,7 +128,7 @@ function ForecastTHead() {
             </${Help}>
         </th>
         <th>
-            Sade
+            Sade t.
             <${Help} label="?">
             Sateen todenäköisyys prosentteina.
             </${Help}>
