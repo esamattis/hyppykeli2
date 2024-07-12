@@ -186,6 +186,10 @@ dialog {
     .as-rows-on-big-screen {
         flex-direction: row;
     }
+
+    .big-screen-row {
+        padding-right: 10px;
+    }
 }
 
 p {

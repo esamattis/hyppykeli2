@@ -839,7 +839,7 @@ export function Root() {
                 </p>
 
                 <div class="as-rows-on-big-screen">
-                    <div>
+                    <div class="big-screen-row">
                         <h2 class="h2-with-icon">
                             Pilvet
                             <${Anvil} />
@@ -848,7 +848,7 @@ export function Root() {
                         <${LatestMetar} />
                     </div>
 
-                    <div>
+                    <div class="big-screen-row">
                         <div class="anchor" id="latest"></div>
                         <h2 class="h2-with-icon">
                             Tuulet
