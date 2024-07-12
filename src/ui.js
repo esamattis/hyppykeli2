@@ -918,9 +918,9 @@ export function Root() {
                     </${ErrorBoundary}>
                 </div>
 
-                <${SideMenu} />
-                <${StickyFooter} />
             </div>
+            <${SideMenu} />
+            <${StickyFooter} />
         </div>
     `;
 }
