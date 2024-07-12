@@ -909,6 +909,9 @@ export function Root() {
 
                 <div class="anchor" id="high"></div>
                 <h2>ECMWF Ylätuuliennusteet</h2>
+                <p>
+                    Lähde <a href="https://open-meteo.com/">Open-Meteo</a> API.
+                </p>
                 <div class="side-scroll">
                     <${ErrorBoundary}>
                         <${OpenMeteoTool} />
