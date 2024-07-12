@@ -698,7 +698,6 @@ export async function updateWeatherData() {
         "mts-1-1-Temperature",
     );
 
-
     const directionForecasts = parseTimeSeries(
         forecastXml,
         "mts-1-1-WindDirection",
