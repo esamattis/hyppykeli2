@@ -668,6 +668,8 @@ export function SideMenu() {
                 />
             </form>
 
+            <h2>Päivitä sisältö</h2>
+
             <p>
                 <${UpdateButton} />
             </p>
