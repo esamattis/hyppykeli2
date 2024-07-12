@@ -781,24 +781,32 @@ window.addEventListener("pageshow", (event) => {
 
 setInterval(updateWeatherData, 60000);
 
+let initial = true;
+
 // listen to query string changes and refretch the data on changes
 QUERY_PARAMS.subscribe(() => {
-    updateWeatherData().then(() => {
-        // Scroll to url fragment after the intial data is loaded
-        // since anchor positions change after the data load
-        const fragment = location.hash;
-        if (!fragment) {
-            return;
-        }
+    updateWeatherData();
 
-        let element;
+    if (!initial) {
+        return;
+    }
 
-        try {
-            element = document.querySelector(fragment);
-        } catch (error) {}
+    initial = false;
 
-        if (element) {
-            element.scrollIntoView();
-        }
-    });
+    // Scroll to url fragment after the intial data is loaded
+    // since anchor positions change after the data load
+    const fragment = location.hash;
+    if (!fragment) {
+        return;
+    }
+
+    let element;
+
+    try {
+        element = document.querySelector(fragment);
+    } catch (error) {}
+
+    if (element) {
+        element.scrollIntoView();
+    }
 });
