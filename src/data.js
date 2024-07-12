@@ -683,6 +683,11 @@ export async function updateWeatherData() {
         return;
     }
 
+    // const allFeatures = Array.from(
+    //     forecastXml.querySelectorAll("SF_SpatialSamplingFeature"),
+    // ).map((el) => el.getAttribute("gml:id"));
+    // console.log(allFeatures);
+
     const gustForecasts = parseTimeSeries(
         forecastXml,
         "mts-1-1-HourlyMaximumGust",
