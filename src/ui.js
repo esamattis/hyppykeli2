@@ -846,7 +846,7 @@ export function Root() {
     }
 
     return html`
-        <div class="content">
+        <div class="content grid">
             ${
                 ERRORS.value.length > 0
                     ? html`

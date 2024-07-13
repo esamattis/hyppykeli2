@@ -51,6 +51,12 @@ button {
     display: grid;
     margin: 10px;
     margin-bottom: 100px;
+}
+
+.grid {
+    display: grid;
+    margin: 10px;
+    margin-bottom: 100px;
     grid-template-columns: 1fr;
     gap: 10px;
     grid-template-areas:
@@ -67,7 +73,7 @@ button {
 }
 
 @media (min-width: 900px) {
-    .content {
+    .grid {
         grid-template-areas:
             "title title"
             "info info"
