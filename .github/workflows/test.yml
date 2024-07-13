@@ -1,4 +1,4 @@
-name: TypeScript Typecheck
+name: Code quality checks
 
 on:
     push:
