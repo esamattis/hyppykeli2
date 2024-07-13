@@ -2,7 +2,7 @@
 import { effect, signal } from "@preact/signals";
 import { useCallback, useEffect, useState } from "preact/hooks";
 import { html } from "htm/preact";
-import { OpenMeteoTool } from "./om.js";
+import { clearOMCache, OpenMeteoTool } from "./om.js";
 import {
     FORECASTS,
     OBSERVATIONS,
@@ -427,6 +427,7 @@ function UpdateButton() {
             disabled=${LOADING.value > 0}
             onClick=${() => {
                 MENU_OPEN.value = false;
+                clearOMCache();
                 updateWeatherData();
             }}
         >

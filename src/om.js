@@ -8,11 +8,6 @@ import { effect, signal } from "@preact/signals";
  */
 const OM_DATA = signal(null);
 
-// Refetch data on coordinates changes
-effect(() => {
-    fetchDataWithCache();
-});
-
 function getTimeRange() {
     const now = new Date();
     const start = now.toISOString();
@@ -46,10 +41,13 @@ async function fetchDataWithCoordinates(coordinates) {
     return await response.json();
 }
 
-/**
- * @returns {Promise<void>}
- */
-async function fetchDataWithCache() {
+export function clearOMCache() {
+    localStorage.removeItem("ECMWFWindAloft");
+    localStorage.removeItem("ECMWFWindAloftTime");
+    localStorage.removeItem("ECMWFWindAloftCoordinates");
+}
+
+export async function fetchHighWinds() {
     const coordinates = FORECAST_COORDINATES.value ?? STATION_COORDINATES.value;
     if (!coordinates) {
         return;

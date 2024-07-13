@@ -2,6 +2,7 @@
 // docs https://opendata.fmi.fi/wfs?service=WFS&version=2.0.0&request=describeStoredQueries&
 import { computed, signal } from "@preact/signals";
 import { calculateDirectionDifference, removeNullish } from "./utils.js";
+import { fetchHighWinds } from "./om.js";
 
 /**
  * @typedef {import('@preact/signals').Signal<T>} Signal<T>
@@ -500,6 +501,126 @@ export function addError(msg) {
     ERRORS.value = [...ERRORS.value, msg];
 }
 
+async function fetchFmiForecasts() {
+    const forecastRange = Number(QUERY_PARAMS.value.forecast_range) || 12;
+
+    const forecastStartTime = new Date();
+    const forecastEndTime = new Date();
+    forecastEndTime.setHours(
+        forecastEndTime.getHours() + forecastRange,
+        0,
+        0,
+        0,
+    );
+
+    const day = FORECAST_DAY.value;
+    if (day > 0) {
+        forecastStartTime.setHours(7, 0, 0, 0);
+        forecastStartTime.setDate(forecastStartTime.getDate() + day);
+        forecastEndTime.setHours(21, 0, 0, 0);
+        forecastEndTime.setDate(forecastEndTime.getDate() + day);
+    }
+
+    const cacheBust = Math.floor(Date.now() / 30_000);
+
+    const forecastXml = await fmiRequest(
+        // "fmi::forecast::hirlam::surface::point::timevaluepair",
+        // "ecmwf::forecast::surface::point::simple",
+        // "ecmwf::forecast::surface::point::timevaluepair",
+        "fmi::forecast::edited::weather::scandinavia::point::timevaluepair",
+        {
+            cch: cacheBust,
+
+            starttime: forecastStartTime.toISOString(),
+            endtime: forecastEndTime.toISOString(),
+
+            timestep: 10,
+            // parameters: FORECAST_PAREMETERS.join(","),
+            // parameters: "WindGust",
+            // LowCloudCover, MiddleCloudCover, HighCloudCover, MiddleAndLowCloudCover
+            // parameters: [
+            //     "HourlyMaximumGust",
+            //     "WindDirection",
+            //     "WindSpeedMS",
+            //     "LowCloudCover",
+            //     "MiddleAndLowCloudCover",
+            //     "PoP", // precipitation probability
+            // ].join(","),
+            // place: "Utti",
+            latlon: FORECAST_COORDINATES.value ?? STATION_COORDINATES.value,
+        },
+        "/example_data/forecast.xml",
+    );
+
+    if (forecastXml === "error") {
+        addError("Virhe ennusteiden hakemisessa.");
+        return;
+    }
+
+    if (!forecastXml) {
+        addError("Ennusteita ei löytynyt");
+        return;
+    }
+
+    // const allFeatures = Array.from(
+    //     forecastXml.querySelectorAll("SF_SpatialSamplingFeature"),
+    // ).map((el) => el.getAttribute("gml:id"));
+    // console.log(allFeatures);
+
+    const gustForecasts = parseTimeSeries(
+        forecastXml,
+        "mts-1-1-HourlyMaximumGust",
+    );
+
+    const speedForecasts = parseTimeSeries(forecastXml, "mts-1-1-WindSpeedMS");
+
+    const popForecasts = parseTimeSeries(forecastXml, "mts-1-1-PoP");
+
+    const temperatureForecasts = parseTimeSeries(
+        forecastXml,
+        "mts-1-1-Temperature",
+    );
+
+    const directionForecasts = parseTimeSeries(
+        forecastXml,
+        "mts-1-1-WindDirection",
+    );
+
+    const cloudCoverForecasts = parseTimeSeries(
+        forecastXml,
+        // "mts-1-1-MiddleAndLowCloudCover",
+        "mts-1-1-LowCloudCover",
+    );
+
+    const middleCloudCoverForecasts = parseTimeSeries(
+        forecastXml,
+        // "mts-1-1-MiddleCloudCover",
+        "mts-1-1-MiddleAndLowCloudCover",
+    );
+
+    const locationCollection = forecastXml.querySelector("LocationCollection");
+    const locationName = locationCollection?.querySelector("name")?.innerHTML;
+    const regionName = locationCollection?.querySelector("region")?.innerHTML;
+    FORECAST_LOCATION_NAME.value = `${locationName}, ${regionName}`;
+
+    /** @type {WeatherData[]} */
+    const combinedForecasts = gustForecasts.map((gust, i) => {
+        return {
+            gust: gust.value,
+            direction: directionForecasts[i]?.value ?? -1,
+            speed: speedForecasts[i]?.value ?? -1,
+            time: gust.time,
+            lowCloudCover: cloudCoverForecasts[i]?.value,
+            middleCloudCover: middleCloudCoverForecasts[i]?.value,
+            rain: popForecasts[i]?.value,
+            temperature: temperatureForecasts[i]?.value ?? -99,
+        };
+    });
+
+    FORECASTS.value = combinedForecasts;
+    STALE_FORECASTS.value = false;
+}
+
 export async function updateWeatherData() {
     ERRORS.value = [];
     const fmisid = QUERY_PARAMS.value.fmisid;
@@ -508,7 +629,6 @@ export async function updateWeatherData() {
     const lon = Number(QUERY_PARAMS.value.lon);
     const customName = QUERY_PARAMS.value.name;
     const obsRange = Number(QUERY_PARAMS.value.observation_range) || 12;
-    const forecastRange = Number(QUERY_PARAMS.value.forecast_range) || 12;
 
     if (lat && lon) {
         FORECAST_COORDINATES.value = `${lat},${lon}`;
@@ -624,119 +744,7 @@ export async function updateWeatherData() {
 
     OBSERVATIONS.value = combined;
 
-    const forecastStartTime = new Date();
-    const forecastEndTime = new Date();
-    forecastEndTime.setHours(
-        forecastEndTime.getHours() + forecastRange,
-        0,
-        0,
-        0,
-    );
-
-    const day = FORECAST_DAY.value;
-    if (day > 0) {
-        forecastStartTime.setHours(7, 0, 0, 0);
-        forecastStartTime.setDate(forecastStartTime.getDate() + day);
-        forecastEndTime.setHours(21, 0, 0, 0);
-        forecastEndTime.setDate(forecastEndTime.getDate() + day);
-    }
-
-    const forecastXml = await fmiRequest(
-        // "fmi::forecast::hirlam::surface::point::timevaluepair",
-        // "ecmwf::forecast::surface::point::simple",
-        // "ecmwf::forecast::surface::point::timevaluepair",
-        "fmi::forecast::edited::weather::scandinavia::point::timevaluepair",
-        {
-            cch: cacheBust,
-
-            starttime: forecastStartTime.toISOString(),
-            endtime: forecastEndTime.toISOString(),
-
-            timestep: 10,
-            // parameters: FORECAST_PAREMETERS.join(","),
-            // parameters: "WindGust",
-            // LowCloudCover, MiddleCloudCover, HighCloudCover, MiddleAndLowCloudCover
-            // parameters: [
-            //     "HourlyMaximumGust",
-            //     "WindDirection",
-            //     "WindSpeedMS",
-            //     "LowCloudCover",
-            //     "MiddleAndLowCloudCover",
-            //     "PoP", // precipitation probability
-            // ].join(","),
-            // place: "Utti",
-            latlon: FORECAST_COORDINATES.value ?? STATION_COORDINATES.value,
-        },
-        "/example_data/forecast.xml",
-    );
-
-    if (forecastXml === "error") {
-        addError("Virhe ennusteiden hakemisessa.");
-        return;
-    }
-
-    if (!forecastXml) {
-        addError("Ennusteita ei löytynyt");
-        return;
-    }
-
-    // const allFeatures = Array.from(
-    //     forecastXml.querySelectorAll("SF_SpatialSamplingFeature"),
-    // ).map((el) => el.getAttribute("gml:id"));
-    // console.log(allFeatures);
-
-    const gustForecasts = parseTimeSeries(
-        forecastXml,
-        "mts-1-1-HourlyMaximumGust",
-    );
-
-    const speedForecasts = parseTimeSeries(forecastXml, "mts-1-1-WindSpeedMS");
-
-    const popForecasts = parseTimeSeries(forecastXml, "mts-1-1-PoP");
-
-    const temperatureForecasts = parseTimeSeries(
-        forecastXml,
-        "mts-1-1-Temperature",
-    );
-
-    const directionForecasts = parseTimeSeries(
-        forecastXml,
-        "mts-1-1-WindDirection",
-    );
-
-    const cloudCoverForecasts = parseTimeSeries(
-        forecastXml,
-        // "mts-1-1-MiddleAndLowCloudCover",
-        "mts-1-1-LowCloudCover",
-    );
-
-    const middleCloudCoverForecasts = parseTimeSeries(
-        forecastXml,
-        // "mts-1-1-MiddleCloudCover",
-        "mts-1-1-MiddleAndLowCloudCover",
-    );
-
-    const locationCollection = forecastXml.querySelector("LocationCollection");
-    const locationName = locationCollection?.querySelector("name")?.innerHTML;
-    const regionName = locationCollection?.querySelector("region")?.innerHTML;
-    FORECAST_LOCATION_NAME.value = `${locationName}, ${regionName}`;
-
-    /** @type {WeatherData[]} */
-    const combinedForecasts = gustForecasts.map((gust, i) => {
-        return {
-            gust: gust.value,
-            direction: directionForecasts[i]?.value ?? -1,
-            speed: speedForecasts[i]?.value ?? -1,
-            time: gust.time,
-            lowCloudCover: cloudCoverForecasts[i]?.value,
-            middleCloudCover: middleCloudCoverForecasts[i]?.value,
-            rain: popForecasts[i]?.value,
-            temperature: temperatureForecasts[i]?.value ?? -99,
-        };
-    });
-
-    FORECASTS.value = combinedForecasts;
-    STALE_FORECASTS.value = false;
+    await Promise.all([fetchFmiForecasts(), fetchHighWinds()]);
 }
 
 /**
@@ -798,28 +806,28 @@ let initial = true;
 
 // listen to query string changes and refretch the data on changes
 QUERY_PARAMS.subscribe(() => {
-    updateWeatherData();
+    updateWeatherData().then(() => {
+        if (!initial) {
+            return;
+        }
 
-    if (!initial) {
-        return;
-    }
+        initial = false;
 
-    initial = false;
+        // Scroll to url fragment after the intial data is loaded
+        // since anchor positions change after the data load
+        const fragment = location.hash;
+        if (!fragment) {
+            return;
+        }
 
-    // Scroll to url fragment after the intial data is loaded
-    // since anchor positions change after the data load
-    const fragment = location.hash;
-    if (!fragment) {
-        return;
-    }
+        let element;
 
-    let element;
+        try {
+            element = document.querySelector(fragment);
+        } catch (error) {}
 
-    try {
-        element = document.querySelector(fragment);
-    } catch (error) {}
-
-    if (element) {
-        element.scrollIntoView();
-    }
+        if (element) {
+            element.scrollIntoView();
+        }
+    });
 });
