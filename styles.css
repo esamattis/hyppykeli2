@@ -177,7 +177,7 @@ dialog {
     flex-direction: column;
 }
 
-@media (min-width: 650px) {
+@media (min-width: 950px) {
     .compass {
         position: fixed;
         top: 0;
