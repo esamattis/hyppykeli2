@@ -150,29 +150,34 @@ export function Graph() {
         HOVERED_OBSERVATION.value = undefined;
     };
 
-    return html`<div class="graphs">
-        <h2 id="observation-graph">
-            Havainnot
-            <span class="date"> ${formatDate(new Date())} </span>
-        </h2>
-        <div class="chart" onMouseLeave=${onMouseLeaveObs}>
-            <canvas ref=${obsChartRef}></canvas>
+    return html`
+        <div id="observations-graph">
+            <h2>
+                Havainnot
+                <span class="date"> ${formatDate(new Date())} </span>
+            </h2>
+            <div class="chart" onMouseLeave=${onMouseLeaveObs}>
+                <canvas ref=${obsChartRef}></canvas>
+            </div>
         </div>
-        <h2 id="forecast-graph">
-            Ennusteet
-            <span class="date">
-                ${formatDate(FORECAST_DATE.value)} ${" "}
-                ${humanDayText(FORECAST_DATE.value)}
-            </span>
-        </h2>
 
-        <div
-            class=${STALE_FORECASTS.value ? "chart stale" : "chart fresh"}
-            onMouseLeave=${onMouseLeaveObs}
-        >
-            <canvas ref=${foreChartRef}></canvas>
+        <div id="forecasts-graph">
+            <h2>
+                Ennusteet
+                <span class="date">
+                    ${formatDate(FORECAST_DATE.value)} ${" "}
+                    ${humanDayText(FORECAST_DATE.value)}
+                </span>
+            </h2>
+
+            <div
+                class=${STALE_FORECASTS.value ? "chart stale" : "chart fresh"}
+                onMouseLeave=${onMouseLeaveObs}
+            >
+                <canvas ref=${foreChartRef}></canvas>
+            </div>
         </div>
-    </div>`;
+    `;
 }
 
 /**

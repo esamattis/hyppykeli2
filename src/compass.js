@@ -71,10 +71,8 @@ export function Compass() {
     const studentCircle = STUDENT_LIMIT_LENGTH;
     // prettier-ignore
     return html`
-        <div class="compass">
+        <div id="compass" class="compass">
             <svg
-                width="200"
-                height="200"
                 viewBox="0 0 400 400"
                 xmlns="http://www.w3.org/2000/svg">
 

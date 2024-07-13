@@ -677,11 +677,11 @@ export function SideMenu() {
 
             <h2>Osiot</h2>
 
-            <p><a href="#observation-graph">Havainnot 📈</a></p>
-            <p><a href="#forecast-graph">Ennusteet 📈</a></p>
-            <p><a href="#observations">Havainnot 🧾</a></p>
-            <p><a href="#forecasts">Ennusteet 🧾</a></p>
-            <p><a href="#high">Ylätuuliennusteet</a></p>
+            <p><a href="#observations-graph">Havainnot 📈</a></p>
+            <p><a href="#forecasts-graph">Ennusteet 📈</a></p>
+            <p><a href="#observations-table">Havainnot 🧾</a></p>
+            <p><a href="#forecasts-table">Ennusteet 🧾</a></p>
+            <p><a href="#high-winds">Ylätuuliennusteet</a></p>
 
             <h2>DZs</h2>
             ${OTHER_DZs.value.map(
@@ -754,21 +754,21 @@ export function StickyFooter() {
                 </div>
             </a>
 
-            <a class="item" href="#observation-graph">
+            <a class="item" href="#observations-graph">
                 <div class="wrap">
                     <div class="icon">📈</div>
                     <div class="text">Kaaviot</div>
                 </div>
             </a>
 
-            <a class="item" href="#observations">
+            <a class="item" href="#observations-table">
                 <div class="wrap">
                     <div class="icon">🧾</div>
                     <div class="text">Taulukot</div>
                 </div>
             </a>
 
-            <a class="item" href="#high">
+            <a class="item" href="#high-winds">
                 <div class="wrap">
                     <div class="icon">💨</div>
                     <div class="text">Ylätuulet</div>
@@ -846,151 +846,138 @@ export function Root() {
     }
 
     return html`
-        <div>
-            <div class="content">
+        <div class="content">
+            ${
+                ERRORS.value.length > 0
+                    ? html`
+                          <div class="errors">
+                              ${ERRORS.value.map((error) => {
+                                  return html` <p>${error}</p> `;
+                              })}
+                          </div>
+                      `
+                    : null
+            }
+
+            <h1 id="title">
+                <a class="logo" href="/"> Hyppykeli</a> –${" "}
+                <span id="title">${NAME}</span>
+            </h1>
+
+            <div id="info">
                 ${
-                    ERRORS.value.length > 0
+                    STATION_NAME.value
                         ? html`
-                              <div class="errors">
-                                  ${ERRORS.value.map((error) => {
-                                      return html` <p>${error}</p> `;
-                                  })}
-                              </div>
+                              Tiedot haettu havaintoasemalta${" "}
+                              <a
+                                  href="https://www.google.fi/maps/place/${STATION_COORDINATES.value}"
+                                  >${STATION_NAME}</a
+                              >.${" "}
+
+                              <${ForecastLocationInfo} />
+                          `
+                        : "Ladataan..."
+                }
+                ${
+                    latestMetar
+                        ? html`
+                              ${" "}Lentokentän korkeus meren pinnasta${" "}
+                              ${latestMetar.elevation.toFixed(0)}M. ${" "}
                           `
                         : null
                 }
+                <span class="disclaimer">
+                    Tietojen käyttö omalla vastuulla. Ei takeita että tiedot
+                    ovat oikein.
+                </span>
+            </div>
 
-                <h1 id="#top">
-                    <a class="logo" href="/"> Hyppykeli</a> –${" "}
-                    <span id="title">${NAME}</span>
-                </h1>
 
-                <p class="info">
-                    ${
-                        STATION_NAME.value
-                            ? html`
-                                  Tiedot haettu havaintoasemalta${" "}
-                                  <a
-                                      href="https://www.google.fi/maps/place/${STATION_COORDINATES.value}"
-                                      >${STATION_NAME}</a
-                                  >.${" "}
+            <div class="clouds" id="clouds">
+                <h2 class="h2-with-icon">
+                    Pilvet
+                    <${Anvil} />
+                </h2>
 
-                                  <${ForecastLocationInfo} />
-                              `
-                            : "Ladataan..."
-                    }
-                    ${
-                        latestMetar
-                            ? html`
-                                  ${" "}Lentokentän korkeus meren pinnasta${" "}
-                                  ${latestMetar.elevation.toFixed(0)}M. ${" "}
-                              `
-                            : null
-                    }
+                <${LatestMetar} />
+            </div>
 
-                    <span class="disclaimer">
-                        Tietojen käyttö omalla vastuulla. Ei takeita että tiedot
-                        ovat oikein.
+            <div id="winds">
+                <h2 class="h2-with-icon">
+                    Tuulet
+                    <div style="width: 1ch"></div>
+                    <${Parachute} />
+                </h2>
+                <${LatestWind} />
+            </div>
+
+            <${Compass} />
+
+            <${Graph} />
+
+            <div id="observations-table" class="observations">
+                <h2 class="sticky">
+                    Havainnot
+                    <span class="date">
+                        ${formatDate(new Date())}
                     </span>
-                </p>
-
-                <div class="as-rows-on-big-screen">
-
-                    <div class="clouds big-screen-row">
-                        <h2 class="h2-with-icon">
-                            Pilvet
-                            <${Anvil} />
-                        </h2>
-
-                        <${LatestMetar} />
-                    </div>
-
-                    <div class="winds big-screen-row">
-                        <div class="anchor" id="latest"></div>
-                        <h2 class="h2-with-icon">
-                            Tuulet
-                            <div style="width: 1ch"></div>
-
-                            <${Parachute} />
-                        </h2>
-
-                        <${Compass} />
-
-                        <${LatestWind} />
-                    </div>
-                </div>
-
-                <${Graph} />
-
-                <div class="as-rows-on-big-screen">
-                    <div class="observations">
-                        <div class="anchor" id="observations"></div>
-                        <h2 class="sticky">
-                            Havainnot
-                            <span class="date">
-                                ${formatDate(new Date())}
-                            </span>
-                        </h2>
-                        <div class="side-scroll">
-                            <${DataTable}
-                                data=${OBSERVATIONS}
-                                thead=${html`<${ObservationTHead} />`}
-                                Rows=${ObservationRows}
-                            />
-                        </div>
-                    </div>
-
-                    <div class=${"forecasts " + (STALE_FORECASTS.value ? "stale" : "fresh")}>
-                        <div class="anchor" id="forecasts"></div>
-                        <h2 class="sticky">
-                            Ennuste
-                            <span class="date">
-                                ${formatDate(FORECAST_DATE.value)} ${" "}
-                                ${humanDayText(FORECAST_DATE.value)}
-                            </span>
-                        </h2>
-
-                        <p>
-                            <${ForecastLocationInfo} />
-                        </p>
-
-                        <div class="side-scroll">
-                            <${DataTable}
-                                data=${FORECASTS}
-                                thead=${html`<${ForecastTHead} />`}
-                                Rows=${ForecastRows}
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="high-winds">
-                    <div class="anchor" id="high"></div>
-                    <h2>ECMWF Ylätuuliennusteet</h2>
-                    <p>
-                        Lähde <a href="https://open-meteo.com/">Open-Meteo</a> API.
-                    </p>
-                    <div class="side-scroll">
-                        <${ErrorBoundary}>
-                            <${OpenMeteoTool} />
-                        </${ErrorBoundary}>
-                    </div>
+                </h2>
+                <div class="side-scroll">
+                    <${DataTable}
+                        data=${OBSERVATIONS}
+                        thead=${html`<${ObservationTHead} />`}
+                        Rows=${ObservationRows}
+                    />
                 </div>
             </div>
-            <${SideMenu} />
-            <${StickyFooter} />
 
-           ${
-               QUERY_PARAMS.value.css
-                   ? html`<style
-                         dangerouslySetInnerHTML=${{
-                             __html: QUERY_PARAMS.value.css,
-                         }}
-                     ></style>`
-                   : null
-           }
+            <div id="forecasts-table" class=${STALE_FORECASTS.value ? "stale" : "fresh"}>
+                <div class="anchor" id="forecasts"></div>
+                <h2 class="sticky">
+                    Ennuste
+                    <span class="date">
+                        ${formatDate(FORECAST_DATE.value)} ${" "}
+                        ${humanDayText(FORECAST_DATE.value)}
+                    </span>
+                </h2>
 
+                <p>
+                    <${ForecastLocationInfo} />
+                </p>
+
+                <div class="side-scroll">
+                    <${DataTable}
+                        data=${FORECASTS}
+                        thead=${html`<${ForecastTHead} />`}
+                        Rows=${ForecastRows}
+                    />
+                </div>
+            </div>
+
+            <div class="high-winds"  id="high-winds">
+                <h2>ECMWF Ylätuuliennusteet</h2>
+                <p>
+                    Lähde <a href="https://open-meteo.com/">Open-Meteo</a> API.
+                </p>
+                <div class="side-scroll">
+                    <${ErrorBoundary}>
+                        <${OpenMeteoTool} />
+                    </${ErrorBoundary}>
+                </div>
+            </div>
 
         </div>
+        <${SideMenu} />
+        <${StickyFooter} />
+
+        ${
+            QUERY_PARAMS.value.css
+                ? html`<style
+                      dangerouslySetInnerHTML=${{
+                          __html: QUERY_PARAMS.value.css,
+                      }}
+                  ></style>`
+                : null
+        }
     `;
 }

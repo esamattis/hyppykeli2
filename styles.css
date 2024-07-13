@@ -7,10 +7,79 @@ button {
     padding: 5px;
 }
 
+#title {
+    grid-area: title;
+}
+
+#info {
+    grid-area: info;
+}
+
+#clouds {
+    grid-area: clouds;
+}
+
+#winds {
+    grid-area: winds;
+}
+
+#compass {
+    grid-area: compass;
+}
+
+#observations-graph {
+    grid-area: observations-graph;
+}
+
+#forecasts-graph {
+    grid-area: forecasts-graph;
+}
+
+#forecasts-table {
+    grid-area: forecasts-table;
+}
+
+#observations-table {
+    grid-area: observations-table;
+}
+
+#high-winds {
+    grid-area: high-winds;
+}
+
 .content {
+    display: grid;
     margin: 10px;
     margin-bottom: 100px;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    grid-template-areas:
+        "title title"
+        "info info"
+        "clouds clouds"
+        "winds winds"
+        "compass compass"
+        "observations-graph observations-graph"
+        "forecasts-graph forecasts-graph"
+        "observations-table observations-table"
+        "forecasts-table forecasts-table"
+        "high-winds high-winds";
 }
+
+@media (min-width: 900px) {
+    .content {
+        grid-template-areas:
+            "title title"
+            "info info"
+            "clouds winds"
+            "compass compass"
+            "observations-graph observations-graph"
+            "forecasts-graph forecasts-graph"
+            "observations-table forecasts-table"
+            "high-winds high-winds";
+    }
+}
+
 
 a:visited {
     color: blue;
@@ -80,6 +149,7 @@ a:visited {
 p {
     line-height: 1.5;
 }
+
 .sticky-footer .item .icon,
 .sticky-footer .item .text {
     display: flex;
@@ -139,6 +209,7 @@ input[type="text"] {
 .compass {
     display: flex;
     z-index: 100;
+    height: 200px;
 }
 
 .historic {
@@ -170,27 +241,6 @@ dialog {
 .metar {
     font-size: 70%;
     font-family: monospace;
-}
-
-.as-rows-on-big-screen {
-    display: flex;
-    flex-direction: column;
-}
-
-@media (min-width: 950px) {
-    .compass {
-        position: fixed;
-        top: 0;
-        right: 0;
-        flex-direction: column;
-    }
-    .as-rows-on-big-screen {
-        flex-direction: row;
-    }
-
-    .big-screen-row {
-        padding-right: 10px;
-    }
 }
 
 p {
@@ -324,9 +374,11 @@ h2 .date {
     0% {
         transform: rotate(30deg);
     }
+
     50% {
         transform: rotate(-30deg);
     }
+
     100% {
         transform: rotate(30deg);
     }
@@ -336,6 +388,7 @@ h2 .date {
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(360deg);
     }
@@ -350,10 +403,12 @@ h2 .date {
     height: 100vh;
     background-color: white;
 }
+
 .fullscreen-compass svg {
     width: 100%;
     height: 100%;
 }
+
 .back-link {
     position: absolute;
     top: 10px;
