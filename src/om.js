@@ -88,11 +88,11 @@ export async function fetchHighWinds() {
  */
 function formatTableData(hourly) {
     const pressureLevels = [
-        { pressure: "600 hPa", height: "4200 m" },
-        { pressure: "700 hPa", height: "3000 m" },
-        { pressure: "850 hPa", height: "1500 m" },
-        { pressure: "925 hPa", height: "800 m" },
-        { pressure: "1000 hPa", height: "110 m" },
+        { pressure: "600 hPa", height: "4200" },
+        { pressure: "700 hPa", height: "3000" },
+        { pressure: "850 hPa", height: "1500" },
+        { pressure: "925 hPa", height: "800" },
+        { pressure: "1000 hPa", height: "110" },
     ];
 
     /** @type {number[]} */
@@ -160,8 +160,8 @@ function getAverageData(hourly, targetHour, dayOffset) {
 }
 
 // Määritellään muuttujat värityslogiikalle
-const onCanopyHeights = ["110 m", "800 m"];
-const freeFallHeights = ["1500 m", "3000 m", "4200 m"];
+const onCanopyHeights = ["110", "800"];
+const freeFallHeights = ["1500", "3000", "4200"];
 
 const windSpeedClasses = [
     "wind-low",
@@ -189,7 +189,10 @@ const getWindSpeedClass = (speed, height) => {
     return "";
 };
 
-export function OpenMeteoTool() {
+/**
+ * @param {{showDays?: "both" | "today" | "tomorrow"}} props
+ */
+export function OpenMeteoTool({ showDays = "both" }) {
     const data = OM_DATA.value ? formatTableData(OM_DATA.value.hourly) : null;
 
     /**
@@ -245,7 +248,7 @@ export function OpenMeteoTool() {
                         </th>
                     </tr>
                     <tr>
-                        <th>Korkeus</th>
+                        <th></th>
                         ${Object.keys(tableData).map(
                             (hour) =>
                                 html`<th
@@ -316,74 +319,12 @@ export function OpenMeteoTool() {
 
     return html`
         <div>
-            <style>
-                .wind-table {
-                    border-collapse: collapse;
-                    margin-bottom: 20px;
-                }
-                .wind-table th,
-                .wind-table td {
-                    border: 1px solid #ddd;
-                    padding: 2px;
-                    text-align: center;
-                }
-                .wind-table th {
-                    background-color: #f2f2f2;
-                }
-                .time-header {
-                    min-width: 80px;
-                }
-                .pressure-cell {
-                    text-align: left;
-                    font-weight: bold;
-                }
-                .wind-cell {
-                    padding: 2px;
-                }
-                .wind-speed {
-                    font-weight: bold;
-                }
-                .wind-direction {
-                    color: #666;
-                }
-                .wind-low {
-                    background-color: #90ee90; /* vihreä */
-                }
-                .wind-medium {
-                    background-color: #ffff00; /* keltainen */
-                }
-                .wind-high {
-                    background-color: #ffa500; /* oranssi */
-                }
-                .wind-very-high {
-                    background-color: #ff6347; /* punainen */
-                }
-                .past-column {
-                    opacity: 0.5;
-                }
-                .wind-direction {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                }
-                .wind-direction span {
-                    margin-left: 4px;
-                    font-size: 14px;
-                }
-                .wind-table th.current-column,
-                .wind-table td.current-column {
-                    border-left: 2px solid #333;
-                    border-right: 2px solid #333;
-                }
-                .wind-table th.current-column {
-                    border-top: 2px solid #333;
-                }
-                .wind-table tr:last-child td.current-column {
-                    border-bottom: 2px solid #333;
-                }
-            </style>
-            ${renderTable("Tänään", data.todayData)}
-            ${renderTable("Huomenna", data.tomorrowData)}
+            ${showDays === "today" || showDays === "both"
+                ? renderTable("Tänään", data.todayData)
+                : null}
+            ${showDays === "tomorrow" || showDays === "both"
+                ? renderTable("Huomenna", data.tomorrowData)
+                : null}
         </div>
     `;
 }
