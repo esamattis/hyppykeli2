@@ -1,10 +1,39 @@
 // @ts-check
 import { html } from "htm/preact";
 import { FORECAST_COORDINATES, STATION_COORDINATES } from "./data.js";
-import { effect, signal } from "@preact/signals";
+import { signal } from "@preact/signals";
+
+// Vakiot tiedoston alussa
+const PRESSURE_LEVELS = [
+  { pressure: "600 hPa", height: "4200" },
+  { pressure: "700 hPa", height: "3000" },
+  { pressure: "850 hPa", height: "1500" },
+  { pressure: "925 hPa", height: "800" },
+  { pressure: "1000 hPa", height: "110" }
+];
+
+const PRESSURE_LEVELS_RAW = [
+    { pressure: "600 hPa", key: "windspeed_600hPa", directionKey: "winddirection_600hPa" },
+    { pressure: "700 hPa", key: "windspeed_700hPa", directionKey: "winddirection_700hPa" },
+    { pressure: "850 hPa", key: "windspeed_850hPa", directionKey: "winddirection_850hPa" },
+    { pressure: "925 hPa", key: "windspeed_925hPa", directionKey: "winddirection_925hPa" },
+    { pressure: "1000 hPa", key: "windspeed_1000hPa", directionKey: "winddirection_1000hPa" },
+];
+
+const TIME_SLOTS = [0, 3, 6, 9, 12, 15, 18, 21];
+
+const WIND_SPEED_CLASSES = [
+  "wind-low",
+  "wind-medium",
+  "wind-high",
+  "wind-very-high"
+];
+
+const ON_CANOPY_HEIGHTS = ["110", "800"];
+const FREE_FALL_HEIGHTS = ["1500", "3000", "4200"];
 
 /**
- * @type {Signal<OpenMeteoWeatherData | null>}
+ * @type {import("@preact/signals").Signal<OpenMeteoWeatherData | null>}
  */
 const OM_DATA = signal(null);
 
@@ -87,37 +116,30 @@ export async function fetchHighWinds() {
  * @return {FormattedTableData}
  */
 function formatTableData(hourly) {
-    const pressureLevels = [
-        { pressure: "600 hPa", height: "4200" },
-        { pressure: "700 hPa", height: "3000" },
-        { pressure: "850 hPa", height: "1500" },
-        { pressure: "925 hPa", height: "800" },
-        { pressure: "1000 hPa", height: "110" },
-    ];
-
-    /** @type {number[]} */
-    const timeSlots = [6, 9, 12, 15, 18, 21];
-
-    /** @type {Record<string, AverageWindSpeeds>} */
+    /** @type {Record<string, AverageWindSpeedsWithBlock>} */
     const todayData = {};
-    /** @type {Record<string, AverageWindSpeeds>} */
+    /** @type {Record<string, AverageWindSpeedsWithBlock>} */
     const tomorrowData = {};
 
-    timeSlots.forEach((slot) => {
+    TIME_SLOTS.forEach((slot) => {
         todayData[slot] = getAverageData(hourly, slot, 0);
         tomorrowData[slot] = getAverageData(hourly, slot, 1);
     });
 
-    return { pressureLevels, todayData, tomorrowData };
+    return { pressureLevels: PRESSURE_LEVELS, todayData, tomorrowData };
 }
 
 /**
  * @param {OpenMeteoHourlyData} hourly
  * @param {number} targetHour
  * @param {number} dayOffset
- * @returns {AverageWindSpeeds}
+ * @returns {AverageWindSpeedsWithBlock}
  */
 function getAverageData(hourly, targetHour, dayOffset) {
+    const now = new Date();
+    const currentHour = now.getHours();
+    const isCurrentBlock = targetHour === Math.floor(currentHour / 3) * 3 && dayOffset === 0;
+
     const relevantIndices = [0, 1, 2]
         .map((i) => {
             const hour = (targetHour + i * 3) % 24;
@@ -125,66 +147,66 @@ function getAverageData(hourly, targetHour, dayOffset) {
                 const date = new Date(time);
                 return (
                     date.getHours() === hour &&
-                    date.getDate() === new Date().getDate() + dayOffset
+                    date.getDate() === now.getDate() + dayOffset
                 );
             });
         })
         .filter((index) => index !== -1);
 
     /**
-     * @type {OpenMeteoPressureLevel[]}
+     * @type {string[]}
      */
     const pressureLevels = ["1000", "925", "850", "700", "600"];
 
     /**
-     * @type {AverageWindSpeeds}
+     * @type {Record<string, { speed: number, direction: number }>}
      */
     const result = {};
 
     pressureLevels.forEach((level) => {
-        const speeds = relevantIndices.map(
-            (i) => hourly[`windspeed_${level}hPa`]?.[i] ?? 0,
-        );
-        const directions = relevantIndices.map(
-            (i) => hourly[`winddirection_${level}hPa`]?.[i] ?? 0,
-        );
+        const speedKey = `windspeed_${level}hPa`;
+        const directionKey = `winddirection_${level}hPa`;
+        
+        if (isCurrentBlock) {
+            const currentIndex = hourly.time.findIndex((time) => new Date(time).getHours() === currentHour);
+            result[level] = {
+                speed: hourly[speedKey]?.[currentIndex] ?? 0,
+                direction: hourly[directionKey]?.[currentIndex] ?? 0,
+            };
+        } else {
+            const speeds = relevantIndices.map(
+                (i) => hourly[speedKey]?.[i] ?? 0,
+            );
+            const directions = relevantIndices.map(
+                (i) => hourly[directionKey]?.[i] ?? 0,
+            );
 
-        result[level] = {
-            speed: speeds.reduce((a, b) => a + b, 0) / speeds.length,
-            direction:
-                directions.reduce((a, b) => a + b, 0) / directions.length,
-        };
+            result[level] = {
+                speed: speeds.reduce((a, b) => a + b, 0) / speeds.length,
+                direction:
+                    directions.reduce((a, b) => a + b, 0) / directions.length,
+            };
+        }
     });
 
-    return result;
+    return { data: result, isCurrentBlock };
 }
-
-// Määritellään muuttujat värityslogiikalle
-const onCanopyHeights = ["110", "800"];
-const freeFallHeights = ["1500", "3000", "4200"];
-
-const windSpeedClasses = [
-    "wind-low",
-    "wind-medium",
-    "wind-high",
-    "wind-very-high",
-];
 
 /**
  * @param {number} speed
  * @param {string} height
  */
 const getWindSpeedClass = (speed, height) => {
-    if (onCanopyHeights.includes(height)) {
-        if (speed < 8) return windSpeedClasses[0];
-        if (speed < 11) return windSpeedClasses[1];
-        if (speed < 13) return windSpeedClasses[2]; // Oranssi 11-12 m/s
-        return windSpeedClasses[3]; // Punainen 13 m/s ja yli
-    } else if (freeFallHeights.includes(height)) {
-        if (speed < 8) return windSpeedClasses[0];
-        if (speed < 13) return windSpeedClasses[1];
-        if (speed < 18) return windSpeedClasses[2];
-        return windSpeedClasses[3];
+    if (ON_CANOPY_HEIGHTS.includes(height)) {
+        if (speed < 8) return WIND_SPEED_CLASSES[0];
+        if (speed < 11) return WIND_SPEED_CLASSES[1];
+        if (speed < 13) return WIND_SPEED_CLASSES[2]; // Oranssi 11-12 m/s
+        return WIND_SPEED_CLASSES[3]; // Punainen 13 m/s ja yli
+    } else if (FREE_FALL_HEIGHTS.includes(height)) {
+        if (speed < 8) return WIND_SPEED_CLASSES[0];
+        if (speed < 13) return WIND_SPEED_CLASSES[1];
+        if (speed < 18) return WIND_SPEED_CLASSES[2];
+        return WIND_SPEED_CLASSES[3];
     }
     return "";
 };
@@ -216,7 +238,7 @@ export function OpenMeteoTool({ showDays = "both" }) {
 
     /**
      * @param {string} title
-     * @param {Record<string, AverageWindSpeeds>} tableData
+     * @param {Record<string, AverageWindSpeedsWithBlock>} tableData
      */
     const renderTable = (title, tableData) => {
         if (!tableData) return null;
@@ -228,9 +250,9 @@ export function OpenMeteoTool({ showDays = "both" }) {
          * @param {string} hour
          * @returns {string}
          */
-        function getColumnClass(hour) {
+        function getColumnClass(hour, isCurrentBlock) {
             if (title === "Tänään") {
-                if (parseInt(hour) === blockStartHour) {
+                if (isCurrentBlock) {
                     return "current-column";
                 } else if (parseInt(hour) < blockStartHour) {
                     return "past-column";
@@ -240,7 +262,7 @@ export function OpenMeteoTool({ showDays = "both" }) {
         }
 
         return html`
-            <table class="wind-table">
+            <table class="wind-table upperwinds-compact">
                 <thead>
                     <tr>
                         <th colspan="${Object.keys(tableData).length + 1}">
@@ -249,26 +271,26 @@ export function OpenMeteoTool({ showDays = "both" }) {
                     </tr>
                     <tr>
                         <th></th>
-                        ${Object.keys(tableData).map(
-                            (hour) =>
+                        ${Object.entries(tableData).map(
+                            ([hour, { isCurrentBlock }]) =>
                                 html`<th
-                                    class="time-header ${getColumnClass(hour)}"
+                                    class="time-header ${getColumnClass(hour, isCurrentBlock)}"
                                 >
-                                    ${hour}:00
+                                    ${isCurrentBlock ? currentHour : hour}:00
                                 </th>`,
                         )}
                     </tr>
                 </thead>
                 <tbody>
-                    ${data?.pressureLevels.map(({ pressure, height }) => {
+                    ${PRESSURE_LEVELS.map(({ pressure, height }) => {
                         const level = pressure.split(" ")[0] ?? "6";
                         return html`
                             <tr>
                                 <td class="pressure-cell">${height}</td>
                                 ${Object.entries(tableData).map(
-                                    ([hour, hourData]) => {
+                                    ([hour, { data: hourData, isCurrentBlock }]) => {
                                         const columnClass =
-                                            getColumnClass(hour);
+                                            getColumnClass(hour, isCurrentBlock);
                                         return hourData[level]
                                             ? html` <td
                                                   class="wind-cell ${columnClass} ${getWindSpeedClass(
@@ -327,4 +349,58 @@ export function OpenMeteoTool({ showDays = "both" }) {
                 : null}
         </div>
     `;
+}
+
+export function OpenMeteoRaw() {
+    const data = OM_DATA.value;
+
+    if (!data) {
+        return html`<div>Loading...</div>`;
+    }
+
+    const renderTable = () => {
+        const hourly = data.hourly;
+        /** @type {number[]} */
+        const timeSlots = hourly.time.map((time) => new Date(time).getHours());
+
+        return html`
+            <table class="wind-table upperwinds-raw">
+                <thead>
+                    <tr>
+                        <th>Height</th>
+                        ${timeSlots.map((hour) => html`<th>${hour}:00</th>`)}
+                    </tr>
+                </thead>
+                <tbody>
+                    ${PRESSURE_LEVELS_RAW.map(
+                        ({ pressure, key, directionKey }) => html`
+                            <tr>
+                                <td>${pressure}</td>
+                                ${timeSlots.map(
+                                    (hour, index) => html`
+                                        <td>
+                                            ${hourly[key] &&
+                                            hourly[key][index] !== undefined
+                                                ? Math.round(
+                                                      hourly[key][index] / 3.6,
+                                                  )
+                                                : "-"}
+                                            m/s |
+                                            ${hourly[directionKey] &&
+                                            hourly[directionKey][index] !==
+                                                undefined
+                                                ? ` ${hourly[directionKey][index]}`
+                                                : "-"}°
+                                        </td>
+                                    `,
+                                )}
+                            </tr>
+                        `,
+                    )}
+                </tbody>
+            </table>
+        `;
+    };
+
+    return html` <div>${renderTable()}</div> `;
 }
