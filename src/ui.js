@@ -512,11 +512,11 @@ function downloadDataDump(e) {
 }
 
 /**
- * Navigate to a link without reloading the page
+ * Navigate to a link without reloading the while updating the QUERY_PARAMS signal
  *
  * @param {MouseEvent} e
  */
-function handleLinkClick(e) {
+function asInPageNavigation(e) {
     if (!(e.target instanceof HTMLAnchorElement)) {
         return;
     }
@@ -582,12 +582,12 @@ export function SideMenu() {
             <p>
                 ${FORECAST_DAY.value === 0
                     ? html`<a
-                          onClick=${handleLinkClick}
+                          onClick=${asInPageNavigation}
                           href="${getQs({ forecast_day: "1" })}"
                           >Näytä huomisen ennuste</a
                       >`
                     : html`<a
-                          onClick=${handleLinkClick}
+                          onClick=${asInPageNavigation}
                           href="${getQs({ forecast_day: undefined })}"
                           >Näytä tämän päivän ennuste</a
                       >`}
