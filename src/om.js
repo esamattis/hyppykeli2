@@ -279,16 +279,21 @@ export function WindTable({ title, tableData }) {
                 <tr>
                     <th></th>
                     ${Object.entries(tableData).map(
-                        ([hour, { isCurrentBlock }]) => html`
-                            <th
-                                class=${`time-header ${getColumnClass(
-                                    hour,
-                                    isCurrentBlock
-                                )}`}
-                            >
-                                ${isCurrentBlock ? currentHour : hour}:00
-                            </th>
-                        `
+                        ([hour, { isCurrentBlock }]) => {
+                            const startHour = parseInt(hour);
+                            const endHour = (startHour + 3) % 24;
+                            const timeRange = `${startHour.toString().padStart(2, '0')}-${endHour.toString().padStart(2, '0')}`;
+                            return html`
+                                <th
+                                    class=${`time-header ${getColumnClass(
+                                        hour,
+                                        isCurrentBlock
+                                    )}`}
+                                >
+                                    ${isCurrentBlock ? `${currentHour}:00` : timeRange}
+                                </th>
+                            `;
+                        }
                     )}
                 </tr>
             </thead>
