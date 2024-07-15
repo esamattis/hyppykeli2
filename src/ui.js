@@ -881,7 +881,8 @@ export function Root() {
                 ${
                     STATION_NAME.value
                         ? html`
-                              Tiedot haettu havaintoasemalta${" "}
+                              Tiedot haettu Ilmatieteenlaitoksen
+                              havaintoasemalta${" "}
                               <a
                                   href="https://www.google.fi/maps/place/${STATION_COORDINATES.value}"
                                   >${STATION_NAME}</a
