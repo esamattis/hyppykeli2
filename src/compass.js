@@ -69,6 +69,7 @@ function calculateNeedleLength(gust) {
 export function Compass() {
     const circle = INSTRUCTOR_LIMIT_LENGTH;
     const studentCircle = STUDENT_LIMIT_LENGTH;
+    const latestObservation = OBSERVATIONS.value[0];
     // prettier-ignore
     return html`
         <div id="compass" class="compass">
@@ -87,7 +88,27 @@ export function Compass() {
               <text x="380" y="210" font-size="40" text-anchor="middle" fill="black">E</text>
               <${Needle} />
               <${WindVariations} />
-
+              <text
+                    x="200"
+                    y="170"
+                    font-size="24"
+                    text-anchor="middle"
+                    fill="black"
+                    font-weight="bold"
+                    class="compass-observations-gust"
+                >
+                    ${latestObservation ? latestObservation.gust + " m/s" : ""}
+                </text>
+                <text
+                    x="200"
+                    y="240"
+                    font-size="20"
+                    text-anchor="middle"
+                    fill="black"
+                    class="compass-observations-speed"
+                >
+                    ${latestObservation ? latestObservation.speed + " m/s" : ""}
+                </text>
 
             </svg>
 
@@ -118,6 +139,8 @@ export function Compass() {
 export function FullScreenCompass() {
     const circle = INSTRUCTOR_LIMIT_LENGTH;
     const studentCircle = STUDENT_LIMIT_LENGTH;
+    const latestObservation = OBSERVATIONS.value[0];
+
     return html`
         <div class="fullscreen-compass">
             <svg
@@ -184,6 +207,27 @@ export function FullScreenCompass() {
                 </text>
                 <${Needle} />
                 <${WindVariations} />
+                <text
+                    x="200"
+                    y="170"
+                    font-size="24"
+                    text-anchor="middle"
+                    fill="black"
+                    font-weight="bold"
+                    class="compass-observations-gust"
+                >
+                    ${latestObservation ? latestObservation.gust + " m/s" : ""}
+                </text>
+                <text
+                    x="200"
+                    y="240"
+                    font-size="20"
+                    text-anchor="middle"
+                    fill="black"
+                    class="compass-observations-speed"
+                >
+                    ${latestObservation ? latestObservation.speed + " m/s" : ""}
+                </text>
             </svg>
         </div>
     `;

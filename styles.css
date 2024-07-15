@@ -415,6 +415,14 @@ h2 .date {
     }
 }
 
+.compass-observations-gust {
+    display: none;
+}
+
+.compass-observations-speed {
+    display: none;
+}
+
 /* FullScreen Compass */
 .fullscreen-compass {
     position: fixed;
@@ -428,6 +436,14 @@ h2 .date {
 .fullscreen-compass svg {
     width: 100%;
     height: 100%;
+}
+
+.fullscreen-compass .compass-observations-gust {
+    display: block;
+}
+
+.fullscreen-compass .compass-observations-speed {
+    display: block;
 }
 
 .back-link {

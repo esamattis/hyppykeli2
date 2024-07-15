@@ -2,7 +2,7 @@
 import { effect, signal } from "@preact/signals";
 import { useState } from "preact/hooks";
 import { html } from "htm/preact";
-import { clearOMCache, OpenMeteoTool } from "./om.js";
+import { clearOMCache, OpenMeteoTool, OpenMeteoRaw } from "./om.js";
 import {
     FORECASTS,
     OBSERVATIONS,
