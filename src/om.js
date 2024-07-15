@@ -433,24 +433,21 @@ export function OpenMeteoRaw() {
                         ({ pressure, key, directionKey }) => html`
                             <tr>
                                 <td>${pressure}</td>
-                                ${timeSlots.map(
-                                    (hour, index) => html`
+                                ${timeSlots.map((_, index) => {
+                                    const speed =
+                                        Number(hourly[key][index] ?? 0) / 3.6;
+
+                                    const direction = Number(
+                                        hourly[directionKey][index] ?? 0,
+                                    );
+
+                                    return html`
                                         <td>
-                                            ${hourly[key] &&
-                                            hourly[key][index] !== undefined
-                                                ? Math.round(
-                                                      hourly[key][index] / 3.6,
-                                                  )
-                                                : "-"}
-                                            m/s |
-                                            ${hourly[directionKey] &&
-                                            hourly[directionKey][index] !==
-                                                undefined
-                                                ? ` ${hourly[directionKey][index]}`
-                                                : "-"}°
+                                            ${speed.toFixed(0)} m/s |
+                                            ${direction.toFixed(0)}°
                                         </td>
-                                    `,
-                                )}
+                                    `;
+                                })}
                             </tr>
                         `,
                     )}
