@@ -65,3 +65,62 @@ type OpenMeteoDayData = Record<
         isCurrentBlock: boolean;
     }
 >;
+
+/**
+ * Interface representing weather data.
+ */
+interface WeatherData {
+    gust: number;
+    speed: number;
+    direction: number;
+    temperature: number;
+    rain?: number;
+    lowCloudCover?: number | undefined;
+    middleCloudCover?: number | undefined;
+    time: Date;
+}
+
+/**
+ * Interface representing a cloud layer.
+ */
+interface CloudLayer {
+    base: number;
+    amount: string;
+    unit: string;
+    href: string;
+}
+
+/**
+ * Interface representing METAR data.
+ */
+interface MetarData {
+    clouds: CloudLayer[];
+    metar: string;
+    time: Date;
+    elevation: number;
+}
+
+/**
+ * Interface representing query parameters.
+ */
+interface QueryParams {
+    fmisid?: string;
+    icaocode?: string;
+    lat?: string;
+    lon?: string;
+    name?: string;
+    observation_range?: string;
+    forecast_day?: string;
+    forecast_range?: string;
+    direction?: string;
+    gust?: string;
+    css?: string;
+}
+
+/**
+ * FMI stored query names
+ */
+type StoredQuery =
+    | "fmi::avi::observations::iwxxm"
+    | "fmi::observations::weather::timevaluepair"
+    | "fmi::forecast::edited::weather::scandinavia::point::timevaluepair";

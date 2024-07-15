@@ -32,7 +32,7 @@ function updateCharts(obs, fore) {
     };
 
     /**
-     * @param {import("./data.js").WeatherData[]} data
+     * @param {WeatherData[]} data
      */
     const createWarningLines = (data) => [
         {
@@ -181,12 +181,7 @@ export function Graph() {
 }
 
 /**
- * @typedef {import('@preact/signals').Signal<T>} Signal<T>
- * @template {any} T
- */
-
-/**
- * @param {Signal<import("./data.js").WeatherData[]>} signal
+ * @param {Signal<WeatherData[]>} signal
  * @param {boolean} reverse
  */
 function createHoverHandler(signal, reverse) {

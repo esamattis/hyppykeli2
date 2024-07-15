@@ -5,58 +5,6 @@ import { calculateDirectionDifference, removeNullish } from "./utils.js";
 import { fetchHighWinds } from "./om.js";
 
 /**
- * @typedef {import('@preact/signals').Signal<T>} Signal<T>
- * @template {any} T
- */
-
-/**
- * @typedef {"fmi::avi::observations::iwxxm" | "fmi::observations::weather::timevaluepair" | "fmi::forecast::edited::weather::scandinavia::point::timevaluepair" } StoredQuery
- */
-
-/**
- * @typedef {Object} WeatherData
- * @property {number} gust
- * @property {number} speed
- * @property {number} direction
- * @property {number} temperature
- * @property {number} [rain]
- * @property {number|undefined} lowCloudCover
- * @property {number|undefined} middleCloudCover
- * @property {Date} time
- */
-
-/**
- * @typedef {Object} CloudLayer
- * @property {number} base
- * @property {string} amount
- * @property {string} unit
- * @property {string} href
- */
-
-/**
- * @typedef {Object} MetarData
- * @property {CloudLayer[]} clouds
- * @property {string} metar
- * @property {Date} time
- * @property {number} elevation
- */
-
-/**
- * @typedef {Object} QueryParams
- * @property {string} [fmisid]
- * @property {string} [icaocode]
- * @property {string} [lat]
- * @property {string} [lon]
- * @property {string} [name]
- * @property {string} [observation_range]
- * @property {string} [forecast_day]
- * @property {string} [forecast_range]
- * @property {string} [direction]
- * @property {string} [gust]
- * @property {string} [css]
- */
-
-/**
  * @type {Signal<string|undefined>}
  */
 export const NAME = signal(undefined);

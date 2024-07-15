@@ -45,15 +45,6 @@ effect(() => {
 });
 
 /**
- * @typedef {import('./data.js').WeatherData} WeatherData
- */
-
-/**
- * @typedef {import('@preact/signals').Signal<T>} Signal<T>
- * @template {any} T
- */
-
-/**
  * @param {number} gust
  * @returns {"ok" | "warning" | "danger"}
  */
@@ -476,7 +467,7 @@ function downloadDataDump(e) {
 
     const formData = new FormData(e.target);
 
-    const storedQuery = /** @type {import("./data.js").StoredQuery | null} */ (
+    const storedQuery = /** @type {StoredQuery | null} */ (
         formData.get("storedQuery")?.toString() ?? null
     );
 
@@ -521,7 +512,7 @@ function downloadDataDump(e) {
 }
 
 /**
- * @param {import("./data.js").QueryParams} params
+ * @param {QueryParams} params
  */
 function updatedQs(params) {
     const newParams = new URLSearchParams({ ...QUERY_PARAMS.value, ...params });
