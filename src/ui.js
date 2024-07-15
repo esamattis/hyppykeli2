@@ -512,14 +512,6 @@ function downloadDataDump(e) {
 }
 
 /**
- * @param {QueryParams} params
- */
-function updatedQs(params) {
-    const newParams = new URLSearchParams({ ...QUERY_PARAMS.value, ...params });
-    return "?" + newParams.toString();
-}
-
-/**
  * Navigate to a link without reloading the page
  *
  * @param {MouseEvent} e
