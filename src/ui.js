@@ -619,7 +619,14 @@ export function SideMenu() {
             <p><a href="#forecasts-graph">Ennusteet 📈</a></p>
             <p><a href="#observations-table">Havainnot 🧾</a></p>
             <p><a href="#forecasts-table">Ennusteet 🧾</a></p>
-            <p><a href="#high-winds">Ylätuuliennusteet</a></p>
+            <p>
+                <a
+                    href="${QUERY_PARAMS.value.high_winds_details
+                        ? "#high-winds-details"
+                        : "#high-winds-today"}"
+                    >Ylätuuliennusteet</a
+                >
+            </p>
 
             <h2>DZs</h2>
             ${OTHER_DZs.value.map(
