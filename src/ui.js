@@ -28,7 +28,7 @@ import {
 } from "./data.js";
 
 import { Graph } from "./graph.js";
-import { Compass, FullScreenCompass } from "./compass.js";
+import { Compass } from "./compass.js";
 import {
     dateOffset,
     ErrorBoundary,
@@ -829,11 +829,6 @@ function HighWinds() {
 
 export function Root() {
     const latestMetar = METARS.value?.[0];
-    const isCompassView = window.location.hash === "#compass";
-
-    if (isCompassView) {
-        return html`<${FullScreenCompass} />`;
-    }
 
     return html`
         <div class="content grid">
