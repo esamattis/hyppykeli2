@@ -704,7 +704,12 @@ export function StickyFooter() {
                 </div>
             </a>
 
-            <a class="item" href="#high-winds">
+            <a
+                class="item"
+                href="${QUERY_PARAMS.value.high_winds_details
+                    ? "#high-winds-details"
+                    : "#high-winds-today"}"
+            >
                 <div class="wrap">
                     <div class="icon">💨</div>
                     <div class="text">Ylätuulet</div>
