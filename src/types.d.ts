@@ -57,3 +57,11 @@ type AverageWindSpeeds = {
         direction: number;
     };
 };
+
+type OpenMeteoDayData = Record<
+    string,
+    {
+        data: AverageWindSpeeds;
+        isCurrentBlock: boolean;
+    }
+>;
