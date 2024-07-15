@@ -888,24 +888,20 @@ export function Root() {
                 </div>
             </div>
 
-            <div id="high-winds-today">
+            <div id="high-winds-today" class="side-scroll">
                 <h2>ECMWF Ylätuuliennusteet</h2>
                 <p>
                     Lähde <a href="https://open-meteo.com/">Open-Meteo</a> API.
                 </p>
-                <div class="side-scroll">
                     <${ErrorBoundary}>
                         <${OpenMeteoTool} />
                     </${ErrorBoundary}>
-                </div>
             </div>
 
-            <div id="high-winds-tomorrow">
-                <div class="side-scroll">
+            <div id="high-winds-tomorrow" class="side-scroll">
                     <${ErrorBoundary}>
                         <${OpenMeteoTool} tomorrow />
                     </${ErrorBoundary}>
-                </div>
             </div>
 
 
