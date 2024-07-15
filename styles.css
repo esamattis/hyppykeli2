@@ -49,8 +49,13 @@ button {
     grid-area: observations-table;
 }
 
-#high-winds {
-    grid-area: high-winds;
+#high-winds-today {
+    grid-area: high-winds-today;
+}
+
+#high-winds-tomorrow {
+    grid-area: high-winds-tomorrow;
+    align-self: end;
 }
 
 .content {
@@ -94,7 +99,8 @@ button {
         "forecasts-graph forecasts-graph"
         "observations-table observations-table"
         "forecasts-table forecasts-table"
-        "high-winds high-winds";
+        "high-winds-today high-winds-today"
+        "high-winds-tomorrow high-winds-tomorrow";
 }
 
 @media (min-width: 900px) {
@@ -103,14 +109,14 @@ button {
     }
 
     .grid {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 50vw 50vw;
         grid-template-areas:
             "title title"
             "info info"
             "clouds winds"
             "observations-graph forecasts-graph"
             "observations-table forecasts-table"
-            "high-winds high-winds";
+            "high-winds-today high-winds-tomorrow";
     }
 }
 
