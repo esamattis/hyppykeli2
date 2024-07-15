@@ -241,7 +241,6 @@ export function ResizeRecreate({ children }) {
             }
 
             timer = setTimeout(() => {
-                console.log("Resizing");
                 setKey((prevKey) => prevKey + 1);
             }, 1000);
         };
