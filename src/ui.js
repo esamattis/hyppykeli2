@@ -782,50 +782,43 @@ export function Root() {
 
     return html`
         <div class="content grid">
-            ${
-                ERRORS.value.length > 0
-                    ? html`
-                          <div class="errors">
-                              ${ERRORS.value.map((error) => {
-                                  return html` <p>${error}</p> `;
-                              })}
-                          </div>
-                      `
-                    : null
-            }
+            ${ERRORS.value.length > 0
+                ? html`
+                      <div class="errors">
+                          ${ERRORS.value.map((error) => {
+                              return html` <p>${error}</p> `;
+                          })}
+                      </div>
+                  `
+                : null}
 
             <h1 id="title">
                 <span id="title">${NAME}</span>
             </h1>
 
             <div id="info">
-                ${
-                    STATION_NAME.value
-                        ? html`
-                              Tiedot haettu havaintoasemalta${" "}
-                              <a
-                                  href="https://www.google.fi/maps/place/${STATION_COORDINATES.value}"
-                                  >${STATION_NAME}</a
-                              >.${" "}
+                ${STATION_NAME.value
+                    ? html`
+                          Tiedot haettu havaintoasemalta${" "}
+                          <a
+                              href="https://www.google.fi/maps/place/${STATION_COORDINATES.value}"
+                              >${STATION_NAME}</a
+                          >.${" "}
 
-                              <${ForecastLocationInfo} />
-                          `
-                        : "Ladataan..."
-                }
-                ${
-                    latestMetar
-                        ? html`
-                              ${" "}Lentokentän korkeus meren pinnasta${" "}
-                              ${latestMetar.elevation.toFixed(0)}M. ${" "}
-                          `
-                        : null
-                }
+                          <${ForecastLocationInfo} />
+                      `
+                    : "Ladataan..."}
+                ${latestMetar
+                    ? html`
+                          ${" "}Lentokentän korkeus meren pinnasta${" "}
+                          ${latestMetar.elevation.toFixed(0)}M. ${" "}
+                      `
+                    : null}
                 <span class="disclaimer">
                     Tietojen käyttö omalla vastuulla. Ei takeita että tiedot
                     ovat oikein.
                 </span>
             </div>
-
 
             <div class="clouds" id="clouds">
                 <h2 class="h2-with-icon">
@@ -852,9 +845,7 @@ export function Root() {
             <div id="observations-table" class="observations">
                 <h2 class="sticky">
                     Havainnot
-                    <span class="date">
-                        ${formatDate(new Date())}
-                    </span>
+                    <span class="date"> ${formatDate(new Date())} </span>
                 </h2>
                 <div class="side-scroll">
                     <${DataTable}
@@ -865,7 +856,10 @@ export function Root() {
                 </div>
             </div>
 
-            <div id="forecasts-table" class=${STALE_FORECASTS.value ? "stale" : "fresh"}>
+            <div
+                id="forecasts-table"
+                class=${STALE_FORECASTS.value ? "stale" : "fresh"}
+            >
                 <div class="anchor" id="forecasts"></div>
                 <h2 class="sticky">
                     Ennuste
@@ -909,14 +903,12 @@ export function Root() {
         <${SideMenu} />
         <${StickyFooter} />
 
-        ${
-            QUERY_PARAMS.value.css
-                ? html`<style
-                      dangerouslySetInnerHTML=${{
-                          __html: QUERY_PARAMS.value.css,
-                      }}
-                  ></style>`
-                : null
-        }
+        ${QUERY_PARAMS.value.css
+            ? html`<style
+                  dangerouslySetInnerHTML=${{
+                      __html: QUERY_PARAMS.value.css,
+                  }}
+              ></style>`
+            : null}
     `;
 }
