@@ -665,21 +665,37 @@ export function SideMenu() {
     `;
 }
 
+/**
+ * @param {Object} e
+ * @param {HTMLFormElement} e.target
+ * @param {()=>void} e.preventDefault
+ */
+function handleCSSEditorSubmit(e) {
+    e.preventDefault();
+    const css = new FormData(e.target).get("css")?.toString() ?? "";
+    navigateQs({ css: btoa(css) });
+}
+
 function CSSEditor() {
-    return html`<form class="css-editor">
-        ${Object.entries(QUERY_PARAMS.value).map(
-            ([key, value]) => html`
-                <input type="hidden" name=${key} value=${value} />
-            `,
-        )}
+    // prettier-ignore
+    return html`
+        <form class="css-editor" onSubmit=${handleCSSEditorSubmit}>
+            <textarea name="css">${atob(QUERY_PARAMS.value.css || "")}</textarea>
+            <button type="submit">Submit</button>
+        </form>
+    `;
+}
 
-        <textarea name="css">
-            ${QUERY_PARAMS.value.css || ""}
-        </textarea
-        >
+function RenderInjectedCSS() {
+    const css = QUERY_PARAMS.value.css;
 
-        <button type="submit">Submit</button>
-    </form>`;
+    if (!css) {
+        return null;
+    }
+
+    return html`<style
+        dangerouslySetInnerHTML=${{ __html: atob(css) }}
+    ></style>`;
 }
 
 export function StickyFooter() {
@@ -949,14 +965,7 @@ export function Root() {
         <${SideMenu} />
         <${StickyFooter} />
 
-        ${
-            QUERY_PARAMS.value.css
-                ? html`<style
-                      dangerouslySetInnerHTML=${{
-                          __html: QUERY_PARAMS.value.css,
-                      }}
-                  ></style>`
-                : null
-        }
+        <${RenderInjectedCSS} />
+
     `;
 }
