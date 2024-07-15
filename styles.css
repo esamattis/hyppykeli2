@@ -17,8 +17,8 @@ button {
 
 #info {
     grid-area: info;
-    width: calc(100vw - 20px - var(--compass-width));
-    max-width: 400px;
+    width: calc(100vw - 30px - var(--compass-width));
+    max-width: 750px;
 }
 
 #clouds {
