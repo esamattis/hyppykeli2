@@ -212,140 +212,122 @@ const getWindSpeedClass = (speed, height) => {
 };
 
 /**
- * @param {{showDays?: "both" | "today" | "tomorrow"}} props
+ * @param {number|string} num
  */
+function roundToNearestFive(num) {
+    return Math.round(Number(num) / 5) * 5;
+}
+
+export function WindArrow({ direction }) {
+    const arrow = "➤";
+    const rotationDegree = direction + 90;
+    return html`
+        <span
+            style=${{
+                display: "inline-block",
+                transform: `rotate(${rotationDegree}deg)`,
+            }}
+        >
+            ${arrow}
+        </span>
+    `;
+}
+
+export function WindCell({ data, columnClass, height }) {
+    if (!data) return html`<td class=${columnClass}>-</td>`;
+
+    const { speed, direction } = data;
+    const speedInMS = Math.round(speed / 3.6);
+    const roundedDirection = roundToNearestFive(direction.toFixed(0));
+
+    return html`
+        <td
+            class=${`wind-cell ${columnClass} ${getWindSpeedClass(
+                speedInMS,
+                height
+            )}`}
+        >
+            <div class="wind-speed">${speedInMS} m/s</div>
+            <div class="wind-direction">
+                ${roundedDirection}°
+                <${WindArrow} direction=${roundedDirection} />
+            </div>
+        </td>
+    `;
+}
+
+export function WindTable({ title, tableData }) {
+    if (!tableData) return null;
+
+    const currentHour = new Date().getHours();
+    const blockStartHour = Math.floor(currentHour / 3) * 3;
+
+    function getColumnClass(hour, isCurrentBlock) {
+        if (title === "Tänään") {
+            if (isCurrentBlock) return "current-column";
+            if (parseInt(hour) < blockStartHour) return "past-column";
+        }
+        return "";
+    }
+
+    return html`
+        <table class="wind-table upperwinds-compact">
+            <thead>
+                <tr>
+                    <th colspan=${Object.keys(tableData).length + 1}>${title}</th>
+                </tr>
+                <tr>
+                    <th></th>
+                    ${Object.entries(tableData).map(
+                        ([hour, { isCurrentBlock }]) => html`
+                            <th
+                                class=${`time-header ${getColumnClass(
+                                    hour,
+                                    isCurrentBlock
+                                )}`}
+                            >
+                                ${isCurrentBlock ? currentHour : hour}:00
+                            </th>
+                        `
+                    )}
+                </tr>
+            </thead>
+            <tbody>
+                ${PRESSURE_LEVELS.map(({ pressure, height }) => html`
+                    <tr key=${pressure}>
+                        <td class="pressure-cell">${height}</td>
+                        ${Object.entries(tableData).map(
+                            ([hour, { data: hourData, isCurrentBlock }]) => html`
+                                <${WindCell}
+                                    key=${hour}
+                                    data=${hourData[pressure.split(" ")[0]]}
+                                    columnClass=${getColumnClass(
+                                        hour,
+                                        isCurrentBlock
+                                    )}
+                                    height=${height}
+                                />
+                            `
+                        )}
+                    </tr>
+                `)}
+            </tbody>
+        </table>
+    `;
+}
+
 export function OpenMeteoTool({ showDays = "both" }) {
     const data = OM_DATA.value ? formatTableData(OM_DATA.value.hourly) : null;
 
-    /**
-     * @param {number|string} num
-     */
-    function roundToNearestFive(num) {
-        return Math.round(Number(num) / 5) * 5;
-    }
-
-    /**
-     * @param {number} direction
-     */
-    function getWindArrow(direction) {
-        const arrow = "➤";
-        const rotationDegree = direction + 90; // Lisätään 90 astetta, jotta nuoli osoittaa oikeaan suuntaan
-        return html`<span
-            style="display: inline-block; transform: rotate(${rotationDegree}deg);"
-            >${arrow}</span
-        >`;
-    }
-
-    /**
-     * @param {string} title
-     * @param {Record<string, AverageWindSpeedsWithBlock>} tableData
-     */
-    const renderTable = (title, tableData) => {
-        if (!tableData) return null;
-
-        const currentHour = new Date().getHours();
-        const blockStartHour = Math.floor(currentHour / 3) * 3;
-
-        /**
-         * @param {string} hour
-         * @returns {string}
-         */
-        function getColumnClass(hour, isCurrentBlock) {
-            if (title === "Tänään") {
-                if (isCurrentBlock) {
-                    return "current-column";
-                } else if (parseInt(hour) < blockStartHour) {
-                    return "past-column";
-                }
-            }
-            return "";
-        }
-
-        return html`
-            <table class="wind-table upperwinds-compact">
-                <thead>
-                    <tr>
-                        <th colspan="${Object.keys(tableData).length + 1}">
-                            ${title}
-                        </th>
-                    </tr>
-                    <tr>
-                        <th></th>
-                        ${Object.entries(tableData).map(
-                            ([hour, { isCurrentBlock }]) =>
-                                html`<th
-                                    class="time-header ${getColumnClass(hour, isCurrentBlock)}"
-                                >
-                                    ${isCurrentBlock ? currentHour : hour}:00
-                                </th>`,
-                        )}
-                    </tr>
-                </thead>
-                <tbody>
-                    ${PRESSURE_LEVELS.map(({ pressure, height }) => {
-                        const level = pressure.split(" ")[0] ?? "6";
-                        return html`
-                            <tr>
-                                <td class="pressure-cell">${height}</td>
-                                ${Object.entries(tableData).map(
-                                    ([hour, { data: hourData, isCurrentBlock }]) => {
-                                        const columnClass =
-                                            getColumnClass(hour, isCurrentBlock);
-                                        return hourData[level]
-                                            ? html` <td
-                                                  class="wind-cell ${columnClass} ${getWindSpeedClass(
-                                                      hourData[level].speed /
-                                                          3.6,
-                                                      height,
-                                                  )}"
-                                              >
-                                                  <div class="wind-speed">
-                                                      ${Math.round(
-                                                          hourData[level]
-                                                              .speed / 3.6,
-                                                      )}
-                                                      m/s
-                                                  </div>
-                                                  <div class="wind-direction">
-                                                      ${roundToNearestFive(
-                                                          hourData[
-                                                              level
-                                                          ].direction.toFixed(
-                                                              0,
-                                                          ),
-                                                      )}°
-                                                      ${getWindArrow(
-                                                          roundToNearestFive(
-                                                              hourData[level]
-                                                                  .direction,
-                                                          ),
-                                                      )}
-                                                  </div>
-                                              </td>`
-                                            : html`<td class="${columnClass}">
-                                                  -
-                                              </td>`;
-                                    },
-                                )}
-                            </tr>
-                        `;
-                    })}
-                </tbody>
-            </table>
-        `;
-    };
-
-    if (!data) {
-        return html`<div>Loading...</div>`;
-    }
+    if (!data) return html`<div>Loading...</div>`;
 
     return html`
         <div>
             ${showDays === "today" || showDays === "both"
-                ? renderTable("Tänään", data.todayData)
+                ? html`<${WindTable} title="Tänään" tableData=${data.todayData} />`
                 : null}
             ${showDays === "tomorrow" || showDays === "both"
-                ? renderTable("Huomenna", data.tomorrowData)
+                ? html`<${WindTable} title="Huomenna" tableData=${data.tomorrowData} />`
                 : null}
         </div>
     `;
@@ -402,5 +384,5 @@ export function OpenMeteoRaw() {
         `;
     };
 
-    return html` <div>${renderTable()}</div> `;
+    return html`<div>${renderTable()}</div>`;
 }
