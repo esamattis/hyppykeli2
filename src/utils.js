@@ -248,3 +248,73 @@ export function ResizeRecreate({ children }) {
 
     return html`<${Fragment} key=${key}>${children}</${Fragment}>`;
 }
+
+export const EXAMPLE_CSS = `
+    body {
+        display: grid;
+        justify-content: center;
+        align-items: center;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto;
+        height: 100vh;
+        margin: 0;
+        padding: 20px;
+        box-sizing: border-box;
+        gap: 20px;
+        overflow-y: hidden;
+    }
+
+    .side-scroll {
+        overflow-x: unset !important;
+        overflow-y: unset !important;
+    }
+
+    #high-winds-today {
+        grid-column: 1/2;
+        grid-row: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .compass {
+        grid-column: 2/3;
+        grid-row: 1;
+        width: 100%;
+        max-width: 450px;
+        margin: auto;
+        box-shadow: unset !important;
+        top: unset !important;
+    }
+
+    #observations-graph {
+        grid-column: 1/3;
+        grid-row: 2;
+        overflow: auto;
+    }
+
+    .chart {
+        height: clamp(200px, 40vh, 300px);
+    }
+
+    #clouds,
+    #forecasts-graph,
+    #forecasts-table,
+    #high-winds p,
+    #high-winds-today h2 + p,
+    #high-winds-tomorrow,
+    #info,
+    #observations-table,
+    #title,
+    #winds,
+    button.help,
+    h2 {
+        display: none;
+    }
+
+    .compass-observations-gust,
+    .compass-observations-speed {
+        display: inline;
+    }
+
+    `;

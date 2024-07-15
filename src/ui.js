@@ -32,6 +32,7 @@ import { Compass } from "./compass.js";
 import {
     dateOffset,
     ErrorBoundary,
+    EXAMPLE_CSS,
     formatClock,
     formatDate,
     FromNow,
@@ -657,8 +658,13 @@ export function SideMenu() {
 
             <h2>Muokkaa näkymää</h2>
             <p class="disclaimer">
-                Lisää omaa CSS:ää sivulle. Tämä on kokeellinen ominaisuus ja
-                saattaa rikkoa sivun ulkoasun.
+                Tee mukautettu näkymä lisäämällä omaa CSS-koodia. Katso
+                esimerkki${" "}
+                <a
+                    onClick=${asInPageNavigation}
+                    href=${getQs({ css: btoa(EXAMPLE_CSS) })}
+                    >tästä</a
+                >
             </p>
             <${CSSEditor} />
         </div>
