@@ -704,7 +704,12 @@ export function StickyFooter() {
                 </div>
             </a>
 
-            <a class="item" href="#high-winds">
+            <a
+                class="item"
+                href="${QUERY_PARAMS.value.high_winds_details
+                    ? "#high-winds-details"
+                    : "#high-winds-today"}"
+            >
                 <div class="wrap">
                     <div class="icon">💨</div>
                     <div class="text">Ylätuulet</div>
@@ -769,6 +774,55 @@ function ForecastLocationInfo() {
             STATION_COORDINATES.value}"
             >${FORECAST_LOCATION_NAME.value}</a
         >.
+    `;
+}
+
+function HighWinds() {
+    const showDetails = Boolean(QUERY_PARAMS.value.high_winds_details);
+
+    if (showDetails) {
+        return html`
+            <div id="high-winds-details" class="side-scroll">
+                <h2>ECMWF Ylätuuliennusteet</h2>
+
+                <p>
+                    <a
+                        onClick=${asInPageNavigation}
+                        href="${getQs({ high_winds_details: undefined })}"
+                    >
+                        Näytä kooste
+                    </a>
+                </p>
+
+                <${OpenMeteoRaw} />
+            </div>
+        `;
+    }
+
+    return html`
+        <div id="high-winds-today" class="side-scroll">
+            <h2>ECMWF Ylätuuliennusteet</h2>
+
+            <p>
+                Lähde <a href="https://open-meteo.com/">Open-Meteo</a> API.${" "}
+                <a
+                    onClick=${asInPageNavigation}
+                    href="${getQs({ high_winds_details: "1" })}"
+                >
+                    Näytä tarkat tiedot
+                </a>
+            </p>
+
+            <${ErrorBoundary}>
+                <${OpenMeteoTool} />
+            </${ErrorBoundary}>
+        </div>
+
+        <div id="high-winds-tomorrow" class="side-scroll">
+                <${ErrorBoundary}>
+                    <${OpenMeteoTool} tomorrow />
+                </${ErrorBoundary}>
+        </div>
     `;
 }
 
@@ -882,23 +936,7 @@ export function Root() {
                 </div>
             </div>
 
-            <div id="high-winds-today" class="side-scroll">
-                <h2>ECMWF Ylätuuliennusteet</h2>
-                <p>
-                    Lähde <a href="https://open-meteo.com/">Open-Meteo</a> API.
-                </p>
-                    <${ErrorBoundary}>
-                        <${OpenMeteoTool} />
-                    </${ErrorBoundary}>
-            </div>
-
-            <div id="high-winds-tomorrow" class="side-scroll">
-                    <${ErrorBoundary}>
-                        <${OpenMeteoTool} tomorrow />
-                    </${ErrorBoundary}>
-            </div>
-
-
+            <${HighWinds} />
         </div>
         <${SideMenu} />
         <${StickyFooter} />

@@ -58,6 +58,10 @@ button {
     align-self: end;
 }
 
+#high-winds-details {
+    grid-area: high-winds-details;
+}
+
 .content {
     display: grid;
     margin: 10px;
@@ -119,7 +123,8 @@ button {
             "clouds winds"
             "observations-graph forecasts-graph"
             "observations-table forecasts-table"
-            "high-winds-today high-winds-tomorrow";
+            "high-winds-today high-winds-tomorrow"
+            "high-winds-details high-winds-details";
     }
 }
 

@@ -115,6 +115,7 @@ interface QueryParams {
     direction?: string;
     gust?: string;
     css?: string;
+    high_winds_details?: string;
 }
 
 /**
