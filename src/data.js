@@ -317,7 +317,7 @@ HOVERED_OBSERVATION.subscribe(() => {
 });
 
 document.addEventListener("click", (e) => {
-    if (e.target instanceof HTMLElement && !e.target.closest(".chart")) {
+    if (e.target instanceof Element && !e.target.closest(".chart")) {
         HOVERED_OBSERVATION.value = undefined;
     }
 });

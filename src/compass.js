@@ -1,7 +1,7 @@
 // @ts-check
 import { html } from "htm/preact";
 import { HOVERED_OBSERVATION, OBSERVATIONS, WIND_VARIATIONS } from "./data.js";
-import { Help } from "./utils.js";
+import { FromNow, Help } from "./utils.js";
 
 // Constants for needle length calculation
 const MIN_NEEDLE_LENGTH = 30;
@@ -90,6 +90,10 @@ export function Compass() {
 
 
             </svg>
+
+            <p class="compass-time">
+                <${FromNow} date=${HOVERED_OBSERVATION.value?.time} />
+            </p>
 
             <${Help}>
                 <p>
