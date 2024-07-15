@@ -329,10 +329,10 @@ export function OpenMeteoTool({ showDays = "both" }) {
     return html`
         <div>
             ${showDays === "today" || showDays === "both"
-                ? html`<${WindTable} title="Tänään" tableData=${data.todayData} />`
+                ? html`<div class="today-section"><${WindTable} title="Tänään" tableData=${data.todayData} /></div>`
                 : null}
             ${showDays === "tomorrow" || showDays === "both"
-                ? html`<${WindTable} title="Huomenna" tableData=${data.tomorrowData} />`
+                ? html`<div class="tomorrow-section"><${WindTable} title="Huomenna" tableData=${data.tomorrowData} /></div>`
                 : null}
         </div>
     `;
