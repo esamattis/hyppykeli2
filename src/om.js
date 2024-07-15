@@ -5,28 +5,48 @@ import { signal } from "@preact/signals";
 
 // Vakiot tiedoston alussa
 const PRESSURE_LEVELS = [
-  { pressure: "600 hPa", height: "4200" },
-  { pressure: "700 hPa", height: "3000" },
-  { pressure: "850 hPa", height: "1500" },
-  { pressure: "925 hPa", height: "800" },
-  { pressure: "1000 hPa", height: "110" }
+    { pressure: "600 hPa", height: "4200" },
+    { pressure: "700 hPa", height: "3000" },
+    { pressure: "850 hPa", height: "1500" },
+    { pressure: "925 hPa", height: "800" },
+    { pressure: "1000 hPa", height: "110" },
 ];
 
 const PRESSURE_LEVELS_RAW = [
-    { pressure: "600 hPa", key: "windspeed_600hPa", directionKey: "winddirection_600hPa" },
-    { pressure: "700 hPa", key: "windspeed_700hPa", directionKey: "winddirection_700hPa" },
-    { pressure: "850 hPa", key: "windspeed_850hPa", directionKey: "winddirection_850hPa" },
-    { pressure: "925 hPa", key: "windspeed_925hPa", directionKey: "winddirection_925hPa" },
-    { pressure: "1000 hPa", key: "windspeed_1000hPa", directionKey: "winddirection_1000hPa" },
+    {
+        pressure: "600 hPa",
+        key: "windspeed_600hPa",
+        directionKey: "winddirection_600hPa",
+    },
+    {
+        pressure: "700 hPa",
+        key: "windspeed_700hPa",
+        directionKey: "winddirection_700hPa",
+    },
+    {
+        pressure: "850 hPa",
+        key: "windspeed_850hPa",
+        directionKey: "winddirection_850hPa",
+    },
+    {
+        pressure: "925 hPa",
+        key: "windspeed_925hPa",
+        directionKey: "winddirection_925hPa",
+    },
+    {
+        pressure: "1000 hPa",
+        key: "windspeed_1000hPa",
+        directionKey: "winddirection_1000hPa",
+    },
 ];
 
 const TIME_SLOTS = [0, 3, 6, 9, 12, 15, 18, 21];
 
 const WIND_SPEED_CLASSES = [
-  "wind-low",
-  "wind-medium",
-  "wind-high",
-  "wind-very-high"
+    "wind-low",
+    "wind-medium",
+    "wind-high",
+    "wind-very-high",
 ];
 
 const ON_CANOPY_HEIGHTS = ["110", "800"];
@@ -138,7 +158,8 @@ function formatTableData(hourly) {
 function getAverageData(hourly, targetHour, dayOffset) {
     const now = new Date();
     const currentHour = now.getHours();
-    const isCurrentBlock = targetHour === Math.floor(currentHour / 3) * 3 && dayOffset === 0;
+    const isCurrentBlock =
+        targetHour === Math.floor(currentHour / 3) * 3 && dayOffset === 0;
 
     const relevantIndices = [0, 1, 2]
         .map((i) => {
@@ -166,9 +187,11 @@ function getAverageData(hourly, targetHour, dayOffset) {
     pressureLevels.forEach((level) => {
         const speedKey = `windspeed_${level}hPa`;
         const directionKey = `winddirection_${level}hPa`;
-        
+
         if (isCurrentBlock) {
-            const currentIndex = hourly.time.findIndex((time) => new Date(time).getHours() === currentHour);
+            const currentIndex = hourly.time.findIndex(
+                (time) => new Date(time).getHours() === currentHour,
+            );
             result[level] = {
                 speed: hourly[speedKey]?.[currentIndex] ?? 0,
                 direction: hourly[directionKey]?.[currentIndex] ?? 0,
@@ -244,7 +267,7 @@ export function WindCell({ data, columnClass, height }) {
         <td
             class=${`wind-cell ${columnClass} ${getWindSpeedClass(
                 speedInMS,
-                height
+                height,
             )}`}
         >
             <div class="wind-speed">${speedInMS} m/s</div>
@@ -274,7 +297,9 @@ export function WindTable({ title, tableData }) {
         <table class="wind-table upperwinds-compact">
             <thead>
                 <tr>
-                    <th colspan=${Object.keys(tableData).length + 1}>${title}</th>
+                    <th colspan=${Object.keys(tableData).length + 1}>
+                        ${title}
+                    </th>
                 </tr>
                 <tr>
                     <th></th>
@@ -282,40 +307,47 @@ export function WindTable({ title, tableData }) {
                         ([hour, { isCurrentBlock }]) => {
                             const startHour = parseInt(hour);
                             const endHour = (startHour + 3) % 24;
-                            const timeRange = `${startHour.toString().padStart(2, '0')}-${endHour.toString().padStart(2, '0')}`;
+                            const timeRange = `${startHour.toString().padStart(2, "0")}-${endHour.toString().padStart(2, "0")}`;
                             return html`
                                 <th
                                     class=${`time-header ${getColumnClass(
                                         hour,
-                                        isCurrentBlock
+                                        isCurrentBlock,
                                     )}`}
                                 >
-                                    ${isCurrentBlock ? `${currentHour}:00` : timeRange}
+                                    ${isCurrentBlock
+                                        ? `${currentHour}:00`
+                                        : timeRange}
                                 </th>
                             `;
-                        }
+                        },
                     )}
                 </tr>
             </thead>
             <tbody>
-                ${PRESSURE_LEVELS.map(({ pressure, height }) => html`
-                    <tr key=${pressure}>
-                        <td class="pressure-cell">${height}</td>
-                        ${Object.entries(tableData).map(
-                            ([hour, { data: hourData, isCurrentBlock }]) => html`
-                                <${WindCell}
-                                    key=${hour}
-                                    data=${hourData[pressure.split(" ")[0]]}
-                                    columnClass=${getColumnClass(
-                                        hour,
-                                        isCurrentBlock
-                                    )}
-                                    height=${height}
-                                />
-                            `
-                        )}
-                    </tr>
-                `)}
+                ${PRESSURE_LEVELS.map(
+                    ({ pressure, height }) => html`
+                        <tr key=${pressure}>
+                            <td class="pressure-cell">${height}</td>
+                            ${Object.entries(tableData).map(
+                                ([
+                                    hour,
+                                    { data: hourData, isCurrentBlock },
+                                ]) => html`
+                                    <${WindCell}
+                                        key=${hour}
+                                        data=${hourData[pressure.split(" ")[0]]}
+                                        columnClass=${getColumnClass(
+                                            hour,
+                                            isCurrentBlock,
+                                        )}
+                                        height=${height}
+                                    />
+                                `,
+                            )}
+                        </tr>
+                    `,
+                )}
             </tbody>
         </table>
     `;
@@ -329,10 +361,20 @@ export function OpenMeteoTool({ showDays = "both" }) {
     return html`
         <div>
             ${showDays === "today" || showDays === "both"
-                ? html`<div class="today-section"><${WindTable} title="Tänään" tableData=${data.todayData} /></div>`
+                ? html`<div class="today-section">
+                      <${WindTable}
+                          title="Tänään"
+                          tableData=${data.todayData}
+                      />
+                  </div>`
                 : null}
             ${showDays === "tomorrow" || showDays === "both"
-                ? html`<div class="tomorrow-section"><${WindTable} title="Huomenna" tableData=${data.tomorrowData} /></div>`
+                ? html`<div class="tomorrow-section">
+                      <${WindTable}
+                          title="Huomenna"
+                          tableData=${data.tomorrowData}
+                      />
+                  </div>`
                 : null}
         </div>
     `;
