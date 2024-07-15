@@ -1,6 +1,6 @@
 // @ts-check
 import { effect, signal } from "@preact/signals";
-import { useCallback, useEffect, useState } from "preact/hooks";
+import { useState } from "preact/hooks";
 import { html } from "htm/preact";
 import { clearOMCache, OpenMeteoTool } from "./om.js";
 import {
@@ -34,6 +34,7 @@ import {
     ErrorBoundary,
     formatClock,
     formatDate,
+    FromNow,
     Help,
     humanDayText,
     saveTextToFile,
@@ -249,50 +250,6 @@ function DataTable(props) {
     `;
 }
 
-/**
- * Set value returned by the setter function to the state every second.
- *
- * @param {() => T} setter
- * @template {any} T
- * @returns {T}
- */
-function useInterval(setter) {
-    const [state, setState] = useState(/** @type {T} */ (setter()));
-    useEffect(() => {
-        setState(setter());
-        const interval = setInterval(() => {
-            setState(setter());
-        }, 1000);
-
-        return () => {
-            clearInterval(interval);
-        };
-    }, [setter]);
-
-    return state;
-}
-
-/**
- * @param {Object} props
- * @param {Date} [props.date]
- */
-function FromNow(props) {
-    const createFromNow = useCallback(() => {
-        if (!props.date) {
-            return "";
-        }
-
-        return new Intl.RelativeTimeFormat("fi").format(
-            Math.round(-(Date.now() - props.date.getTime()) / 1000 / 60),
-            "minutes",
-        );
-    }, [props.date]);
-
-    const fromNow = useInterval(createFromNow);
-
-    return html`<span class="from-now">${fromNow}</span> `;
-}
-
 function LatestWind() {
     const history = !!HOVERED_OBSERVATION.value;
     const latest = HOVERED_OBSERVATION.value || OBSERVATIONS.value[0];
@@ -322,8 +279,6 @@ function LatestWind() {
 
             <br />
             <${FromNow} date=${latest.time} />
-
-            <small> (klo ${formatClock(latest.time)}) </small>
 
             <br />
             <${GustTrend} />
@@ -412,8 +367,6 @@ function LatestMetar() {
 
         <p>
             <${FromNow} date=${latest.time} />
-
-            <small> (klo ${formatClock(latest.time)}) </small>
 
             <br />
             <em class="metar">${latest.metar}</em>
@@ -837,7 +790,6 @@ function ForecastLocationInfo() {
 }
 
 export function Root() {
-    const history = !!HOVERED_OBSERVATION.value;
     const latestMetar = METARS.value?.[0];
     const isCompassView = window.location.hash === "#compass";
 
@@ -860,7 +812,6 @@ export function Root() {
             }
 
             <h1 id="title">
-                <a class="logo" href="/"> Hyppykeli</a> –${" "}
                 <span id="title">${NAME}</span>
             </h1>
 
