@@ -1,7 +1,7 @@
 // @ts-check
 
 import { Component, html } from "htm/preact";
-import { useRef, useState } from "preact/hooks";
+import { useCallback, useEffect, useRef, useState } from "preact/hooks";
 
 /**
  * @param {Object} props
@@ -160,4 +160,53 @@ export class ErrorBoundary extends Component {
 
         return this.props.children;
     }
+}
+
+/**
+ * Set value returned by the setter function to the state every second.
+ *
+ * @param {() => T} setter
+ * @template {any} T
+ * @returns {T}
+ */
+function useInterval(setter) {
+    const [state, setState] = useState(/** @type {T} */ (setter()));
+    useEffect(() => {
+        setState(setter());
+        const interval = setInterval(() => {
+            setState(setter());
+        }, 1000);
+
+        return () => {
+            clearInterval(interval);
+        };
+    }, [setter]);
+
+    return state;
+}
+
+/**
+ * @param {Object} props
+ * @param {Date} [props.date]
+ */
+export function FromNow(props) {
+    const createFromNow = useCallback(() => {
+        if (!props.date) {
+            return "";
+        }
+
+        return new Intl.RelativeTimeFormat("fi").format(
+            Math.round(-(Date.now() - props.date.getTime()) / 1000 / 60),
+            "minutes",
+        );
+    }, [props.date]);
+
+    if (!props.date) {
+        return null;
+    }
+
+    const fromNow = useInterval(createFromNow);
+
+    return html`<span class="from-now">${fromNow}</span>
+        <small> (klo ${formatClock(props.date)}) </small> `;
 }
