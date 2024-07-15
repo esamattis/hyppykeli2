@@ -12,6 +12,9 @@ const PRESSURE_LEVELS = [
     { pressure: "1000 hPa", height: "110" },
 ];
 
+/**
+ * @type {Array<{ pressure: string, key: keyof OpenMeteoHourlyData, directionKey: keyof OpenMeteoHourlyData }>}
+ */
 const PRESSURE_LEVELS_RAW = [
     {
         pressure: "600 hPa",
@@ -133,12 +136,12 @@ export async function fetchHighWinds() {
 
 /**
  * @param {OpenMeteoHourlyData} hourly
- * @return {FormattedTableData}
  */
 function formatTableData(hourly) {
-    /** @type {Record<string, AverageWindSpeedsWithBlock>} */
+    /** @type {OpenMeteoDayData} */
     const todayData = {};
-    /** @type {Record<string, AverageWindSpeedsWithBlock>} */
+
+    /** @type {OpenMeteoDayData} */
     const tomorrowData = {};
 
     TIME_SLOTS.forEach((slot) => {
@@ -153,7 +156,6 @@ function formatTableData(hourly) {
  * @param {OpenMeteoHourlyData} hourly
  * @param {number} targetHour
  * @param {number} dayOffset
- * @returns {AverageWindSpeedsWithBlock}
  */
 function getAverageData(hourly, targetHour, dayOffset) {
     const now = new Date();
@@ -175,17 +177,19 @@ function getAverageData(hourly, targetHour, dayOffset) {
         .filter((index) => index !== -1);
 
     /**
-     * @type {string[]}
+     * @type {OpenMeteoPressureLevel[]}
      */
     const pressureLevels = ["1000", "925", "850", "700", "600"];
 
     /**
-     * @type {Record<string, { speed: number, direction: number }>}
+     * @type {AverageWindSpeeds}
      */
     const result = {};
 
     pressureLevels.forEach((level) => {
+        /** @type {`windspeed_${OpenMeteoPressureLevel}hPa`} */
         const speedKey = `windspeed_${level}hPa`;
+        /** @type {`winddirection_${OpenMeteoPressureLevel}hPa`} */
         const directionKey = `winddirection_${level}hPa`;
 
         if (isCurrentBlock) {
@@ -241,6 +245,10 @@ function roundToNearestFive(num) {
     return Math.round(Number(num) / 5) * 5;
 }
 
+/**
+ * @param {Object} props
+ * @param {number} props.direction
+ */
 export function WindArrow({ direction }) {
     const arrow = "➤";
     const rotationDegree = direction + 90;
@@ -256,6 +264,14 @@ export function WindArrow({ direction }) {
     `;
 }
 
+/**
+ * @param {Object} props
+ * @param {Object} props.data
+ * @param {number} props.data.speed
+ * @param {number} props.data.direction
+ * @param {string} props.columnClass
+ * @param {string} props.height
+ */
 export function WindCell({ data, columnClass, height }) {
     if (!data) return html`<td class=${columnClass}>-</td>`;
 
@@ -279,12 +295,21 @@ export function WindCell({ data, columnClass, height }) {
     `;
 }
 
+/**
+ * @param {Object} props
+ * @param {string} props.title
+ * @param {OpenMeteoDayData} props.tableData
+ */
 export function WindTable({ title, tableData }) {
     if (!tableData) return null;
 
     const currentHour = new Date().getHours();
     const blockStartHour = Math.floor(currentHour / 3) * 3;
 
+    /**
+     * @param {string}  hour
+     * @param {boolean} isCurrentBlock
+     */
     function getColumnClass(hour, isCurrentBlock) {
         if (title === "Tänään") {
             if (isCurrentBlock) return "current-column";
@@ -336,7 +361,9 @@ export function WindTable({ title, tableData }) {
                                 ]) => html`
                                     <${WindCell}
                                         key=${hour}
-                                        data=${hourData[pressure.split(" ")[0]]}
+                                        data=${hourData[
+                                            pressure.split(" ")[0] ?? ""
+                                        ]}
                                         columnClass=${getColumnClass(
                                             hour,
                                             isCurrentBlock,
@@ -389,6 +416,7 @@ export function OpenMeteoRaw() {
 
     const renderTable = () => {
         const hourly = data.hourly;
+
         /** @type {number[]} */
         const timeSlots = hourly.time.map((time) => new Date(time).getHours());
 
