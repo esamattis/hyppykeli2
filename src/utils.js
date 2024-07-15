@@ -196,8 +196,20 @@ export function FromNow(props) {
             return "";
         }
 
+        const diffInMinutes = Math.round(
+            -(Date.now() - props.date.getTime()) / 1000 / 60,
+        );
+
+        if (Math.abs(diffInMinutes) > 120) {
+            const diffInHours = Math.round(diffInMinutes / 60);
+            return new Intl.RelativeTimeFormat("fi").format(
+                diffInHours,
+                "hours",
+            );
+        }
+
         return new Intl.RelativeTimeFormat("fi").format(
-            Math.round(-(Date.now() - props.date.getTime()) / 1000 / 60),
+            diffInMinutes,
             "minutes",
         );
     }, [props.date]);
