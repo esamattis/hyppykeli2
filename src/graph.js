@@ -136,11 +136,12 @@ export function Graph() {
         obsChart.options.onHover = createHoverHandler(OBSERVATIONS, true);
         foreChart.options.onHover = createHoverHandler(FORECASTS, false);
 
-        effect(() => {
+        const unsubsribe = effect(() => {
             updateCharts(obsChart, foreChart);
         });
 
         return () => {
+            unsubsribe();
             obsChart.destroy();
             foreChart.destroy();
         };
