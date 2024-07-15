@@ -82,10 +82,10 @@ export function Compass() {
               <circle cx="200" cy="200" r=${studentCircle} stroke="orange" stroke-width="2" fill="none" />
 
               <!-- Directions Text -->
-              <text x="200" y="40" font-size="40" text-anchor="middle" fill="black">N</text>
-              <text x="20" y="210" font-size="40" text-anchor="middle" fill="black">W</text>
-              <text x="200" y="390" font-size="40" text-anchor="middle" fill="black">S</text>
-              <text x="380" y="210" font-size="40" text-anchor="middle" fill="black">E</text>
+              <text x="200" y="40" font-weight="bold" font-family="monospace" font-size="40" text-anchor="middle" fill="black">N</text>
+              <text x="20" y="210" font-weight="bold" font-family="monospace" font-size="40" text-anchor="middle" fill="black">W</text>
+              <text x="200" y="390" font-weight="bold" font-family="monospace" font-size="40" text-anchor="middle" fill="black">S</text>
+              <text x="380" y="210" font-weight="bold" font-family="monospace" font-size="40" text-anchor="middle" fill="black">E</text>
               <${Needle} />
               <${WindVariations} />
               <text
