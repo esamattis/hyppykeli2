@@ -790,7 +790,6 @@ function ForecastLocationInfo() {
 }
 
 export function Root() {
-    const history = !!HOVERED_OBSERVATION.value;
     const latestMetar = METARS.value?.[0];
     const isCompassView = window.location.hash === "#compass";
 
@@ -813,7 +812,6 @@ export function Root() {
             }
 
             <h1 id="title">
-                <a class="logo" href="/"> Hyppykeli</a> –${" "}
                 <span id="title">${NAME}</span>
             </h1>
 
