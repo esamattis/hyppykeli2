@@ -380,30 +380,20 @@ export function WindTable({ title, tableData }) {
     `;
 }
 
-export function OpenMeteoTool({ showDays = "both" }) {
+/**
+ * @param {Object} props
+ * @param {boolean} props.tomorrow
+ */
+export function OpenMeteoTool({ tomorrow }) {
     const data = OM_DATA.value ? formatTableData(OM_DATA.value.hourly) : null;
 
     if (!data) return html`<div>Loading...</div>`;
 
     return html`
-        <div>
-            ${showDays === "today" || showDays === "both"
-                ? html`<div class="today-section">
-                      <${WindTable}
-                          title="Tänään"
-                          tableData=${data.todayData}
-                      />
-                  </div>`
-                : null}
-            ${showDays === "tomorrow" || showDays === "both"
-                ? html`<div class="tomorrow-section">
-                      <${WindTable}
-                          title="Huomenna"
-                          tableData=${data.tomorrowData}
-                      />
-                  </div>`
-                : null}
-        </div>
+        <${WindTable}
+            title=${tomorrow ? "Huomenna" : "Tänään"}
+            tableData=${tomorrow ? data.tomorrowData : data.todayData}
+        />
     `;
 }
 
