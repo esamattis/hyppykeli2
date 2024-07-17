@@ -6,12 +6,20 @@
         <link rel="stylesheet" href="/styles.css" />
         <title>Parempi Hyppykeli</title>
         <script type="module">
+            const usingBackButton =
+                window.performance?.navigation.type ===
+                window.performance.navigation.TYPE_BACK_FORWARD;
+
             const params = new URLSearchParams(window.location.search);
             const redirectName =
                 new URLSearchParams(window.location.search).get("dz") ??
                 localStorage.getItem("previous_dz");
 
-            if (redirectName && !params.has("no_redirect")) {
+            if (
+                redirectName &&
+                !params.has("no_redirect") &&
+                !usingBackButton
+            ) {
                 const dz = Array.from(
                     document.querySelectorAll(".dz-list a"),
                 ).find((a) =>
@@ -25,6 +33,7 @@
                     window.location.href = dz.href;
                 }
             }
+
             document
                 .querySelector(".dz-list")
                 .addEventListener("click", (e) => {
