@@ -273,7 +273,10 @@ export function WindArrow({ direction }) {
  * @param {string} props.height
  */
 export function WindCell({ data, columnClass, height }) {
-    if (!data) return html`<td class=${columnClass}>-</td>`;
+    if (!data)
+        return html`
+            <td class=${columnClass}>-</td>
+        `;
 
     const { speed, direction } = data;
     const speedInMS = Math.round(speed / 3.6);
@@ -387,7 +390,10 @@ export function WindTable({ title, tableData }) {
 export function OpenMeteoTool({ tomorrow }) {
     const data = OM_DATA.value ? formatTableData(OM_DATA.value.hourly) : null;
 
-    if (!data) return html`<div>Loading...</div>`;
+    if (!data)
+        return html`
+            <div>Loading...</div>
+        `;
 
     return html`
         <${WindTable}
@@ -401,7 +407,9 @@ export function OpenMeteoRaw() {
     const data = OM_DATA.value;
 
     if (!data) {
-        return html`<div>Loading...</div>`;
+        return html`
+            <div>Loading...</div>
+        `;
     }
 
     const renderTable = () => {
@@ -415,7 +423,11 @@ export function OpenMeteoRaw() {
                 <thead>
                     <tr>
                         <th>Height</th>
-                        ${timeSlots.map((hour) => html`<th>${hour}:00</th>`)}
+                        ${timeSlots.map(
+                            (hour) => html`
+                                <th>${hour}:00</th>
+                            `,
+                        )}
                     </tr>
                 </thead>
                 <tbody>
@@ -446,5 +458,7 @@ export function OpenMeteoRaw() {
         `;
     };
 
-    return html`<div>${renderTable()}</div>`;
+    return html`
+        <div>${renderTable()}</div>
+    `;
 }

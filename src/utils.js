@@ -155,7 +155,10 @@ export class ErrorBoundary extends Component {
     render() {
         if (this.state.hasError) {
             return (
-                this.props.fallback ?? html`<div>Tässä tapahtui virhe :(</div>`
+                this.props.fallback ??
+                html`
+                    <div>Tässä tapahtui virhe :(</div>
+                `
             );
         }
 
@@ -220,8 +223,10 @@ export function FromNow(props) {
 
     const fromNow = useInterval(createFromNow);
 
-    return html`<span class="from-now">${fromNow}</span>
-        <small> (klo ${formatClock(props.date)}) </small> `;
+    return html`
+        <span class="from-now">${fromNow}</span>
+        <small>(klo ${formatClock(props.date)})</small>
+    `;
 }
 
 /**

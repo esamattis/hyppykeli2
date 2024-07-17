@@ -155,7 +155,7 @@ export function Graph() {
         <div id="observations-graph">
             <h2>
                 Havainnot
-                <span class="date"> ${formatDate(new Date())} </span>
+                <span class="date">${formatDate(new Date())}</span>
             </h2>
             <div class="chart" onMouseLeave=${onMouseLeaveObs}>
                 <canvas ref=${obsChartRef}></canvas>

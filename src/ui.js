@@ -138,24 +138,28 @@ function ForecastTHead() {
  */
 function ForecastRows(props) {
     return props.data.map((point) => {
-        return html`<tr class="forecast-row">
-            <td title=${point.time.toString()}>${formatClock(point.time)}</td>
-            <td class=${getWarningLevel(point.gust)}>${point.gust} m/s</td>
-            <td>${point.speed} m/s</td>
-            <td>
-                <${WindDirection} direction=${point.direction} />
-            </td>
-            <td>
-                <${PieChart} percentage=${point.lowCloudCover ?? 0} />
-                ${point.lowCloudCover?.toFixed(0) ?? "-1"}%
-            </td>
-            <td>
-                <${PieChart} percentage=${point.middleCloudCover ?? 0} />
-                ${point.middleCloudCover?.toFixed(0) ?? "-1"}%
-            </td>
-            <td>${point.rain?.toFixed(0)}%</td>
-            <td>${point.temperature?.toFixed(1)} °C</td>
-        </tr> `;
+        return html`
+            <tr class="forecast-row">
+                <td title=${point.time.toString()}>
+                    ${formatClock(point.time)}
+                </td>
+                <td class=${getWarningLevel(point.gust)}>${point.gust} m/s</td>
+                <td>${point.speed} m/s</td>
+                <td>
+                    <${WindDirection} direction=${point.direction} />
+                </td>
+                <td>
+                    <${PieChart} percentage=${point.lowCloudCover ?? 0} />
+                    ${point.lowCloudCover?.toFixed(0) ?? "-1"}%
+                </td>
+                <td>
+                    <${PieChart} percentage=${point.middleCloudCover ?? 0} />
+                    ${point.middleCloudCover?.toFixed(0) ?? "-1"}%
+                </td>
+                <td>${point.rain?.toFixed(0)}%</td>
+                <td>${point.temperature?.toFixed(1)} °C</td>
+            </tr>
+        `;
     });
 }
 
@@ -198,15 +202,18 @@ function WindDirection(props) {
     return html`
         <span>
             ${props.value !== false
-                ? html`<span class="direction-value">
-                      ${props.direction.toFixed(0)}°
-                  </span>`
+                ? html`
+                      <span class="direction-value">
+                          ${props.direction.toFixed(0)}°
+                      </span>
+                  `
                 : null}
             <span
                 class="direction"
                 style=${{ "--direction": props.direction - 180 + "deg" }}
-                >↑</span
             >
+                ↑
+            </span>
         </span>
     `;
 }
@@ -224,9 +231,7 @@ function DataTable(props) {
 
     return html`
         <table class="weather-table">
-            <thead>
-                ${props.thead}
-            </thead>
+            <thead>${props.thead}</thead>
             <tbody>
                 <${props.Rows} data=${data} />
             </tbody>
@@ -247,7 +252,9 @@ function LatestWind() {
     const history = !!HOVERED_OBSERVATION.value;
     const latest = HOVERED_OBSERVATION.value || OBSERVATIONS.value[0];
     if (!latest) {
-        return html`<p>Ladataan tuulitietoja...</p>`;
+        return html`
+            <p>Ladataan tuulitietoja...</p>
+        `;
     }
 
     return html`
@@ -290,8 +297,12 @@ function GustTrend() {
     return html`
         <div title=${`Ero ${trend.toFixed(1)}m/s`}>
             ${trend > 0
-                ? html`Mahdollisesti voimistuva ↗ ${help}`
-                : html`Mahdollisesti heikkenevä ↘ ${help}`}
+                ? html`
+                      Mahdollisesti voimistuva ↗ ${help}
+                  `
+                : html`
+                      Mahdollisesti heikkenevä ↘ ${help}
+                  `}
         </div>
     `;
 }
@@ -331,7 +342,9 @@ function LatestMetar() {
     const latest = METARS.value?.at(-1);
 
     if (!latest) {
-        return html`<p>Ladataan METAR-sanomaa...</p>`;
+        return html`
+            <p>Ladataan METAR-sanomaa...</p>
+        `;
     }
 
     let msg = "";
@@ -347,17 +360,20 @@ function LatestMetar() {
     return html`
         <ul>
             ${msg
-                ? html`<p>${msg}</p>`
+                ? html`
+                      <p>${msg}</p>
+                  `
                 : latest.clouds.map(
-                      (cloud, i) =>
-                          html`<li>
-                              <a href=${cloud.href}
-                                  >${CLOUD_TYPES[cloud.amount] ??
-                                  cloud.amount}</a
-                              >${" "}
+                      (cloud, i) => html`
+                          <li>
+                              <a href=${cloud.href}>
+                                  ${CLOUD_TYPES[cloud.amount] ?? cloud.amount}
+                              </a>
+                              ${" "}
                               ${hectoFeetToMeters(cloud.base).toFixed(0)}M
                               ${" "}
-                          </li>`,
+                          </li>
+                      `,
                   )}
         </ul>
 
@@ -383,7 +399,7 @@ function UpdateButton() {
             Päivitä
         </button>
         <br />
-        <small> Tiedot päivitetään automaattisesti minuutin välein. </small>
+        <small>Tiedot päivitetään automaattisesti minuutin välein.</small>
     `;
 }
 
@@ -586,16 +602,22 @@ export function SideMenu() {
 
             <p>
                 ${FORECAST_DAY.value === 0
-                    ? html`<a
-                          onClick=${asInPageNavigation}
-                          href="${getQs({ forecast_day: "1" })}"
-                          >Näytä huomisen ennuste</a
-                      >`
-                    : html`<a
-                          onClick=${asInPageNavigation}
-                          href="${getQs({ forecast_day: undefined })}"
-                          >Näytä tämän päivän ennuste</a
-                      >`}
+                    ? html`
+                          <a
+                              onClick=${asInPageNavigation}
+                              href="${getQs({ forecast_day: "1" })}"
+                          >
+                              Näytä huomisen ennuste
+                          </a>
+                      `
+                    : html`
+                          <a
+                              onClick=${asInPageNavigation}
+                              href="${getQs({ forecast_day: undefined })}"
+                          >
+                              Näytä tämän päivän ennuste
+                          </a>
+                      `}
             </p>
 
             <form>
@@ -627,13 +649,16 @@ export function SideMenu() {
                     href="${QUERY_PARAMS.value.high_winds_details
                         ? "#high-winds-details"
                         : "#high-winds-today"}"
-                    >Ylätuuliennusteet</a
                 >
+                    Ylätuuliennusteet
+                </a>
             </p>
 
             <h2>DZs</h2>
             ${OTHER_DZs.value.map(
-                (dz) => html`<p><a href=${dz.href}>${dz.title}</a></p>`,
+                (dz) => html`
+                    <p><a href=${dz.href}>${dz.title}</a></p>
+                `,
             )}
 
             <h2>Ongelmia?</h2>
@@ -647,7 +672,9 @@ export function SideMenu() {
             <form onSubmit=${downloadDataDump}>
                 <select name="storedQuery">
                     ${Object.keys(RAW_DATA.value).map(
-                        (key) => html` <option value=${key}>${key}</option> `,
+                        (key) => html`
+                            <option value=${key}>${key}</option>
+                        `,
                     )}
                 </select>
                 <button type="submit" name="mode" value="download">
@@ -673,8 +700,9 @@ export function SideMenu() {
                 <a
                     onClick=${asInPageNavigation}
                     href=${getQs({ css: btoa(EXAMPLE_CSS) })}
-                    >tästä</a
                 >
+                    tästä
+                </a>
             </p>
             <${CSSEditor} />
         </div>
@@ -709,9 +737,9 @@ function RenderInjectedCSS() {
         return null;
     }
 
-    return html`<style
-        dangerouslySetInnerHTML=${{ __html: atob(css) }}
-    ></style>`;
+    return html`
+        <style dangerouslySetInnerHTML=${{ __html: atob(css) }}></style>
+    `;
 }
 
 export function StickyFooter() {
@@ -805,8 +833,10 @@ function ForecastLocationInfo() {
         <a
             href="https://www.google.fi/maps/place/${FORECAST_COORDINATES.value ||
             STATION_COORDINATES.value}"
-            >${FORECAST_LOCATION_NAME.value}</a
-        >.
+        >
+            ${FORECAST_LOCATION_NAME.value}
+        </a>
+        .
     `;
 }
 
@@ -869,7 +899,9 @@ export function Root() {
                     ? html`
                           <div class="errors">
                               ${ERRORS.value.map((error) => {
-                                  return html` <p>${error}</p> `;
+                                  return html`
+                                      <p>${error}</p>
+                                  `;
                               })}
                           </div>
                       `
@@ -888,8 +920,10 @@ export function Root() {
                               havaintoasemalta${" "}
                               <a
                                   href="https://www.google.fi/maps/place/${STATION_COORDINATES.value}"
-                                  >${STATION_NAME}</a
-                              >.${" "}
+                              >
+                                  ${STATION_NAME}
+                              </a>
+                              .${" "}
 
                               <${ForecastLocationInfo} />
                           `
@@ -945,7 +979,9 @@ export function Root() {
                 <div class="side-scroll">
                     <${DataTable}
                         data=${OBSERVATIONS}
-                        thead=${html`<${ObservationTHead} />`}
+                        thead=${html`
+                            <${ObservationTHead} />
+                        `}
                         Rows=${ObservationRows}
                     />
                 </div>
@@ -971,7 +1007,9 @@ export function Root() {
                 <div class="side-scroll">
                     <${DataTable}
                         data=${FORECASTS}
-                        thead=${html`<${ForecastTHead} />`}
+                        thead=${html`
+                            <${ForecastTHead} />
+                        `}
                         Rows=${ForecastRows}
                     />
                 </div>
