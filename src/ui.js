@@ -308,11 +308,20 @@ function GustTrend() {
 }
 
 /**
- * @param {number} hectoMeters
+ * @param {number} value
+ * @param {string} unit
  * @returns {number}
  */
-function hectoFeetToMeters(hectoMeters) {
-    return hectoMeters * 30.48;
+function toMeters(value, unit) {
+    if (unit === "hft") {
+        return value * 30.48;
+    }
+
+    if (unit === "ft") {
+        return value * 0.3048;
+    }
+
+    return value;
 }
 
 // const CLOUDS = {
@@ -370,8 +379,7 @@ function LatestMetar() {
                                   ${CLOUD_TYPES[cloud.amount] ?? cloud.amount}
                               </a>
                               ${" "}
-                              ${hectoFeetToMeters(cloud.base).toFixed(0)}M
-                              ${" "}
+                              ${toMeters(cloud.base, cloud.unit).toFixed(0)}M
                           </li>
                       `,
                   )}
@@ -938,7 +946,7 @@ export function Root() {
                         : null
                 }
                 <span class="disclaimer">
-                    Tietojen käyttö omalla vastuulla. Ei takeita että tiedot
+                    ${" "}Tietojen käyttö omalla vastuulla. Ei takeita että tiedot
                     ovat oikein.
                 </span>
             </div>

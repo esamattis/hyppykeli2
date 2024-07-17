@@ -86,7 +86,7 @@ interface WeatherData {
 interface CloudLayer {
     base: number;
     amount: string;
-    unit?: string;
+    unit: string;
     href?: string;
 }
 

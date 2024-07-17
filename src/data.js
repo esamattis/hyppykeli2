@@ -650,6 +650,7 @@ function setMETARSfromMetarMessage(metars) {
                     return {
                         amount: cloud.abbreviation,
                         base: cloud.altitude,
+                        unit: "ft",
                     };
                 }) ?? [],
         };
