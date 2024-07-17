@@ -240,10 +240,6 @@ a[href^="http"]:not([href*="hyppykeli.fi"]):visited {
     text-decoration: none;
 }
 
-input[type="text"] {
-    width: 10ch;
-}
-
 .errors p {
     color: red;
 }
