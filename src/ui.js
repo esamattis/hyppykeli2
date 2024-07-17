@@ -367,9 +367,7 @@ function LatestMetar() {
     const metar = METARS.value?.at(-1);
 
     if (!metar) {
-        return html`
-            <p>Ladataan METAR-sanomaa...</p>
-        `;
+        return null;
     }
 
     let msg = "";

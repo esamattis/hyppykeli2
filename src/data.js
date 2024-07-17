@@ -782,7 +782,7 @@ export async function updateWeatherData() {
             fetchFmiMetar(icaocode, obsStartTime, cacheBust);
         }
     } else {
-        addError("Lentokenttä tunnus (ICAO) puuttuu.");
+        addError("Ei METAR tietoja.");
     }
 
     const doc = await fmiRequest(
