@@ -623,7 +623,7 @@ export function SideMenu() {
         >
             <h1>${NAME.value}</h1>
 
-            <a href="/">Etusivulle</a>
+            <a href="/?no_redirect">Etusivulle</a>
 
             <h2>Ennuste</h2>
 

@@ -6,11 +6,12 @@
         <link rel="stylesheet" href="/styles.css" />
         <title>Parempi Hyppykeli</title>
         <script type="module">
-            const redirectName = new URLSearchParams(
-                window.location.search,
-            ).get("dz");
+            const params = new URLSearchParams(window.location.search);
+            const redirectName =
+                new URLSearchParams(window.location.search).get("dz") ??
+                localStorage.getItem("previous_dz");
 
-            if (redirectName) {
+            if (redirectName && !params.has("no_redirect")) {
                 const dz = Array.from(
                     document.querySelectorAll(".dz-list a"),
                 ).find((a) =>
@@ -24,6 +25,16 @@
                     window.location.href = dz.href;
                 }
             }
+            document
+                .querySelector(".dz-list")
+                .addEventListener("click", (e) => {
+                    if (e.target.tagName === "A") {
+                        localStorage.setItem(
+                            "previous_dz",
+                            e.target.textContent.trim(),
+                        );
+                    }
+                });
         </script>
     </head>
     <body>
