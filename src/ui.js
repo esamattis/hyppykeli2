@@ -318,10 +318,13 @@ function hectoFeetToMeters(hectoMeters) {
  * @type {Record<string, string>}
  */
 const CLOUD_TYPES = {
-    1: "Muutamia", // Few
-    2: "Hajanaisia", // Scattered
-    3: "Rikkonainen", // Broken
-    4: "Täysi pilvikatto", // Overcast
+    NCD: "Ei pilviä",
+    VV: "SUMUA PERKELE",
+    NSC: "Yksittäisiä",
+    FEW: "Muutamia",
+    SCT: "Hajanaisia",
+    BKN: "Rakoileva",
+    OVC: "Täysi pilvikatto",
 };
 
 function LatestMetar() {
@@ -893,7 +896,7 @@ export function Root() {
                         : "Ladataan..."
                 }
                 ${
-                    latestMetar
+                    latestMetar?.elevation !== undefined
                         ? html`
                               ${" "}Lentokentän korkeus meren pinnasta${" "}
                               ${latestMetar.elevation.toFixed(0)}M. ${" "}

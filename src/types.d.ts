@@ -86,8 +86,8 @@ interface WeatherData {
 interface CloudLayer {
     base: number;
     amount: string;
-    unit: string;
-    href: string;
+    unit?: string;
+    href?: string;
 }
 
 /**
@@ -97,7 +97,7 @@ interface MetarData {
     clouds: CloudLayer[];
     metar: string;
     time: Date;
-    elevation: number;
+    elevation?: number;
 }
 
 /**
@@ -116,6 +116,7 @@ interface QueryParams {
     gust?: string;
     css?: string;
     high_winds_details?: string;
+    flyk_metar?: string;
 }
 
 /**
@@ -125,3 +126,86 @@ type StoredQuery =
     | "fmi::avi::observations::iwxxm"
     | "fmi::observations::weather::timevaluepair"
     | "fmi::forecast::edited::weather::scandinavia::point::timevaluepair";
+
+interface FlykMetar {
+    type: string;
+    features: FlykMetarFeature[];
+}
+
+interface FlykMetarFeature {
+    type: string;
+    geometry: FlykMetarGeometry;
+    properties: FlykMetarProperties;
+}
+
+interface FlykMetarGeometry {
+    type: string;
+    coordinates: number[];
+}
+
+interface FlykMetarProperties {
+    text: string;
+    code: string;
+    day: number;
+    date: string;
+    time: string;
+    auto: boolean;
+    wind: number;
+    windDirection: number;
+    visibility: string;
+    temp: number;
+    dewpoint: number;
+    pressure: number;
+    humidity: number;
+    cavok: boolean;
+    cloudiness: string;
+    cloudbase: number;
+    cloudbaseMeters: number;
+    higherClouds: any[];
+    ceiling: {
+        code: string;
+        feet_agl: number;
+        meters_agl: number;
+    };
+    lat: number;
+    lng: number;
+    parsed: string;
+    name: string;
+    textOffset: number[];
+    iconImage: string;
+}
+
+interface MetarJSResponse {
+    type: "METAR";
+    correction: boolean;
+    station: string;
+    time: string;
+    auto: boolean;
+    wind: {
+        speed: number;
+        gust: number | null;
+        direction: number;
+        variation: number | null;
+        unit: string;
+    };
+    cavok: boolean;
+    visibility: number;
+    visibilityVariation: number | null;
+    visibilityVariationDirection: string | null;
+    weather: {
+        abbreviation: string;
+        meaning: string;
+    }[];
+    clouds?: {
+        abbreviation: string;
+        meaning: string;
+        altitude: number;
+        cumulonimbus: boolean;
+    }[];
+    temperature: number;
+    dewpoint: number;
+    altimeterInHpa: number;
+}
+
+declare module "metar" {}
+declare function parseMETAR(metarString: string): MetarJSResponse;

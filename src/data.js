@@ -3,6 +3,8 @@
 import { computed, signal } from "@preact/signals";
 import { calculateDirectionDifference, removeNullish } from "./utils.js";
 import { fetchHighWinds } from "./om.js";
+// just exposes the parseMETAR global
+import "metar";
 
 /**
  * @type {Signal<string|undefined>}
@@ -421,12 +423,21 @@ function parseCloudsXml(xml) {
             // https://codes.wmo.int/bufr4/codeflag/0-20-008/1
             const amount = new URL(amountHref).pathname.split("/").pop();
 
+            /** @type {Record<string, string>} */
+            const cloudAmounts = {
+                1: "FEW", // Few, FEW
+                2: "SCT", // Scattered, SCT
+                3: "BKN", // Broken, BKN
+                4: "OVC", // Overcast, OVC
+                // TODO: There are more types of clouds. Where to get the full list?
+            };
+
             if (!amount) {
                 return [];
             }
 
             return {
-                amount,
+                amount: cloudAmounts[amount] ?? amount,
                 base: Number(base?.innerHTML),
                 unit: base?.getAttribute("uom") ?? "?",
                 href: amountHref,
@@ -599,6 +610,46 @@ async function fetchFmiMetar(icaocode, startTime, cacheBust) {
     METARS.value = clouds;
 }
 
+/**
+ * Fetches METAR data from the Flyk API for a given ICAO code.
+ *
+ * @param {string} icaocode - The ICAO code of the airport.
+ */
+async function fetchFlykMetar(icaocode) {
+    const res = await fetch("https://flyk.com/api/metars.geojson");
+    /** @type {FlykMetar} */
+    const json = await res.json();
+
+    const features = json.features.find((f) => f.properties.code === icaocode);
+    return features?.properties.text;
+}
+
+/**
+ * @param {string[]} metars
+ */
+function setMETARSfromMetarMessage(metars) {
+    const parsed = metars.map((metar) => {
+        const m = parseMETAR(metar);
+
+        /** @type MetarData */
+        const metarData = {
+            time: new Date(m.time),
+            metar,
+            clouds:
+                m.clouds?.map((cloud) => {
+                    return {
+                        amount: cloud.abbreviation,
+                        base: cloud.altitude,
+                    };
+                }) ?? [],
+        };
+
+        return metarData;
+    });
+
+    METARS.value = parsed;
+}
+
 export async function updateWeatherData() {
     ERRORS.value = [];
     const fmisid = QUERY_PARAMS.value.fmisid;
@@ -621,7 +672,15 @@ export async function updateWeatherData() {
 
     if (icaocode) {
         // intentionally not awaiting, it can be updated on the background
-        fetchFmiMetar(icaocode, obsStartTime, cacheBust);
+        if (QUERY_PARAMS.value.flyk_metar) {
+            fetchFlykMetar(icaocode).then((metars) => {
+                if (metars) {
+                    setMETARSfromMetarMessage([metars]);
+                }
+            });
+        } else {
+            fetchFmiMetar(icaocode, obsStartTime, cacheBust);
+        }
     } else {
         addError("Lentokenttä tunnus (ICAO) puuttuu.");
     }
