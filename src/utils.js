@@ -225,6 +225,7 @@ export function FromNow(props) {
 
     return html`
         <span class="from-now">${fromNow}</span>
+        ${" "}
         <small>(klo ${formatClock(props.date)})</small>
     `;
 }

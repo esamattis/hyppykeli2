@@ -19,6 +19,7 @@ button {
     grid-area: info;
     width: calc(100vw - 30px - var(--compass-width));
     max-width: 750px;
+    line-height: 1.8;
 }
 
 #clouds {
@@ -192,10 +193,6 @@ a:visited {
 .ball {
     display: inline-block;
     transform: scale(2);
-}
-
-.info * {
-    line-height: 1.5;
 }
 
 .sticky-footer .item .icon,
