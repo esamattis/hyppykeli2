@@ -857,7 +857,7 @@ function ForecastLocationInfo() {
         >
             ${FORECAST_LOCATION_NAME.value}
         </a>
-        .
+        . ${" "}
     `;
 }
 
@@ -910,9 +910,48 @@ function HighWinds() {
     `;
 }
 
-export function Root() {
+function Info() {
     const latestMetar = METARS.value?.[0];
 
+    return html`
+        <div id="info">
+            ${STATION_NAME.value
+                ? html`
+                      Havaintotiedot haettu Ilmatieteenlaitoksen
+                      havaintoasemalta${" "}
+                      <a
+                          href="https://www.google.fi/maps/place/${STATION_COORDINATES.value}"
+                      >
+                          ${STATION_NAME}
+                      </a>
+                      .${" "}
+
+                      <${ForecastLocationInfo} />
+                  `
+                : "Ladataan... "}
+            ${latestMetar?.elevation !== undefined
+                ? html`
+                      ${" "}Lentokentän korkeus meren pinnasta${" "}
+                      ${latestMetar.elevation.toFixed(0)}M. ${" "}
+                  `
+                : null}
+            ${QUERY_PARAMS.value.flyk_metar
+                ? html`
+                      METAR-sanomat tarjoaa ${" "}
+                      <a href="https://flyk.com">flyk.com</a>
+                      ${" "}
+                  `
+                : null}
+
+            <div class="disclaimer">
+                ${" "}Tietojen käyttö omalla vastuulla. Ei takeita että tiedot
+                ovat oikein.
+            </div>
+        </div>
+    `;
+}
+
+export function Root() {
     return html`
         <div class="content grid">
             ${
@@ -933,36 +972,8 @@ export function Root() {
                 <span id="title">${NAME}</span>
             </h1>
 
-            <div id="info">
-                ${
-                    STATION_NAME.value
-                        ? html`
-                              Tiedot haettu Ilmatieteenlaitoksen
-                              havaintoasemalta${" "}
-                              <a
-                                  href="https://www.google.fi/maps/place/${STATION_COORDINATES.value}"
-                              >
-                                  ${STATION_NAME}
-                              </a>
-                              .${" "}
 
-                              <${ForecastLocationInfo} />
-                          `
-                        : "Ladataan..."
-                }
-                ${
-                    latestMetar?.elevation !== undefined
-                        ? html`
-                              ${" "}Lentokentän korkeus meren pinnasta${" "}
-                              ${latestMetar.elevation.toFixed(0)}M. ${" "}
-                          `
-                        : null
-                }
-                <span class="disclaimer">
-                    ${" "}Tietojen käyttö omalla vastuulla. Ei takeita että tiedot
-                    ovat oikein.
-                </span>
-            </div>
+            <${Info}/>
 
             <div class="clouds" id="clouds">
                 <h2 class="h2-with-icon">
