@@ -616,6 +616,9 @@ export function SideMenu() {
             onClick=${closeMenuOnLinkClick}
         >
             <h1>${NAME.value}</h1>
+
+            <a href="/">Etusivulle</a>
+
             <h2>Ennuste</h2>
 
             <p>
