@@ -25,6 +25,7 @@ import {
     QUERY_PARAMS,
     navigateQs,
     getQs,
+    LATEST_OBSERVATION,
 } from "./data.js";
 
 import { Graph } from "./graph.js";
@@ -38,6 +39,7 @@ import {
     FromNow,
     Help,
     humanDayText,
+    isValidObservation,
     ResizeRecreate,
     saveTextToFile,
 } from "./utils.js";
@@ -88,12 +90,14 @@ function ObservationRows(props) {
                 <td title=${point.time.toString()}>
                     ${formatClock(point.time)}
                 </td>
-                <td class=${getWarningLevel(point.gust)}>${point.gust} m/s</td>
+                <td class=${getWarningLevel(point.gust ?? 0)}>
+                    ${point.gust ?? -1} m/s
+                </td>
                 <td>${point.speed} m/s</td>
                 <td>
                     <${WindDirection} direction=${point.direction} />
                 </td>
-                <td>${point.temperature.toFixed(1)} °C</td>
+                <td>${point.temperature?.toFixed(1)} °C</td>
             </tr>
         `;
     });
@@ -143,7 +147,9 @@ function ForecastRows(props) {
                 <td title=${point.time.toString()}>
                     ${formatClock(point.time)}
                 </td>
-                <td class=${getWarningLevel(point.gust)}>${point.gust} m/s</td>
+                <td class=${getWarningLevel(point.gust ?? 0)}>
+                    ${point.gust} m/s
+                </td>
                 <td>${point.speed} m/s</td>
                 <td>
                     <${WindDirection} direction=${point.direction} />
@@ -253,15 +259,15 @@ function DataTable(props) {
 
 function LatestWind() {
     const history = !!HOVERED_OBSERVATION.value;
-    const latest = HOVERED_OBSERVATION.value || OBSERVATIONS.value[0];
+    const obs = HOVERED_OBSERVATION.value || LATEST_OBSERVATION.value;
 
-    if (!latest) {
+    if (!obs) {
         return html`
             <p>Ladataan tuulitietoja...</p>
         `;
     }
 
-    if (latest.direction === -1 && latest.speed === -1 && latest.gust === -1) {
+    if (!isValidObservation(obs)) {
         return html`
             <p>Ei havaintoja :(</p>
         `;
@@ -272,23 +278,23 @@ function LatestWind() {
             Puuska
             <span
                 class=${"latest-value latest-gust " +
-                getWarningLevel(latest.gust)}
+                getWarningLevel(obs.gust ?? 0)}
             >
-                ${" "}${latest.gust} m/s${" "}
+                ${" "}${obs.gust?.toFixed(1) ?? "?"} m/s${" "}
             </span>
             Tuuli
             <span class="latest-value latest-wind">
-                ${" "}${latest.speed} m/s${" "}
+                ${" "}${obs.speed?.toFixed(1) ?? "?"} m/s${" "}
             </span>
 
             Suunta${" "}
             <span class="latest-value latest-wind">
-                ${" "}${latest.direction}°${" "}
+                ${" "}${obs.direction?.toFixed(0)}°${" "}
             </span>
             ${" "}
 
             <br />
-            <${FromNow} date=${latest.time} />
+            <${FromNow} date=${obs.time} />
 
             <br />
             <${GustTrend} />
@@ -358,9 +364,9 @@ const CLOUD_TYPES = {
 };
 
 function LatestMetar() {
-    const latest = METARS.value?.at(-1);
+    const metar = METARS.value?.at(-1);
 
-    if (!latest) {
+    if (!metar) {
         return html`
             <p>Ladataan METAR-sanomaa...</p>
         `;
@@ -368,8 +374,8 @@ function LatestMetar() {
 
     let msg = "";
 
-    if (latest?.clouds.length === 0) {
-        if (latest.metar.includes("CAVOK")) {
+    if (metar?.clouds.length === 0) {
+        if (metar.metar.includes("CAVOK")) {
             msg = "Ei pilviä alle 1500M (CAVOK)";
         } else {
             msg = "Ei tietoa pilvistä";
@@ -382,7 +388,7 @@ function LatestMetar() {
                 ? html`
                       <p>${msg}</p>
                   `
-                : latest.clouds.map(
+                : metar.clouds.map(
                       (cloud, i) => html`
                           <li>
                               <a href=${cloud.href}>
@@ -396,10 +402,10 @@ function LatestMetar() {
         </ul>
 
         <p>
-            <${FromNow} date=${latest.time} />
+            <${FromNow} date=${metar.time} />
 
             <br />
-            <em class="metar">${latest.metar}</em>
+            <em class="metar">${metar.metar}</em>
         </p>
     `;
 }
@@ -828,7 +834,7 @@ function Anvil() {
 }
 
 function Parachute() {
-    const latestGust = OBSERVATIONS.value?.[0]?.gust ?? 0;
+    const latestGust = LATEST_OBSERVATION.value?.gust ?? 0;
     const level = getWarningLevel(latestGust);
 
     let animation = "";
@@ -911,7 +917,7 @@ function HighWinds() {
 }
 
 function Info() {
-    const latestMetar = METARS.value?.[0];
+    const metar = METARS.value?.[0];
 
     return html`
         <div id="info">
@@ -929,10 +935,10 @@ function Info() {
                       <${ForecastLocationInfo} />
                   `
                 : "Ladataan... "}
-            ${latestMetar?.elevation !== undefined
+            ${metar?.elevation !== undefined
                 ? html`
                       ${" "}Lentokentän korkeus meren pinnasta${" "}
-                      ${latestMetar.elevation.toFixed(0)}M. ${" "}
+                      ${metar.elevation.toFixed(0)}M. ${" "}
                   `
                 : null}
             ${QUERY_PARAMS.value.flyk_metar

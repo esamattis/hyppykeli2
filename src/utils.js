@@ -231,6 +231,22 @@ export function FromNow(props) {
 }
 
 /**
+ * @param {string|undefined} value
+ * @returns {{ value: number | null }}
+ */
+export function safeParseNumber(value) {
+    if (value === undefined) {
+        return { value: null };
+    }
+
+    if (/^\d*\.?\d+$/.test(value.trim())) {
+        return { value: parseInt(value.trim(), 10) };
+    }
+
+    return { value: null };
+}
+
+/**
  * @param {Object} props
  * @param {any} props.children
  */
@@ -335,3 +351,45 @@ export const EXAMPLE_CSS = `
     }
 
     `;
+
+/**
+ * @param {WeatherData|undefined} obs
+ */
+export function isValidObservation(obs) {
+    if (!obs) {
+        return false;
+    }
+
+    if (obs.direction === -1 || obs.gust === -1 || obs.speed === -1) {
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * Zero is falsy in JavaScript, so we need to check for it explicitly
+ *
+ * @param {any} value
+ * @returns {value is null | undefined}
+ */
+export function isNullish(value) {
+    return value === null || value === undefined;
+}
+
+/**
+ * @template T
+ * @param {T[]} array
+ * @returns {NonNullable<T>[]}
+ */
+export function filterNullish(array) {
+    // @ts-ignore
+    return array.filter((item) => !isNullish(item));
+}
+
+/**
+ * @param {number} num
+ */
+export function knotsToMs(num) {
+    return num * 0.514444;
+}

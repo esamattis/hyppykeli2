@@ -1,7 +1,15 @@
 // @ts-check
 // docs https://opendata.fmi.fi/wfs?service=WFS&version=2.0.0&request=describeStoredQueries&
 import { computed, signal } from "@preact/signals";
-import { calculateDirectionDifference, removeNullish } from "./utils.js";
+import {
+    calculateDirectionDifference,
+    filterNullish,
+    isNullish,
+    isValidObservation,
+    knotsToMs,
+    removeNullish,
+    safeParseNumber,
+} from "./utils.js";
 import { fetchHighWinds } from "./om.js";
 // just exposes the parseMETAR global
 import "metar";
@@ -33,7 +41,8 @@ export const OBSERVATIONS = signal([]);
 
 export const HAS_WIND_OBSERVATIONS = computed(() => {
     for (const obs of OBSERVATIONS.value) {
-        if (obs.direction !== -1 || obs.gust !== -1 || obs.speed !== -1) {
+        // at least one
+        if (isValidObservation(obs)) {
             return true;
         }
     }
@@ -45,6 +54,43 @@ export const HAS_WIND_OBSERVATIONS = computed(() => {
  * @type {Signal<WeatherData|undefined>}
  */
 export const HOVERED_OBSERVATION = signal(undefined);
+
+/**
+ * @type {Signal<WeatherData|undefined>}
+ */
+export const LATEST_OBSERVATION = computed(() => {
+    if (OBSERVATIONS.value[0] && isValidObservation(OBSERVATIONS.value[0])) {
+        return OBSERVATIONS.value[0];
+    }
+
+    const metar = METARS.value?.[0];
+    if (!metar) {
+        return;
+    }
+
+    const speed = metar.wind.speed;
+    const gust = metar.wind.gust;
+
+    /** @type {WeatherData} */
+    const metarObs = {
+        source: "metar",
+        lowCloudCover: undefined,
+        middleCloudCover: undefined,
+        time: metar.time,
+        gust: isNullish(gust) ? undefined : knotsToMs(gust),
+        speed: isNullish(speed) ? undefined : knotsToMs(speed),
+        direction:
+            typeof metar.wind.direction === "number"
+                ? metar.wind.direction
+                : undefined,
+        temperature: metar.temperature,
+    };
+
+    if (isValidObservation(metarObs)) {
+        console.log("Latest observation from METAR", metarObs);
+        return metarObs;
+    }
+});
 
 /**
  * @type {Signal<WeatherData[]>}
@@ -69,6 +115,7 @@ function mockLatestObservation(original) {
     let mock = original;
 
     mock = {
+        source: "fmi",
         lowCloudCover: undefined,
         middleCloudCover: undefined,
         time: new Date(),
@@ -106,9 +153,11 @@ export const WIND_VARIATIONS = computed(() => {
         return;
     }
 
-    const directions = recentObservations.map((obs) => obs.direction);
-    const speeds = recentObservations.map((obs) => obs.speed);
-    const gusts = recentObservations.map((obs) => obs.gust);
+    const directions = filterNullish(
+        recentObservations.map((obs) => obs.direction),
+    );
+    const speeds = filterNullish(recentObservations.map((obs) => obs.speed));
+    const gusts = filterNullish(recentObservations.map((obs) => obs.gust));
 
     // Calculate the average direction
     const sumSin = directions.reduce(
@@ -142,7 +191,8 @@ export const WIND_VARIATIONS = computed(() => {
     // Calculate speed variation
     const averageSpeed =
         speeds.reduce((sum, speed) => sum + speed, 0) / speeds.length;
-    const maxGust = Math.max(...gusts);
+
+    const maxGust = Math.max(...filterNullish(gusts));
     const gustSpeedRatio = maxGust / averageSpeed;
 
     // Determine color and width based on criteria
@@ -193,7 +243,8 @@ export const GUST_TREND = computed(() => {
     }
 
     const avg =
-        recentGusts.reduce((sum, gust) => sum + gust, 0) / recentGusts.length;
+        filterNullish(recentGusts).reduce((sum, gust) => sum + gust, 0) /
+        recentGusts.length;
 
     return -latestGust + avg;
 });
@@ -406,6 +457,24 @@ function parseCloudsXml(xml) {
             member.querySelector("fieldElevation")?.innerHTML ?? -1,
         );
 
+        const windSpeed = Number(
+            member.querySelector("meanWindSpeed")?.innerHTML ?? -1,
+        );
+
+        const temperature =
+            safeParseNumber(member.querySelector("airTemperature")?.innerHTML)
+                .value ?? -200;
+
+        const windGust =
+            safeParseNumber(
+                //  TODO: XXX not correct!
+                member.querySelector("windGust")?.innerHTML,
+            ).value ?? -1;
+
+        const windDirection = Number(
+            member.querySelector("meanWindDirection")?.innerHTML ?? -1,
+        );
+
         const metar = member.querySelector("source input")?.innerHTML;
 
         if (!metar) {
@@ -455,6 +524,13 @@ function parseCloudsXml(xml) {
         });
 
         return {
+            wind: {
+                gust: windGust,
+                speed: windSpeed,
+                direction: windDirection,
+                unit: "kt",
+            },
+            temperature,
             time,
             elevation,
             clouds,
@@ -575,6 +651,7 @@ async function fetchFmiForecasts() {
     /** @type {WeatherData[]} */
     const combinedForecasts = gustForecasts.map((gust, i) => {
         return {
+            source: "forecast",
             gust: gust.value,
             direction: directionForecasts[i]?.value ?? -1,
             speed: speedForecasts[i]?.value ?? -1,
@@ -582,7 +659,7 @@ async function fetchFmiForecasts() {
             lowCloudCover: cloudCoverForecasts[i]?.value,
             middleCloudCover: middleCloudCoverForecasts[i]?.value,
             rain: popForecasts[i]?.value,
-            temperature: temperatureForecasts[i]?.value ?? -99,
+            temperature: temperatureForecasts[i]?.value,
         };
     });
 
@@ -648,6 +725,13 @@ function setMETARSfromMetarMessage(metars) {
         const metarData = {
             time: new Date(m.time),
             metar,
+            wind: {
+                gust: m.wind.gust ?? undefined,
+                speed: m.wind.speed ?? undefined,
+                direction: m.wind.direction,
+                unit: m.wind.unit.toLowerCase(),
+            },
+            temperature: m.temperature,
             clouds:
                 m.clouds?.map((cloud) => {
                     return {
@@ -760,13 +844,14 @@ export async function updateWeatherData() {
     /** @type {WeatherData[]} */
     const combined = gusts.map((gust, i) => {
         return {
+            source: "fmi",
             gust: gust.value,
-            speed: windSpeed[i]?.value ?? -1,
-            direction: directions[i]?.value ?? -1,
+            speed: windSpeed[i]?.value,
+            direction: directions[i]?.value,
             time: gust.time,
             middleCloudCover: undefined,
             lowCloudCover: undefined,
-            temperature: temperatures[i]?.value ?? -99,
+            temperature: temperatures[i]?.value,
         };
     });
 

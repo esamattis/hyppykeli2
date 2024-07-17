@@ -1,7 +1,12 @@
 // @ts-check
 import { html } from "htm/preact";
-import { HOVERED_OBSERVATION, OBSERVATIONS, WIND_VARIATIONS } from "./data.js";
-import { FromNow, Help } from "./utils.js";
+import {
+    HOVERED_OBSERVATION,
+    LATEST_OBSERVATION,
+    OBSERVATIONS,
+    WIND_VARIATIONS,
+} from "./data.js";
+import { FromNow, Help, isNullish, isValidObservation } from "./utils.js";
 
 // Constants for needle length calculation
 const MIN_NEEDLE_LENGTH = 30;
@@ -138,25 +143,29 @@ export function Compass() {
 
 function Needle() {
     const history = !!HOVERED_OBSERVATION.value;
-    const point = HOVERED_OBSERVATION.value ?? OBSERVATIONS.value[0];
+    const obs = HOVERED_OBSERVATION.value ?? LATEST_OBSERVATION.value;
 
-    if (!point) {
+    // When using metar based observations, gust might not be available.
+    // Fall back to speed in that case.
+    const gust = obs?.gust ?? obs?.speed;
+
+    if (isNullish(gust) || isNullish(obs?.direction)) {
         return null;
     }
 
-    if (point.gust == -1 || point.direction == -1 || point.speed == -1) {
+    if (!isValidObservation(obs)) {
         return null;
     }
 
-    const needleLength = calculateNeedleLength(point.gust);
-    const needleColor = point.gust > MAX_WIND_SPEED ? "black" : "red";
+    const needleLength = calculateNeedleLength(gust);
+    const needleColor = gust > MAX_WIND_SPEED ? "black" : "red";
 
     return html`
         <g className="${history ? "historic" : ""}">
             <polygon
                 points=${`190,${200 - needleLength} 210,${200 - needleLength} 220,200 180,200`}
                 fill=${needleColor}
-                transform=${`rotate(${point.direction - 180}, 200, 200)`}
+                transform=${`rotate(${obs.direction - 180}, 200, 200)`}
             />
             <!-- Center Point -->
             <circle cx="200" cy="200" r="10" fill="black" />

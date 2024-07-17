@@ -70,10 +70,11 @@ type OpenMeteoDayData = Record<
  * Interface representing weather data.
  */
 interface WeatherData {
-    gust: number;
-    speed: number;
-    direction: number;
-    temperature: number;
+    source: "metar" | "fmi" | "forecast";
+    gust: number | undefined;
+    speed: number | undefined;
+    direction: number | undefined;
+    temperature: number | undefined;
     rain?: number;
     lowCloudCover?: number | undefined;
     middleCloudCover?: number | undefined;
@@ -95,6 +96,13 @@ interface CloudLayer {
  */
 interface MetarData {
     clouds: CloudLayer[];
+    temperature: number;
+    wind: {
+        direction: number | "VRB";
+        gust: number | undefined;
+        speed: number;
+        unit: string;
+    };
     metar: string;
     time: Date;
     elevation?: number;
@@ -184,7 +192,7 @@ interface MetarJSResponse {
     wind: {
         speed: number;
         gust: number | null;
-        direction: number;
+        direction: number | "VRB";
         variation: number | null;
         unit: string;
     };
