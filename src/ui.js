@@ -897,7 +897,7 @@ export function Root() {
             ${
                 ERRORS.value.length > 0
                     ? html`
-                          <div class="errors">
+                          <div id="errors" class="errors">
                               ${ERRORS.value.map((error) => {
                                   return html`
                                       <p>${error}</p>

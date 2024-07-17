@@ -673,9 +673,11 @@ export async function updateWeatherData() {
     if (icaocode) {
         // intentionally not awaiting, it can be updated on the background
         if (QUERY_PARAMS.value.flyk_metar) {
-            fetchFlykMetar(icaocode).then((metars) => {
-                if (metars) {
-                    setMETARSfromMetarMessage([metars]);
+            fetchFlykMetar(icaocode).then((metar) => {
+                if (metar) {
+                    setMETARSfromMetarMessage([metar]);
+                } else {
+                    addError(`Ei METAR-sanomaa kentälle ${icaocode}.`);
                 }
             });
         } else {
