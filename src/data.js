@@ -382,7 +382,7 @@ function parseTimeSeries(doc, id) {
  * @param {Document} xml
  * @returns {MetarData[]}
  */
-function parseClouds(xml) {
+function parseCloudsXml(xml) {
     const members = Array.from(xml.querySelectorAll("member"));
 
     return members.flatMap((member) => {
@@ -569,6 +569,36 @@ async function fetchFmiForecasts() {
     STALE_FORECASTS.value = false;
 }
 
+/**
+ * @param {string} icaocode
+ * @param {Date} startTime
+ * @param {number} cacheBust
+ */
+async function fetchFmiMetar(icaocode, startTime, cacheBust) {
+    const xml = await fmiRequest(
+        "fmi::avi::observations::iwxxm",
+        {
+            cch: cacheBust,
+            starttime: startTime.toISOString(),
+            icaocode,
+        },
+        "/example_data/metar.xml",
+    );
+
+    if (xml === "error") {
+        addError(`Virhe METAR-sanomaa hakiessa kentälle ${icaocode}.`);
+        return;
+    }
+
+    if (!xml || !xml.querySelector("member")) {
+        addError(`Tuntematon lentokentän tunnus ${icaocode}.`);
+        return;
+    }
+
+    const clouds = parseCloudsXml(xml);
+    METARS.value = clouds;
+}
+
 export async function updateWeatherData() {
     ERRORS.value = [];
     const fmisid = QUERY_PARAMS.value.fmisid;
@@ -590,28 +620,8 @@ export async function updateWeatherData() {
     const cacheBust = Math.floor(Date.now() / 30_000);
 
     if (icaocode) {
-        fmiRequest(
-            "fmi::avi::observations::iwxxm",
-            {
-                cch: cacheBust,
-                starttime: obsStartTime.toISOString(),
-                icaocode,
-            },
-            "/example_data/metar.xml",
-        ).then((xml) => {
-            if (xml === "error") {
-                addError(`Virhe METAR-sanomaa hakiessa kentälle ${icaocode}.`);
-                return;
-            }
-
-            if (!xml || !xml.querySelector("member")) {
-                addError(`Tuntematon lentokentän tunnus ${icaocode}.`);
-                return;
-            }
-
-            const clouds = parseClouds(xml);
-            METARS.value = clouds;
-        });
+        // intentionally not awaiting, it can be updated on the background
+        fetchFmiMetar(icaocode, obsStartTime, cacheBust);
     } else {
         addError("Lentokenttä tunnus (ICAO) puuttuu.");
     }
