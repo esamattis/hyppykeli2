@@ -10,19 +10,41 @@ import {
     HOVERED_OBSERVATION,
     FORECAST_DATE,
     STALE_FORECASTS,
+    HAS_WIND_OBSERVATIONS,
 } from "./data.js";
 import { formatClock, formatDate, humanDayText } from "./utils.js";
 
 /**
- * @param {Chart} obs
- * @param {Chart} fore
+ * @returns {import("chart.js").ChartConfiguration}
+ */
+function getDefaultGraphOptions() {
+    return {
+        type: "line",
+        data: {
+            labels: [],
+            datasets: [],
+        },
+        options: {
+            maintainAspectRatio: false,
+            interaction: {
+                mode: "index",
+                axis: "x",
+                intersect: false,
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                },
+            },
+        },
+    };
+}
+
+/**
+ * @param {Chart|null} obs
+ * @param {Chart|null} fore
  */
 function updateCharts(obs, fore) {
-    obs.data.labels = OBSERVATIONS.value
-        .map((point) => formatClock(point.time))
-        .reverse();
-    fore.data.labels = FORECASTS.value.map((point) => formatClock(point.time));
-
     const shared = {
         spanGaps: true,
         borderJoinStyle: "round",
@@ -49,48 +71,59 @@ function updateCharts(obs, fore) {
         },
     ];
 
-    obs.data.datasets = [
-        {
-            ...shared,
-            label: "Puuska (m/s)",
-            data: OBSERVATIONS.value.map((obs) => obs.gust).reverse(),
-            borderColor: "blue",
-        },
-        {
-            ...shared,
-            label: "Tuuli (m/s)",
-            data: OBSERVATIONS.value.map((obs) => obs.speed).reverse(),
-            borderColor: "lightblue",
-        },
-        ...createWarningLines(OBSERVATIONS.value),
-    ];
+    if (obs) {
+        obs.data.labels = OBSERVATIONS.value
+            .map((point) => formatClock(point.time))
+            .reverse();
 
-    fore.data.datasets = [
-        {
-            ...shared,
-            label: "Puuskaennuste (m/s)",
-            data: FORECASTS.value.map((obs) => obs.gust),
-            borderColor: "blue",
-            cubicInterpolationMode: "monotone",
-            borderDash: [5, 5],
-            borderWidth: 5,
-        },
-        {
-            ...shared,
-            label: "Tuuli (m/s)",
-            data: FORECASTS.value.map((obs) => obs.speed),
-            borderColor: "lightblue",
-            cubicInterpolationMode: "monotone",
-            borderDash: [5, 5],
-            borderWidth: 5,
-        },
-        ...createWarningLines(FORECASTS.value),
-    ];
+        obs.data.datasets = [
+            {
+                ...shared,
+                label: "Puuska (m/s)",
+                data: OBSERVATIONS.value.map((obs) => obs.gust).reverse(),
+                borderColor: "blue",
+            },
+            {
+                ...shared,
+                label: "Tuuli (m/s)",
+                data: OBSERVATIONS.value.map((obs) => obs.speed).reverse(),
+                borderColor: "lightblue",
+            },
+            ...createWarningLines(OBSERVATIONS.value),
+        ];
+        // "none" disables the update animation.
+        // It is too flashy when the array is fully replaced.
+        obs.update("none");
+    }
 
-    // "none" disables the update animation.
-    // It is too flashy when the array is fully replaced.
-    obs.update("none");
-    fore.update("none");
+    if (fore) {
+        fore.data.labels = FORECASTS.value.map((point) =>
+            formatClock(point.time),
+        );
+        fore.data.datasets = [
+            {
+                ...shared,
+                label: "Puuskaennuste (m/s)",
+                data: FORECASTS.value.map((obs) => obs.gust),
+                borderColor: "blue",
+                cubicInterpolationMode: "monotone",
+                borderDash: [5, 5],
+                borderWidth: 5,
+            },
+            {
+                ...shared,
+                label: "Tuuli (m/s)",
+                data: FORECASTS.value.map((obs) => obs.speed),
+                borderColor: "lightblue",
+                cubicInterpolationMode: "monotone",
+                borderDash: [5, 5],
+                borderWidth: 5,
+            },
+            ...createWarningLines(FORECASTS.value),
+        ];
+
+        fore.update("none");
+    }
 }
 
 export function Graph() {
@@ -98,43 +131,23 @@ export function Graph() {
     const foreChartRef = useRef(null);
 
     useEffect(() => {
-        /**
-         * @type {any}
-         */
-        const options = {
-            type: "line",
-            data: {
-                labels: [],
-                datasets: [],
-            },
-            options: {
-                maintainAspectRatio: false,
-                interaction: {
-                    mode: "index",
-                    axis: "x",
-                    intersect: false,
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                    },
-                },
-            },
-        };
+        /** @type {Chart | null} */
+        let obsChart = null;
+        /** @type {Chart | null} */
+        let foreChart = null;
 
-        if (!obsChartRef.current || !foreChartRef.current) {
-            console.error("Chart references are not initialized.");
-            return;
+        if (obsChartRef.current) {
+            obsChart = new Chart(obsChartRef.current, getDefaultGraphOptions());
+            obsChart.options.onHover = createHoverHandler(OBSERVATIONS, true);
         }
 
-        const obsOptions = structuredClone(options);
-        const foreOptions = structuredClone(options);
-
-        const obsChart = new Chart(obsChartRef.current, obsOptions);
-        const foreChart = new Chart(foreChartRef.current, foreOptions);
-
-        obsChart.options.onHover = createHoverHandler(OBSERVATIONS, true);
-        foreChart.options.onHover = createHoverHandler(FORECASTS, false);
+        if (foreChartRef.current) {
+            foreChart = new Chart(
+                foreChartRef.current,
+                getDefaultGraphOptions(),
+            );
+            foreChart.options.onHover = createHoverHandler(FORECASTS, false);
+        }
 
         const unsubsribe = effect(() => {
             updateCharts(obsChart, foreChart);
@@ -142,27 +155,34 @@ export function Graph() {
 
         return () => {
             unsubsribe();
-            obsChart.destroy();
-            foreChart.destroy();
+            obsChart?.destroy();
+            foreChart?.destroy();
         };
-    }, []);
+    }, [HAS_WIND_OBSERVATIONS.value]);
 
     const onMouseLeaveObs = () => {
         HOVERED_OBSERVATION.value = undefined;
     };
 
     return html`
-        <div id="observations-graph">
-            <h2>
-                Havainnot
-                <span class="date">${formatDate(new Date())}</span>
-            </h2>
-            <div class="chart" onMouseLeave=${onMouseLeaveObs}>
-                <canvas ref=${obsChartRef}></canvas>
-            </div>
-        </div>
+        ${HAS_WIND_OBSERVATIONS.value
+            ? html`
+                  <div id="observations-graph">
+                      <h2>
+                          Havainnot
+                          <span class="date">${formatDate(new Date())}</span>
+                      </h2>
+                      <div class="chart" onMouseLeave=${onMouseLeaveObs}>
+                          <canvas ref=${obsChartRef}></canvas>
+                      </div>
+                  </div>
+              `
+            : null}
 
-        <div id="forecasts-graph">
+        <div
+            id="forecasts-graph"
+            style=${HAS_WIND_OBSERVATIONS.value ? "" : "grid-column-start: 1"}
+        >
             <h2>
                 Ennusteet
                 <span class="date">

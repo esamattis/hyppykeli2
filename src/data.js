@@ -31,6 +31,16 @@ export const STATION_NAME = signal(undefined);
  */
 export const OBSERVATIONS = signal([]);
 
+export const HAS_WIND_OBSERVATIONS = computed(() => {
+    for (const obs of OBSERVATIONS.value) {
+        if (obs.direction !== -1 || obs.gust !== -1 || obs.speed !== -1) {
+            return true;
+        }
+    }
+
+    return false;
+});
+
 /**
  * @type {Signal<WeatherData|undefined>}
  */

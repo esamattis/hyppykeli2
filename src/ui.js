@@ -220,7 +220,7 @@ function WindDirection(props) {
 
 /**
  * @param {Object} props
- * @param {Signal<unknown[]>} props.data
+ * @param {Signal<WeatherData[]>} props.data
  * @param {any} props.Rows
  * @param {any} props.thead
  */
