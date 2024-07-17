@@ -10,7 +10,7 @@
         <div class="content">
             <h1>Hyppykeli</h1>
 
-            <div class="dz-list">
+            <div class="dz-list" style="display: none">
                 <p>
                     <a href="/dz/?fmisid=137208&icaocode=EFJY">EFJY</a>
                 </p>
@@ -90,6 +90,7 @@
                     for (const child of children) {
                         dzList.appendChild(child);
                     }
+                    dzList.style.display = "block";
                 })();
             </script>
 
