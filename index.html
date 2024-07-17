@@ -5,6 +5,26 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="/styles.css" />
         <title>Parempi Hyppykeli</title>
+        <script type="module">
+            const redirectName = new URLSearchParams(
+                window.location.search,
+            ).get("dz");
+
+            if (redirectName) {
+                const dz = Array.from(
+                    document.querySelectorAll(".dz-list a"),
+                ).find((a) =>
+                    a.textContent
+                        .trim()
+                        .toLowerCase()
+                        .includes(redirectName.trim().toLowerCase()),
+                );
+
+                if (dz) {
+                    window.location.href = dz.href;
+                }
+            }
+        </script>
     </head>
     <body>
         <div class="content">
