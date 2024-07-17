@@ -251,9 +251,16 @@ function DataTable(props) {
 function LatestWind() {
     const history = !!HOVERED_OBSERVATION.value;
     const latest = HOVERED_OBSERVATION.value || OBSERVATIONS.value[0];
+
     if (!latest) {
         return html`
             <p>Ladataan tuulitietoja...</p>
+        `;
+    }
+
+    if (latest.direction === -1 && latest.speed === -1 && latest.gust === -1) {
+        return html`
+            <p>Ei havaintoja :(</p>
         `;
     }
 
