@@ -602,6 +602,15 @@ function handleForecastDayChange(e) {
     navigateQs({ forecast_day: dayDiff.toString() }, "merge");
 }
 
+/**
+ * @param {MouseEvent} e
+ */
+function savePreviousDz(e) {
+    if (e.target instanceof HTMLAnchorElement) {
+        localStorage.setItem("previous_dz", e.target.textContent?.trim() ?? "");
+    }
+}
+
 export function SideMenu() {
     /**
      * @param {MouseEvent} e
@@ -682,11 +691,14 @@ export function SideMenu() {
             </p>
 
             <h2>DZs</h2>
-            ${OTHER_DZs.value.map(
-                (dz) => html`
-                    <p><a href=${dz.href}>${dz.title}</a></p>
-                `,
-            )}
+
+            <div class="dzs" onClick=${savePreviousDz}>
+                ${OTHER_DZs.value.map(
+                    (dz) => html`
+                        <p><a href=${dz.href}>${dz.title}</a></p>
+                    `,
+                )}
+            </div>
 
             <h2>Ongelmia?</h2>
 
