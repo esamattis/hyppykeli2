@@ -630,7 +630,10 @@ async function fetchFlykMetar(icaocode) {
     /** @type {FlykMetar} */
     const json = await res.json();
 
-    const features = json.features.find((f) => f.properties.code === icaocode);
+    const re = new RegExp(`^(METAR|SPECI) ${icaocode} `);
+    const features = json.features.find((f) => {
+        return re.test(f.properties.text);
+    });
     return features?.properties.text;
 }
 
