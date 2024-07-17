@@ -144,6 +144,10 @@ function Needle() {
         return null;
     }
 
+    if (point.gust == -1 || point.direction == -1 || point.speed == -1) {
+        return null;
+    }
+
     const needleLength = calculateNeedleLength(point.gust);
     const needleColor = point.gust > MAX_WIND_SPEED ? "black" : "red";
 
