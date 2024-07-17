@@ -63,6 +63,19 @@
                     </a>
                 </p>
             </div>
+            <script>
+                (() => {
+                    const dzList = document.querySelector(".dz-list");
+                    const children = Array.from(dzList.children);
+                    children.sort((a, b) =>
+                        a.textContent.localeCompare(b.textContent),
+                    );
+                    dzList.innerHTML = "";
+                    for (const child of children) {
+                        dzList.appendChild(child);
+                    }
+                })();
+            </script>
 
             <p>
                 Vähän vielä rakenteilla. Koodit

@@ -492,6 +492,8 @@ effect(() => {
             },
         );
 
+        dzs.sort((a, b) => a.title.localeCompare(b.title));
+
         OTHER_DZs.value = dzs;
     });
 });
