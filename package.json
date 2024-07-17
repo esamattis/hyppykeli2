@@ -2,8 +2,8 @@
     "type": "module",
     "scripts": {
         "dev": "python3 -m http.server",
-        "prettier-check": "prettier --check src/ *.css",
-        "prettier": "prettier --write src/ *.css",
+        "prettier-check": "prettier --check index.html src/ *.css",
+        "prettier": "prettier --write index.html src/ *.css",
         "tsc": "tsc",
         "build": "./build.sh"
     },
