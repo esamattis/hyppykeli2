@@ -80,13 +80,13 @@ function updateCharts(obs, fore) {
             {
                 ...shared,
                 label: "Puuska (m/s)",
-                data: OBSERVATIONS.value.map((obs) => obs.gust).reverse(),
+                data: OBSERVATIONS.value.map((obs) => obs.gust ?? 0).reverse(),
                 borderColor: "blue",
             },
             {
                 ...shared,
                 label: "Tuuli (m/s)",
-                data: OBSERVATIONS.value.map((obs) => obs.speed).reverse(),
+                data: OBSERVATIONS.value.map((obs) => obs.speed ?? 0).reverse(),
                 borderColor: "lightblue",
             },
             ...createWarningLines(OBSERVATIONS.value),
@@ -104,7 +104,7 @@ function updateCharts(obs, fore) {
             {
                 ...shared,
                 label: "Puuskaennuste (m/s)",
-                data: FORECASTS.value.map((obs) => obs.gust),
+                data: FORECASTS.value.map((obs) => obs.gust ?? 0),
                 borderColor: "blue",
                 cubicInterpolationMode: "monotone",
                 borderDash: [5, 5],
@@ -113,7 +113,7 @@ function updateCharts(obs, fore) {
             {
                 ...shared,
                 label: "Tuuli (m/s)",
-                data: FORECASTS.value.map((obs) => obs.speed),
+                data: FORECASTS.value.map((obs) => obs.speed ?? 0),
                 borderColor: "lightblue",
                 cubicInterpolationMode: "monotone",
                 borderDash: [5, 5],
