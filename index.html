@@ -60,16 +60,69 @@
             <h2>Luo droppis</h2>
 
             <form action="/dz">
+                <style>
+                    @scope {
+                        label {
+                            display: flex;
+                            font-weight: bold;
+                        }
+                        label > span {
+                            width: 200px;
+                            display: flex;
+                        }
+                        input[type="text"] {
+                            display: flex;
+                            width: 20ch;
+                            padding: 2px;
+                        }
+
+                        label small {
+                            font-weight: normal;
+                            font-size: 75%;
+                        }
+                    }
+                </style>
+
                 <fieldset>
-                    <input type="text" name="icaocode" placeholder="ICAO" />
-                    <input type="text" name="fmisid" placeholder="FMISID" />
-                    <input type="text" name="name" placeholder="Nimi" />
+                    <label>
+                        <span>Nimi</span>
+                        <input type="text" name="name" placeholder="My DZ" />
+                    </label>
+
+                    <label>
+                        <span>FMISID</span>
+                        <input type="text" name="fmisid" placeholder="123445" />
+                    </label>
+
+                    <label>
+                        <span>ICAO</span>
+                        <input type="text" name="icaocode" placeholder="EFXY" />
+                    </label>
+
+                    <label>
+                        <span>Flyk.com METAR</span>
+                        <input type="checkbox" name="flyk_metar" value="1" />
+                        <small
+                            >Osa METAR-sanomista ei löydy Ilmatieteenlaitoksen
+                            rajapinnoista.</small
+                        >
+                    </label>
                 </fieldset>
 
                 <fieldset>
                     <legend>Ennusteen koordinaatit</legend>
-                    <input type="text" name="lat" placeholder="lat" />
-                    <input type="text" name="lon" placeholder="lon" />
+                    <label>
+                        <span>Lattitude</span>
+                        <input type="text" name="lat" placeholder="lat" />
+                    </label>
+
+                    <label>
+                        <span>Longitude</span>
+                        <input type="text" name="lon" placeholder="lon" />
+                    </label>
+
+                    <br />
+
                     <small>
                         Ei pakollinen. Käytetään havaintoaseman sijaintia jos ei
                         annettu.
