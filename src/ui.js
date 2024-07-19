@@ -26,6 +26,9 @@ import {
     navigateQs,
     getQs,
     LATEST_OBSERVATION,
+    SAVED_DZs,
+    saveCurrentDz,
+    removeSavedDz,
 } from "./data.js";
 
 import { Graph } from "./graph.js";
@@ -40,6 +43,7 @@ import {
     Help,
     humanDayText,
     isValidObservation,
+    removeNullish,
     ResizeRecreate,
     saveTextToFile,
 } from "./utils.js";
@@ -582,7 +586,7 @@ function asInPageNavigation(e) {
 
     const target = new URL(e.target.href);
     const foo = Object.fromEntries(target.searchParams);
-    navigateQs(foo, "replace");
+    navigateQs(foo, { replace: true });
 }
 
 /**
@@ -599,7 +603,7 @@ function handleForecastDayChange(e) {
             (value.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
         ) + 1;
 
-    navigateQs({ forecast_day: dayDiff.toString() }, "merge");
+    navigateQs({ forecast_day: dayDiff.toString() });
 }
 
 /**
@@ -692,6 +696,56 @@ export function SideMenu() {
 
             <h2>DZs</h2>
 
+            <h3>Tallennetut</h3>
+
+            <div class="dzs" onClick=${savePreviousDz}>
+                ${SAVED_DZs.value.flatMap((dz) => {
+                    const name = dz.name;
+                    if (!name) {
+                        return [];
+                    }
+
+                    const qs =
+                        "?" + new URLSearchParams(removeNullish(dz)).toString();
+
+                    return html`
+                        <p>
+                            <a href=${qs}>${name}</a>
+                            <button
+                                type="button"
+                                style="margin-left: 1ch; font-size: 50%"
+                                onClick=${() => {
+                                    if (
+                                        confirm(
+                                            "Are you sure you want to remove this DZ?",
+                                        )
+                                    ) {
+                                        // Remove after timeout so the button is still present
+                                        // whent the outside click detection is triggered
+                                        // or otherwise the menu is unintentionally closed
+                                        setTimeout(() => {
+                                            removeSavedDz(name);
+                                        });
+                                    }
+                                }}
+                            >
+                                ╳
+                            </button>
+                        </p>
+                    `;
+                })}
+            </div>
+
+            <button
+                type="button"
+                onClick=${() => {
+                    saveCurrentDz(prompt("Nimi", NAME.value));
+                }}
+            >
+                Tallenna nykyinen
+            </button>
+
+            <h3>Muut</h3>
             <div class="dzs" onClick=${savePreviousDz}>
                 ${OTHER_DZs.value.map(
                     (dz) => html`
