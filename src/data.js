@@ -474,11 +474,13 @@ function xpath(doc, path) {
 
 /**
  * @param {Element} node
+ * @param {number} fallback
  */
-function pointsToTimeSeries(node) {
+function pointsToTimeSeries(node, fallback) {
     return Array.from(node.querySelectorAll("point")).map((point) => {
+        const value = Number(point.querySelector("value")?.innerHTML);
         return {
-            value: Number(point.querySelector("value")?.innerHTML ?? 0) || -1,
+            value: isNaN(value) ? fallback : value,
             time: new Date(
                 point.querySelector("time")?.innerHTML ?? new Date(),
             ),
@@ -489,14 +491,15 @@ function pointsToTimeSeries(node) {
 /**
  * @param {Document} doc
  * @param {string} id
+ * @param {number} fallback
  */
-function parseTimeSeries(doc, id) {
+function parseTimeSeries(doc, id, fallback) {
     const node = xpath(doc, `//wml2:MeasurementTimeseries[@gml:id="${id}"]`);
     if (!node) {
         return [];
     }
 
-    return pointsToTimeSeries(node);
+    return pointsToTimeSeries(node, fallback);
 }
 
 /**
@@ -645,14 +648,14 @@ async function fetchFmiForecasts() {
             // parameters: FORECAST_PAREMETERS.join(","),
             // parameters: "WindGust",
             // LowCloudCover, MiddleCloudCover, HighCloudCover, MiddleAndLowCloudCover
-            // parameters: [
-            //     "HourlyMaximumGust",
-            //     "WindDirection",
-            //     "WindSpeedMS",
-            //     "LowCloudCover",
-            //     "MiddleAndLowCloudCover",
-            //     "PoP", // precipitation probability
-            // ].join(","),
+            parameters: [
+                "HourlyMaximumGust",
+                "WindDirection",
+                "WindSpeedMS",
+                "LowCloudCover",
+                "MiddleAndLowCloudCover",
+                "PoP", // precipitation probability
+            ].join(","),
             // place: "Utti",
             latlon: FORECAST_COORDINATES.value,
         },
@@ -677,32 +680,41 @@ async function fetchFmiForecasts() {
     const gustForecasts = parseTimeSeries(
         forecastXml,
         "mts-1-1-HourlyMaximumGust",
+        -1,
     );
 
-    const speedForecasts = parseTimeSeries(forecastXml, "mts-1-1-WindSpeedMS");
+    const speedForecasts = parseTimeSeries(
+        forecastXml,
+        "mts-1-1-WindSpeedMS",
+        -1,
+    );
 
-    const popForecasts = parseTimeSeries(forecastXml, "mts-1-1-PoP");
+    const popForecasts = parseTimeSeries(forecastXml, "mts-1-1-PoP", 0);
 
     const temperatureForecasts = parseTimeSeries(
         forecastXml,
         "mts-1-1-Temperature",
+        -100,
     );
 
     const directionForecasts = parseTimeSeries(
         forecastXml,
         "mts-1-1-WindDirection",
+        -1,
     );
 
     const cloudCoverForecasts = parseTimeSeries(
         forecastXml,
         // "mts-1-1-MiddleAndLowCloudCover",
         "mts-1-1-LowCloudCover",
+        -1,
     );
 
     const middleCloudCoverForecasts = parseTimeSeries(
         forecastXml,
         // "mts-1-1-MiddleCloudCover",
         "mts-1-1-MiddleAndLowCloudCover",
+        -1,
     );
 
     const locationCollection = forecastXml.querySelector("LocationCollection");
