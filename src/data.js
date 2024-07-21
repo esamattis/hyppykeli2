@@ -129,7 +129,6 @@ export const LATEST_OBSERVATION = computed(() => {
     };
 
     if (isValidObservation(metarObs)) {
-        console.log("Latest observation from METAR", metarObs);
         return metarObs;
     }
 });
