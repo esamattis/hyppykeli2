@@ -266,9 +266,7 @@ function LatestWind() {
     const obs = HOVERED_OBSERVATION.value || LATEST_OBSERVATION.value;
 
     if (!obs) {
-        return html`
-            <p>Ladataan tuulitietoja...</p>
-        `;
+        return null;
     }
 
     if (!isValidObservation(obs)) {
@@ -1000,7 +998,7 @@ function Info() {
 
                       <${ForecastLocationInfo} />
                   `
-                : "Ladataan... "}
+                : null}
             ${metar?.elevation !== undefined
                 ? html`
                       ${" "}Lentokentän korkeus meren pinnasta${" "}

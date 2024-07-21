@@ -183,12 +183,7 @@
                 <fieldset>
                     <label>
                         <span>Nimi</span>
-                        <input
-                            type="text"
-                            name="name"
-                            placeholder="My DZ"
-                            required
-                        />
+                        <input type="text" name="name" placeholder="My DZ" />
                     </label>
                     <div class="desc"></div>
 
@@ -245,9 +240,11 @@
                     <script>
                         document.currentScript.previousElementSibling.addEventListener(
                             "click",
-                            () => {
+                            (e) => {
+                                e.target.disabled = true;
                                 navigator.geolocation.getCurrentPosition(
                                     (position) => {
+                                        e.target.disabled = false;
                                         document.querySelector(
                                             'input[name="lat"]',
                                         ).value = position.coords.latitude;

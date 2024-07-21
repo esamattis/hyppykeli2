@@ -1,6 +1,6 @@
 // @ts-check
 // docs https://opendata.fmi.fi/wfs?service=WFS&version=2.0.0&request=describeStoredQueries&
-import { computed, signal } from "@preact/signals";
+import { computed, effect, signal } from "@preact/signals";
 import {
     calculateDirectionDifference,
     filterNullish,
@@ -29,11 +29,6 @@ export const SAVED_DZs = signal(
  * @param {string|null|undefined} name
  */
 export function saveCurrentDz(name) {
-    if (!name) {
-        alert("Virheellinen nimi");
-        return;
-    }
-
     let qp = QUERY_PARAMS.value;
     const index = SAVED_DZs.value.findIndex((dz) => dz.name == name);
 
@@ -58,9 +53,18 @@ export function removeSavedDz(name) {
 }
 
 /**
+ * Current URLSearchParams (query string) in the location bar
+ *
+ * @type {Signal<QueryParams>}
+ */
+export const QUERY_PARAMS = signal(
+    Object.fromEntries(new URLSearchParams(location.search)),
+);
+
+/**
  * @type {Signal<string|undefined>}
  */
-export const NAME = signal(undefined);
+export const NAME = signal(QUERY_PARAMS.value.name);
 
 /**
  * @type {Signal<number>}
@@ -328,18 +332,23 @@ export const FORECAST_DAY = computed(() => {
     return day ? Number(day) : 0;
 });
 
-/**
- * Current URLSearchParams (query string) in the location bar
- *
- * @type {Signal<QueryParams>}
- */
-export const QUERY_PARAMS = signal(
-    Object.fromEntries(new URLSearchParams(location.search)),
-);
+if (QUERY_PARAMS.value.lat && QUERY_PARAMS.value.lon) {
+    FORECAST_COORDINATES.value = `${QUERY_PARAMS.value.lat},${QUERY_PARAMS.value.lon}`;
+}
 
 if (QUERY_PARAMS.value.save) {
-    saveCurrentDz(QUERY_PARAMS.value.name ?? QUERY_PARAMS.value.icaocode);
-    navigateQs({ save: undefined }, { replace: true });
+    const unsub = effect(() => {
+        const name =
+            NAME.value ??
+            QUERY_PARAMS.value.name ??
+            QUERY_PARAMS.value.icaocode;
+        if (!name) {
+            return;
+        }
+        unsub();
+        saveCurrentDz(name);
+        navigateQs({ save: undefined }, { replace: true });
+    });
 }
 
 /**
@@ -595,6 +604,10 @@ export function addError(msg) {
 }
 
 async function fetchFmiForecasts() {
+    if (!FORECAST_COORDINATES.value) {
+        throw new Error("No coordinates, cannot fetch fmi forecasts");
+    }
+
     const forecastRange = Number(QUERY_PARAMS.value.forecast_range) || 12;
 
     const forecastStartTime = new Date();
@@ -640,7 +653,7 @@ async function fetchFmiForecasts() {
             //     "PoP", // precipitation probability
             // ].join(","),
             // place: "Utti",
-            latlon: FORECAST_COORDINATES.value ?? STATION_COORDINATES.value,
+            latlon: FORECAST_COORDINATES.value,
         },
         "/example_data/forecast.xml",
     );
@@ -695,6 +708,9 @@ async function fetchFmiForecasts() {
     const locationName = locationCollection?.querySelector("name")?.innerHTML;
     const regionName = locationCollection?.querySelector("region")?.innerHTML;
     FORECAST_LOCATION_NAME.value = `${locationName}, ${regionName}`;
+    if (!NAME.value) {
+        NAME.value = locationName;
+    }
 
     /** @type {WeatherData[]} */
     const combinedForecasts = gustForecasts.map((gust, i) => {
@@ -796,17 +812,14 @@ function setMETARSfromMetarMessage(metars) {
     METARS.value = parsed;
 }
 
-export async function updateWeatherData() {
-    ERRORS.value = [];
+export async function fetchObservations() {
     const fmisid = QUERY_PARAMS.value.fmisid;
     const icaocode = QUERY_PARAMS.value.icaocode;
-    const lat = Number(QUERY_PARAMS.value.lat);
-    const lon = Number(QUERY_PARAMS.value.lon);
     const customName = QUERY_PARAMS.value.name;
     const obsRange = Number(QUERY_PARAMS.value.observation_range) || 12;
 
-    if (lat && lon) {
-        FORECAST_COORDINATES.value = `${lat},${lon}`;
+    if (!fmisid) {
+        return;
     }
 
     NAME.value = customName || icaocode || undefined;
@@ -875,13 +888,11 @@ export async function updateWeatherData() {
     }
 
     STATION_NAME.value = name;
-    if (!NAME.value) {
-        NAME.value = name;
-    }
 
     STATION_COORDINATES.value =
         doc.querySelector("pos")?.innerHTML.trim().split(/\s+/).join(",") ??
         null;
+    FORECAST_COORDINATES.value = STATION_COORDINATES.value;
 
     const gusts = parseTimeSeries(doc, "obs-obs-1-1-windgust").reverse();
     const windSpeed = parseTimeSeries(doc, "obs-obs-1-1-windspeedms").reverse();
@@ -912,8 +923,22 @@ export async function updateWeatherData() {
     }
 
     OBSERVATIONS.value = combined;
+}
 
-    await Promise.all([fetchFmiForecasts(), fetchHighWinds()]);
+export async function updateWeatherData() {
+    ERRORS.value = [];
+    if (FORECAST_COORDINATES.value) {
+        // we can fetch everyting in parallel if we have manually provided coordinates
+        await Promise.all([
+            fetchObservations(),
+            fetchFmiForecasts(),
+            fetchHighWinds(),
+        ]);
+    } else {
+        // otherwise we need to fetch the coordinates first to get the station coordinates
+        await fetchObservations();
+        await Promise.all([fetchFmiForecasts(), fetchHighWinds()]);
+    }
 }
 
 /**
