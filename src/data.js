@@ -654,6 +654,7 @@ async function fetchFmiForecasts() {
                 "WindSpeedMS",
                 "LowCloudCover",
                 "MiddleAndLowCloudCover",
+                "Temperature",
                 "PoP", // precipitation probability
             ].join(","),
             // place: "Utti",
