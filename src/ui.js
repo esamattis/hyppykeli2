@@ -995,10 +995,9 @@ function Info() {
                           ${STATION_NAME}
                       </a>
                       .${" "}
-
-                      <${ForecastLocationInfo} />
                   `
                 : null}
+            <${ForecastLocationInfo} />
             ${metar?.elevation !== undefined
                 ? html`
                       ${" "}Lentokentän korkeus meren pinnasta${" "}
