@@ -29,6 +29,7 @@ export const SAVED_DZs = signal(
  * @param {string|null|undefined} name
  */
 export function saveCurrentDz(name) {
+    name = name ?? undefined;
     let qp = QUERY_PARAMS.value;
     const index = SAVED_DZs.value.findIndex((dz) => dz.name == name);
 
