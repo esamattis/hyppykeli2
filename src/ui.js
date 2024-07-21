@@ -715,7 +715,7 @@ export function SideMenu() {
                                 onClick=${() => {
                                     if (
                                         confirm(
-                                            "Are you sure you want to remove this DZ?",
+                                            "Haluatko varmasti poistaa tallennetun DZ:n?",
                                         )
                                     ) {
                                         // Remove after timeout so the button is still present
