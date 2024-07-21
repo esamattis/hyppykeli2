@@ -906,7 +906,10 @@ export async function fetchObservations() {
     STATION_COORDINATES.value =
         doc.querySelector("pos")?.innerHTML.trim().split(/\s+/).join(",") ??
         null;
-    FORECAST_COORDINATES.value = STATION_COORDINATES.value;
+
+    if (!FORECAST_COORDINATES.value) {
+        FORECAST_COORDINATES.value = STATION_COORDINATES.value;
+    }
 
     const gusts = parseTimeSeries(doc, "obs-obs-1-1-windgust", -1).reverse();
     const windSpeed = parseTimeSeries(
