@@ -785,7 +785,7 @@ export function SideMenu() {
             </form>
 
             <h2>Muokkaa näkymää</h2>
-            <p class="disclaimer">
+            <p>
                 Tee mukautettu näkymä lisäämällä omaa CSS-koodia. Katso
                 esimerkki${" "}
                 <a

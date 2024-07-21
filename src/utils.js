@@ -283,53 +283,6 @@ export function ResizeRecreate({ children }) {
 }
 
 export const EXAMPLE_CSS = `
-    body {
-        display: grid;
-        justify-content: center;
-        align-items: center;
-        grid-template-columns: 1fr 1fr;
-        grid-template-rows: auto;
-        height: 100vh;
-        margin: 0;
-        padding: 20px;
-        box-sizing: border-box;
-        gap: 20px;
-        overflow-y: hidden;
-    }
-
-    .side-scroll {
-        overflow-x: unset !important;
-        overflow-y: unset !important;
-    }
-
-    #high-winds-today {
-        grid-column: 1/2;
-        grid-row: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-
-    .compass {
-        grid-column: 2/3;
-        grid-row: 1;
-        width: 100%;
-        max-width: 450px;
-        margin: auto;
-        box-shadow: unset !important;
-        top: unset !important;
-    }
-
-    #observations-graph {
-        grid-column: 1/3;
-        grid-row: 2;
-        overflow: auto;
-    }
-
-    .chart {
-        height: clamp(200px, 40vh, 300px);
-    }
-
     #clouds,
     #forecasts-graph,
     #forecasts-table,
@@ -341,16 +294,64 @@ export const EXAMPLE_CSS = `
     #title,
     #winds,
     button.help,
-    h2 {
+    .content h2 {
         display: none;
     }
-
+    .content.grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    #observations-graph {
+        grid-column: 1;
+        grid-row: 1;
+        width: 100%;
+        overflow-y: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    #observations-graph .chart {
+        height: clamp(200px, 50vh, 400px) !important;
+        width: clamp(200px, 100vw, 480px) !important;
+    }
+    #high-winds-today.side-scroll {
+        grid-column: 1;
+        grid-row: 2;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .time-header {
+        min-width: 50px;
+    }
+    #compass.compass {
+        grid-column: 2;
+        grid-row: 1/3;
+        width: clamp(200px, 50vw, 600px) !important;
+        position: relative !important;
+        top: unset !important;
+        right: unset !important;
+        box-shadow: none !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
     .compass-observations-gust,
     .compass-observations-speed {
-        display: inline;
+        display: block;
     }
-
-    `;
+    @media (max-width: 900px) {
+        .content.grid {
+            display: block;
+            gap: 0;
+        }
+        #compass.compass {
+            width: clamp(200px, 70vw, 900px) !important;
+            margin: 0 auto;
+        }
+    }
+`;
 
 /**
  * @param {WeatherData|undefined} obs
