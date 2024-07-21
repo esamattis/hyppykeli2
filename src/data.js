@@ -935,7 +935,7 @@ export async function updateWeatherData() {
             fetchHighWinds(),
         ]);
     } else {
-        // otherwise we need to fetch the coordinates first to get the station coordinates
+        // otherwise we need to fetch the stationdata first to get the station coordinates
         await fetchObservations();
         await Promise.all([fetchFmiForecasts(), fetchHighWinds()]);
     }
