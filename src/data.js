@@ -908,14 +908,19 @@ export async function fetchObservations() {
         null;
     FORECAST_COORDINATES.value = STATION_COORDINATES.value;
 
-    const gusts = parseTimeSeries(doc, "obs-obs-1-1-windgust").reverse();
-    const windSpeed = parseTimeSeries(doc, "obs-obs-1-1-windspeedms").reverse();
+    const gusts = parseTimeSeries(doc, "obs-obs-1-1-windgust", -1).reverse();
+    const windSpeed = parseTimeSeries(
+        doc,
+        "obs-obs-1-1-windspeedms",
+        -1,
+    ).reverse();
     const directions = parseTimeSeries(
         doc,
         "obs-obs-1-1-winddirection",
+        -1,
     ).reverse();
 
-    const temperatures = parseTimeSeries(doc, "obs-obs-1-1-t2m").reverse();
+    const temperatures = parseTimeSeries(doc, "obs-obs-1-1-t2m", -99).reverse();
 
     /** @type {WeatherData[]} */
     const combined = gusts.map((gust, i) => {
