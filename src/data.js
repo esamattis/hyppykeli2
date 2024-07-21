@@ -26,11 +26,12 @@ export const SAVED_DZs = signal(
 );
 
 /**
- * @param {string|null} [name]
+ * @param {string|null|undefined} name
  */
 export function saveCurrentDz(name) {
     if (!name) {
-        name = NAME.value;
+        alert("Virheellinen nimi");
+        return;
     }
 
     let qp = QUERY_PARAMS.value;
@@ -336,7 +337,7 @@ export const QUERY_PARAMS = signal(
 );
 
 if (QUERY_PARAMS.value.save) {
-    saveCurrentDz();
+    saveCurrentDz(QUERY_PARAMS.value.name ?? QUERY_PARAMS.value.icaocode);
     navigateQs({ save: undefined }, { replace: true });
 }
 
