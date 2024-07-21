@@ -14,6 +14,48 @@ import { fetchHighWinds } from "./om.js";
 // just exposes the parseMETAR global
 import "metar";
 
+/** @type {Signal<QueryParams[]>} */
+export const SAVED_DZs = signal(
+    (() => {
+        try {
+            return JSON.parse(window.localStorage.getItem("saved_dzs") ?? "[]");
+        } catch {
+            return [];
+        }
+    })(),
+);
+
+/**
+ * @param {string|null} [name]
+ */
+export function saveCurrentDz(name) {
+    if (!name) {
+        name = NAME.value;
+    }
+
+    let qp = QUERY_PARAMS.value;
+    const index = SAVED_DZs.value.findIndex((dz) => dz.name == name);
+
+    qp = { ...qp, name, save: undefined };
+
+    if (index === -1) {
+        SAVED_DZs.value = [...SAVED_DZs.value, qp];
+    } else {
+        SAVED_DZs.value = SAVED_DZs.value.with(index, qp);
+    }
+
+    window.localStorage.setItem("saved_dzs", JSON.stringify(SAVED_DZs));
+}
+
+/**
+ * @param {string} name
+ */
+export function removeSavedDz(name) {
+    const filtered = SAVED_DZs.value.filter((dz) => dz.name !== name);
+    window.localStorage.setItem("saved_dzs", JSON.stringify(filtered));
+    SAVED_DZs.value = filtered;
+}
+
 /**
  * @type {Signal<string|undefined>}
  */
@@ -293,6 +335,11 @@ export const FORECAST_DAY = computed(() => {
 export const QUERY_PARAMS = signal(
     Object.fromEntries(new URLSearchParams(location.search)),
 );
+
+if (QUERY_PARAMS.value.save) {
+    saveCurrentDz();
+    navigateQs({ save: undefined }, { replace: true });
+}
 
 /**
  * @type {Signal<Date>}
@@ -762,6 +809,9 @@ export async function updateWeatherData() {
     }
 
     NAME.value = customName || icaocode || undefined;
+    if (NAME.value) {
+        localStorage.setItem("previous_dz", NAME.value);
+    }
 
     const obsStartTime = new Date();
     obsStartTime.setHours(obsStartTime.getHours() - obsRange, 0, 0, 0);
@@ -869,10 +919,12 @@ export async function updateWeatherData() {
  * Update the query string in the url bar and update the global QUERY_PARAMS signal.
  *
  * @param {QueryParams} params
- * @param {"merge" | "replace"} [mode]
+ * @param {Object} [options]
+ * @param {"merge" | "replace"} [options.mode] defaults to "merge"
+ * @param {boolean} [options.replace]
  */
-export function navigateQs(params, mode) {
-    if (!mode || mode === "merge") {
+export function navigateQs(params, options) {
+    if (!options?.mode || options?.mode === "merge") {
         QUERY_PARAMS.value = {
             ...QUERY_PARAMS.value,
             ...params,
@@ -882,7 +934,12 @@ export function navigateQs(params, mode) {
     }
 
     const qs = new URLSearchParams(removeNullish(QUERY_PARAMS.value));
-    history.pushState(null, "", `?${qs}`);
+
+    if (options?.replace) {
+        history.replaceState(null, "", `?${qs}`);
+    } else {
+        history.pushState(null, "", `?${qs}`);
+    }
 }
 
 /**
