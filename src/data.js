@@ -970,6 +970,8 @@ const DEBUG_DIRECTIONS = [270, 270, 270, 270, 200, 200];
 const THIRTY_MINUTES_IN_MS = 30 * 60 * 1000;
 const MAX_EXTRA_WIDTH = 30;
 const EXTRA_WIDTH_MULTIPLIER = 3;
+
+/** @type {Record<string, string>} */
 const COLOR_MAPPINGS = {
     0: "#E6DB00",
     1: "#2CF000",
@@ -1032,6 +1034,10 @@ const DIRECTION_VARIATION_TABLE = [
 ];
 
 // Helper functions for WIND_VARIATIONS
+
+/**
+ * @param {number[]} directions
+ */
 function calculateAverageDirection(directions) {
     if (DEBUG)
         console.log(`calculateAverageDirection: directions = ${directions}`);
@@ -1062,6 +1068,10 @@ export function calculateVariationRange(directions) {
     return maxDiff;
 }
 
+/**
+ * @param {number} avgSpeed
+ * @param {number} gustSpeed
+ */
 function findBaseWindRef(avgSpeed, gustSpeed) {
     for (const entry of WIND_REF_BASE_TABLE) {
         if (gustSpeed >= entry.gustSpeed && avgSpeed >= entry.avgSpeed) {
@@ -1072,6 +1082,9 @@ function findBaseWindRef(avgSpeed, gustSpeed) {
     return 0;
 }
 
+/**
+ * @param {number} gustDiff
+ */
 function findGustDiffIncrement(gustDiff) {
     for (const entry of GUST_DIFF_TABLE) {
         if (gustDiff >= entry.diff) {
@@ -1081,6 +1094,10 @@ function findGustDiffIncrement(gustDiff) {
     return 0;
 }
 
+/**
+ * @param {number} directionVariation
+ * @param {number} gustSpeed
+ */
 function findDirectionVariationIncrement(directionVariation, gustSpeed) {
     for (const entry of DIRECTION_VARIATION_TABLE) {
         if (
@@ -1093,6 +1110,11 @@ function findDirectionVariationIncrement(directionVariation, gustSpeed) {
     return 0;
 }
 
+/**
+ * @param {number} avgSpeed
+ * @param {number} gustSpeed
+ * @param {number} directionVariation
+ */
 function calculateWindRef(avgSpeed, gustSpeed, directionVariation) {
     if (DEBUG)
         console.log(
@@ -1115,6 +1137,9 @@ function calculateWindRef(avgSpeed, gustSpeed, directionVariation) {
     return result;
 }
 
+/**
+ * @param {WeatherData[]} observations
+ */
 function filterRecentObservations(observations) {
     if (DEBUG) return observations;
     const thirtyMinutesAgo = new Date(Date.now() - THIRTY_MINUTES_IN_MS);
@@ -1123,6 +1148,9 @@ function filterRecentObservations(observations) {
     );
 }
 
+/**
+ * @param {WeatherData[]} observations
+ */
 function extractAndFilterData(observations) {
     const directions = observations
         .map((obs) => obs.direction)
@@ -1136,6 +1164,11 @@ function extractAndFilterData(observations) {
     return { directions, speeds, gusts };
 }
 
+/**
+ * @param {number[]} directions
+ * @param {number[]} speeds
+ * @param {number[]} gusts
+ */
 function calculateWindData(directions, speeds, gusts) {
     const averageDirection = calculateAverageDirection(directions);
     const variationRange = calculateVariationRange(directions);
@@ -1145,6 +1178,10 @@ function calculateWindData(directions, speeds, gusts) {
     return { averageDirection, variationRange, averageSpeed, maxGust };
 }
 
+/**
+ * @param {number} maxGust
+ * @param {number} averageSpeed
+ */
 function calculateExtraWidth(maxGust, averageSpeed) {
     return Math.min(
         Math.max(
@@ -1158,8 +1195,10 @@ function calculateExtraWidth(maxGust, averageSpeed) {
 export const WIND_VARIATIONS = computed(() => {
     if (DEBUG) console.log("WIND_VARIATIONS: Calculating...");
 
+    /** @type {WeatherData[]} */
     const observations = DEBUG
         ? DEBUG_DIRECTIONS.map((dir, idx) => ({
+              source: "mock",
               direction: dir,
               speed: DEBUG_SPEEDS[idx % DEBUG_SPEEDS.length],
               gust: DEBUG_GUSTS[idx % DEBUG_GUSTS.length],

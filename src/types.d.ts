@@ -70,14 +70,14 @@ type OpenMeteoDayData = Record<
  * Interface representing weather data.
  */
 interface WeatherData {
-    source: "metar" | "fmi" | "forecast";
-    gust: number | undefined;
-    speed: number | undefined;
-    direction: number | undefined;
-    temperature: number | undefined;
+    source: "metar" | "fmi" | "forecast" | "mock";
+    gust?: number;
+    speed?: number;
+    direction?: number;
+    temperature?: number;
     rain?: number;
-    lowCloudCover?: number | undefined;
-    middleCloudCover?: number | undefined;
+    lowCloudCover?: number;
+    middleCloudCover?: number;
     time: Date;
 }
 
