@@ -3,6 +3,17 @@
 import { Component, html } from "htm/preact";
 import { Fragment } from "preact";
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
+import { QUERY_PARAMS } from "./data.js";
+
+/**
+ * Logs the provided arguments to the console when the query string contains debug=1
+ * @param {...any} args - The arguments to log.
+ */
+export function debug(...args) {
+    if (QUERY_PARAMS.value.debug) {
+        console.log(...args);
+    }
+}
 
 /**
  * @param {Object} props
@@ -393,4 +404,22 @@ export function filterNullish(array) {
  */
 export function knotsToMs(num) {
     return num * 0.514444;
+}
+
+/**
+ * Calculate the cloud base altitude in meters from the surface temperature and dew point temperature.
+ * https://en.wikipedia.org/wiki/Cloud_base
+ *
+ * @param {number} temp - The surface temperature in Celsius.
+ * @param {number} dewPoint - The dew point temperature in Celsius.
+ * @return {number} - The estimated cloud base altitude in meters.
+ */
+export function calculateCloudBase(temp, dewPoint) {
+    // Calculate the difference between the surface temperature and the dew point temperature
+    const deltaT = temp - dewPoint;
+
+    // Estimate the cloud base altitude in meters
+    const cloudBaseAltitude = 125 * deltaT;
+
+    return cloudBaseAltitude;
 }

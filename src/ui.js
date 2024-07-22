@@ -34,6 +34,7 @@ import {
 import { Graph } from "./graph.js";
 import { Compass } from "./compass.js";
 import {
+    calculateCloudBase,
     dateOffset,
     ErrorBoundary,
     EXAMPLE_CSS,
@@ -42,6 +43,7 @@ import {
     FromNow,
     Help,
     humanDayText,
+    isNullish,
     isValidObservation,
     removeNullish,
     ResizeRecreate,
@@ -365,8 +367,13 @@ const CLOUD_TYPES = {
     OVC: "Täysi pilvikatto",
 };
 
-function LatestMetar() {
+function LatestClouds() {
     const metar = METARS.value?.at(-1);
+    const latest = LATEST_OBSERVATION.value;
+    const dewPointAltitute =
+        !isNullish(latest?.temperature) && !isNullish(latest?.dewPoint)
+            ? calculateCloudBase(latest.temperature, latest.dewPoint)
+            : null;
 
     if (!metar) {
         return null;
@@ -386,7 +393,7 @@ function LatestMetar() {
         <ul>
             ${msg
                 ? html`
-                      <p>${msg}</p>
+                      <li>${msg}</li>
                   `
                 : metar.clouds.map(
                       (cloud, i) => html`
@@ -399,6 +406,28 @@ function LatestMetar() {
                           </li>
                       `,
                   )}
+            ${isNullish(dewPointAltitute)
+                ? null
+                : html`
+                      <li>
+                          <span style="margin-top: 5px; font-style: italic; font-size: 90%">
+                          Kastepisteen korkeus ${dewPointAltitute.toFixed(0)}M
+                          </span>
+
+                          <${Help} label="?">
+                            <p>
+                                Arvio pilvien korkeudesta kastepisteen perusteella.
+                                Laskettu lämpötilasta ${latest?.temperature?.toFixed(1)}°C ja kastepisteestä ${latest?.dewPoint?.toFixed(1)}°C.
+                            </p>
+
+                            <p>
+                                Kastepiste on lämpötila jonka alapuolella vesihöyry tiivistyy pisaroiksi muodostaen pilviä.
+                                Eli arvio kertoo missä korkeudessa lämpötila laskee kastepisteeseen.
+                            </p>
+
+                          </${Help}>
+                      </li>
+                  `}
         </ul>
 
         <p>
@@ -1050,7 +1079,7 @@ export function Root() {
                     <${Anvil} />
                 </h2>
 
-                <${LatestMetar} />
+                <${LatestClouds} />
             </div>
 
             <div id="winds">

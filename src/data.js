@@ -3,6 +3,7 @@
 import { computed, effect, signal } from "@preact/signals";
 import {
     calculateDirectionDifference,
+    debug,
     filterNullish,
     isNullish,
     isValidObservation,
@@ -124,6 +125,7 @@ export const LATEST_OBSERVATION = computed(() => {
         source: "metar",
         lowCloudCover: undefined,
         middleCloudCover: undefined,
+        dewPoint: metar.dewpoint,
         time: metar.time,
         gust: isNullish(gust) ? undefined : knotsToMs(gust),
         speed: isNullish(speed) ? undefined : knotsToMs(speed),
@@ -135,7 +137,6 @@ export const LATEST_OBSERVATION = computed(() => {
     };
 
     if (isValidObservation(metarObs)) {
-        console.log("Latest observation from METAR", metarObs);
         return metarObs;
     }
 });
@@ -775,7 +776,13 @@ export async function fetchObservations() {
             cch: cacheBust,
             starttime: obsStartTime.toISOString(),
             // endtime:
-            parameters: ["winddirection", "windspeedms", "windgust", "t2m"],
+            parameters: [
+                "winddirection",
+                "windspeedms",
+                "windgust",
+                "t2m",
+                "td",
+            ],
             fmisid,
         },
         "/example_data/observations.xml",
@@ -830,6 +837,7 @@ export async function fetchObservations() {
     ).reverse();
 
     const temperatures = parseTimeSeries(doc, "obs-obs-1-1-t2m", -99).reverse();
+    const dewPoints = parseTimeSeries(doc, "obs-obs-1-1-td", -99).reverse();
 
     /** @type {WeatherData[]} */
     const combined = gusts.map((gust, i) => {
@@ -842,6 +850,7 @@ export async function fetchObservations() {
             middleCloudCover: undefined,
             lowCloudCover: undefined,
             temperature: temperatures[i]?.value,
+            dewPoint: dewPoints[i]?.value,
         };
     });
 
@@ -962,7 +971,6 @@ QUERY_PARAMS.subscribe(() => {
 });
 
 // Constants for WIND_VARIATIONS
-const DEBUG = false;
 const DEBUG_SPEEDS = [1];
 const DEBUG_GUSTS = [6];
 const DEBUG_DIRECTIONS = [270, 270, 270, 270, 200, 200];
@@ -1039,8 +1047,7 @@ const DIRECTION_VARIATION_TABLE = [
  * @param {number[]} directions
  */
 function calculateAverageDirection(directions) {
-    if (DEBUG)
-        console.log(`calculateAverageDirection: directions = ${directions}`);
+    debug(`calculateAverageDirection: directions = ${directions}`);
     const sumSin = directions.reduce(
         (sum, dir) => sum + Math.sin((dir * Math.PI) / 180),
         0,
@@ -1050,7 +1057,7 @@ function calculateAverageDirection(directions) {
         0,
     );
     const result = ((Math.atan2(sumSin, sumCos) * 180) / Math.PI + 360) % 360;
-    if (DEBUG) console.log(`calculateAverageDirection: result = ${result}`);
+    debug(`calculateAverageDirection: result = ${result}`);
     return result;
 }
 
@@ -1058,8 +1065,7 @@ function calculateAverageDirection(directions) {
  * @param {number[]} directions
  */
 export function calculateVariationRange(directions) {
-    if (DEBUG)
-        console.log(`calculateVariationRange: directions = ${directions}`);
+    debug(`calculateVariationRange: directions = ${directions}`);
     let maxDiff = 0;
     for (let i = 0; i < directions.length; i++) {
         for (let j = i + 1; j < directions.length; j++) {
@@ -1078,7 +1084,7 @@ export function calculateVariationRange(directions) {
 function findBaseWindRef(avgSpeed, gustSpeed) {
     for (const entry of WIND_REF_BASE_TABLE) {
         if (gustSpeed >= entry.gustSpeed && avgSpeed >= entry.avgSpeed) {
-            if (DEBUG) console.log("BASE WINDREF: " + entry.windRef);
+            debug("BASE WINDREF: " + entry.windRef);
             return entry.windRef;
         }
     }
@@ -1119,10 +1125,9 @@ function findDirectionVariationIncrement(directionVariation, gustSpeed) {
  * @param {number} directionVariation
  */
 function calculateWindRef(avgSpeed, gustSpeed, directionVariation) {
-    if (DEBUG)
-        console.log(
-            `calculateWindRef: avgSpeed = ${avgSpeed}, gustSpeed = ${gustSpeed}, directionVariation = ${directionVariation}`,
-        );
+    debug(
+        `calculateWindRef: avgSpeed = ${avgSpeed}, gustSpeed = ${gustSpeed}, directionVariation = ${directionVariation}`,
+    );
 
     let windRef = findBaseWindRef(avgSpeed, gustSpeed);
     const gustDiff = gustSpeed - avgSpeed;
@@ -1136,7 +1141,7 @@ function calculateWindRef(avgSpeed, gustSpeed, directionVariation) {
     windRef += directionVariationIncrement;
 
     const result = Math.min(Math.max(Math.round(windRef), 0), 4);
-    if (DEBUG) console.log(`calculateWindRef: result = ${result}`);
+    debug(`calculateWindRef: result = ${result}`);
     return result;
 }
 
@@ -1144,7 +1149,7 @@ function calculateWindRef(avgSpeed, gustSpeed, directionVariation) {
  * @param {WeatherData[]} observations
  */
 function filterRecentObservations(observations) {
-    if (DEBUG) return observations;
+    if (QUERY_PARAMS.value.debug) return observations;
     const thirtyMinutesAgo = new Date(Date.now() - THIRTY_MINUTES_IN_MS);
     return observations.filter(
         (obs) => obs.time >= thirtyMinutesAgo && obs.direction !== -1,
@@ -1196,20 +1201,21 @@ function calculateExtraWidth(maxGust, averageSpeed) {
 }
 
 export const WIND_VARIATIONS = computed(() => {
-    if (DEBUG) console.log("WIND_VARIATIONS: Calculating...");
+    debug("WIND_VARIATIONS: Calculating...");
 
     /** @type {WeatherData[]} */
-    const observations = DEBUG
-        ? DEBUG_DIRECTIONS.map((dir, idx) => ({
-              source: "mock",
-              direction: dir,
-              speed: DEBUG_SPEEDS[idx % DEBUG_SPEEDS.length],
-              gust: DEBUG_GUSTS[idx % DEBUG_GUSTS.length],
-              time: new Date(),
-          }))
-        : OBSERVATIONS.value;
+    const observations =
+        QUERY_PARAMS.value.mock === "wind-variations"
+            ? DEBUG_DIRECTIONS.map((dir, idx) => ({
+                  source: "mock",
+                  direction: dir,
+                  speed: DEBUG_SPEEDS[idx % DEBUG_SPEEDS.length],
+                  gust: DEBUG_GUSTS[idx % DEBUG_GUSTS.length],
+                  time: new Date(),
+              }))
+            : OBSERVATIONS.value;
 
-    if (DEBUG) console.log("WIND_VARIATIONS: observations = ", observations);
+    debug("WIND_VARIATIONS: observations = ", observations);
 
     const recentObservations = filterRecentObservations(observations);
 
@@ -1250,6 +1256,6 @@ export const WIND_VARIATIONS = computed(() => {
         extraWidth: calculateExtraWidth(maxGust, averageSpeed),
     };
 
-    if (DEBUG) console.log("WIND_VARIATIONS: result = ", result);
+    debug("WIND_VARIATIONS: result = ", result);
     return result;
 });

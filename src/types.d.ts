@@ -75,6 +75,7 @@ interface WeatherData {
     speed?: number;
     direction?: number;
     temperature?: number;
+    dewPoint?: number;
     rain?: number;
     lowCloudCover?: number;
     middleCloudCover?: number;
@@ -97,6 +98,7 @@ interface CloudLayer {
 interface MetarData {
     clouds: CloudLayer[];
     temperature: number;
+    dewpoint?: number;
     wind: {
         direction: number | "VRB";
         gust: number | undefined;
@@ -112,6 +114,8 @@ interface MetarData {
  * Interface representing query parameters.
  */
 interface QueryParams {
+    debug?: string;
+    mock?: string;
     fmisid?: string;
     icaocode?: string;
     lat?: string;
