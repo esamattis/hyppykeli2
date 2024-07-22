@@ -10,6 +10,7 @@ import {
     knotsToMs,
     removeNullish,
     safeParseNumber,
+    fetchJSON,
 } from "./utils.js";
 import { fetchHighWinds } from "./om.js";
 // just exposes the parseMETAR global
@@ -579,7 +580,7 @@ async function fetchFmiForecasts(coordinates) {
                 "PoP", // precipitation probability
             ].join(","),
             // place: "Utti",
-            latlon: FORECAST_COORDINATES.value,
+            latlon: coordinates,
         },
         "/example_data/forecast.xml",
     );
@@ -709,12 +710,10 @@ async function fetchFmiMetar(icaocode, startTime, cacheBust) {
  * @param {string} icaocode - The ICAO code of the airport.
  */
 async function fetchFlykMetar(icaocode) {
-    const res = await fetch("https://flyk.com/api/metars.geojson");
     /** @type {FlykMetar} */
-    const json = await res.json();
-
+    const data = await fetchJSON("https://flyk.com/api/metars.geojson");
     const re = new RegExp(`^(METAR|SPECI) ${icaocode} `);
-    const features = json.features.find((f) => {
+    const features = data.features.find((f) => {
         return re.test(f.properties.text);
     });
     return features?.properties.text;
@@ -911,27 +910,6 @@ async function fetchRoadStationInfo(roadsid) {
         FORECAST_COORDINATES.value = STATION_COORDINATES.value;
     }
     STATION_NAME.value = data.properties.names.fi + " (Digitraffic)";
-}
-
-/**
- * @param {string} url
- * @param {Object} [options]
- * @param {Record<string, string>} [options.headers]
- */
-async function fetchJSON(url, options) {
-    const { hostname, search } = new URL(url);
-    const res = await fetch(url, {
-        headers: options?.headers,
-    });
-
-    if (!res.ok) {
-        addError(
-            `Virhe ${hostname} API:ssa: ${res.status}, parametrit: ${search}`,
-        );
-        return;
-    }
-
-    return await res.json();
 }
 
 /**
