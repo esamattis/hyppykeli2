@@ -185,8 +185,8 @@ function WindVariations() {
     const { variationRange, averageDirection, color, extraWidth } = variations;
     const radius = INSTRUCTOR_LIMIT_LENGTH; // Radius of the compass circle
     const arcWidth = BASE_ARC_WIDTH + (extraWidth || 0);
-    const outerRadius = radius + arcWidth / 2;
-    const innerRadius = radius - arcWidth / 2;
+    const outerRadius = radius; // Always use the compass radius as the outer radius
+    const innerRadius = radius - arcWidth;
 
     // Calculate the start and end angles for the arc
     let startAngle = (averageDirection + 180 - variationRange / 2 + 360) % 360;
