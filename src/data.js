@@ -124,6 +124,7 @@ export const LATEST_OBSERVATION = computed(() => {
         source: "metar",
         lowCloudCover: undefined,
         middleCloudCover: undefined,
+        dewPoint: metar.dewpoint,
         time: metar.time,
         gust: isNullish(gust) ? undefined : knotsToMs(gust),
         speed: isNullish(speed) ? undefined : knotsToMs(speed),
@@ -135,7 +136,6 @@ export const LATEST_OBSERVATION = computed(() => {
     };
 
     if (isValidObservation(metarObs)) {
-        console.log("Latest observation from METAR", metarObs);
         return metarObs;
     }
 });
@@ -775,7 +775,13 @@ export async function fetchObservations() {
             cch: cacheBust,
             starttime: obsStartTime.toISOString(),
             // endtime:
-            parameters: ["winddirection", "windspeedms", "windgust", "t2m"],
+            parameters: [
+                "winddirection",
+                "windspeedms",
+                "windgust",
+                "t2m",
+                "td",
+            ],
             fmisid,
         },
         "/example_data/observations.xml",
@@ -830,6 +836,7 @@ export async function fetchObservations() {
     ).reverse();
 
     const temperatures = parseTimeSeries(doc, "obs-obs-1-1-t2m", -99).reverse();
+    const dewPoints = parseTimeSeries(doc, "obs-obs-1-1-td", -99).reverse();
 
     /** @type {WeatherData[]} */
     const combined = gusts.map((gust, i) => {
@@ -842,6 +849,7 @@ export async function fetchObservations() {
             middleCloudCover: undefined,
             lowCloudCover: undefined,
             temperature: temperatures[i]?.value,
+            dewPoint: dewPoints[i]?.value,
         };
     });
 

@@ -394,3 +394,21 @@ export function filterNullish(array) {
 export function knotsToMs(num) {
     return num * 0.514444;
 }
+
+/**
+ * Calculate the cloud base altitude in meters from the surface temperature and dew point temperature.
+ * https://en.wikipedia.org/wiki/Cloud_base
+ *
+ * @param {number} temp - The surface temperature in Celsius.
+ * @param {number} dewPoint - The dew point temperature in Celsius.
+ * @return {number} - The estimated cloud base altitude in meters.
+ */
+export function calculateCloudBase(temp, dewPoint) {
+    // Calculate the difference between the surface temperature and the dew point temperature
+    const deltaT = temp - dewPoint;
+
+    // Estimate the cloud base altitude in meters
+    const cloudBaseAltitude = 125 * deltaT;
+
+    return cloudBaseAltitude;
+}
