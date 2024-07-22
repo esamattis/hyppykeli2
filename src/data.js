@@ -753,23 +753,26 @@ function setMETARSfromMetarMessage(metars) {
     METARS.value = parsed;
 }
 
+function getObservationStartTime() {
+    const obsRange = Number(QUERY_PARAMS.value.observation_range) || 12;
+    const obsStartTime = new Date();
+    obsStartTime.setHours(obsStartTime.getHours() - obsRange, 0, 0, 0);
+    return obsStartTime;
+}
+
 /**
-
-
-* @param {string} fmisid
-*/
+ * @param {string} fmisid
+ */
 export async function fetchFmiObservations(fmisid) {
     const icaocode = QUERY_PARAMS.value.icaocode;
     const customName = QUERY_PARAMS.value.name;
-    const obsRange = Number(QUERY_PARAMS.value.observation_range) || 12;
 
     NAME.value = customName || icaocode || undefined;
     if (NAME.value) {
         localStorage.setItem("previous_dz", NAME.value);
     }
 
-    const obsStartTime = new Date();
-    obsStartTime.setHours(obsStartTime.getHours() - obsRange, 0, 0, 0);
+    const obsStartTime = getObservationStartTime();
 
     const cacheBust = Math.floor(Date.now() / 30_000);
 
@@ -916,10 +919,15 @@ async function fetchRoadStationInfo(roadsid) {
  * @param {string} roadsid
  */
 async function fetchRoadObservations(roadsid) {
+    const obsStartTime = getObservationStartTime();
+
     // load in background as not so important
     /** @type {Promise<RoadStationHistoryValue[]|undefined>} */
     const historyPromise = fetchJSON(
-        `https://tie.digitraffic.fi/api/beta/weather-history-data/${roadsid}`,
+        `https://tie.digitraffic.fi/api/beta/weather-history-data/${roadsid}?` +
+            new URLSearchParams({
+                from: obsStartTime.toISOString(),
+            }),
         {
             headers: {
                 "Digitraffic-User": "hyppykeli.fi",
