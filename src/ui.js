@@ -825,6 +825,11 @@ export function SideMenu() {
                 </a>
             </p>
             <${CSSEditor} />
+
+            <!-- prettier-ignore -->
+            <p>
+                Tietoja palvelusta: Katso <a href="/?no_redirect=1">etusivu</a>.
+            </p>
         </div>
     `;
 }
