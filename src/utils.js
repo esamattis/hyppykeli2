@@ -3,6 +3,17 @@
 import { Component, html } from "htm/preact";
 import { Fragment } from "preact";
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
+import { QUERY_PARAMS } from "./data.js";
+
+/**
+ * Logs the provided arguments to the console when the query string contains debug=1
+ * @param {...any} args - The arguments to log.
+ */
+export function debug(...args) {
+    if (QUERY_PARAMS.value.debug) {
+        console.log(...args);
+    }
+}
 
 /**
  * @param {Object} props

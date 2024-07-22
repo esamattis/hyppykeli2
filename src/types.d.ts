@@ -114,6 +114,8 @@ interface MetarData {
  * Interface representing query parameters.
  */
 interface QueryParams {
+    debug?: string;
+    mock?: string;
     fmisid?: string;
     icaocode?: string;
     lat?: string;
