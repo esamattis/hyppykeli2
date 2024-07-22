@@ -1,0 +1,19 @@
+{
+    "type": "module",
+    "scripts": {
+        "dev": "python3 -m http.server",
+        "prettier-check": "prettier --check index.html src/ *.css",
+        "prettier": "prettier --write index.html src/ *.css",
+        "tsc": "tsc",
+        "build": "./build.sh"
+    },
+    "dependencies": {
+        "@preact/signals": "^1.2.3",
+        "chart.js": "^4.4.3",
+        "esbuild": "^0.21.5",
+        "htm": "^3.1.1",
+        "preact": "^10.22.0",
+        "prettier": "^3.3.2",
+        "typescript": "^5.5.3"
+    }
+}

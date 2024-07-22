@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="/styles.css" />
+        <title>Parempi Hyppykeli</title>
+        <style>
+            p {
+                line-height: 1.5;
+            }
+            .dz-list a {
+                font-size: 120%;
+            }
+        </style>
+        <script type="module">
+            import { redirectToDz } from "/src/landing-page.js";
+            redirectToDz();
+        </script>
+        <script>
+            function sortPrevious() {
+                const dzList = document.currentScript.previousElementSibling;
+                const children = Array.from(dzList.children);
+                children.sort((a, b) =>
+                    a.textContent.localeCompare(b.textContent),
+                );
+                dzList.innerHTML = "";
+                for (const child of children) {
+                    dzList.appendChild(child);
+                }
+                dzList.style.display = "block";
+            }
+        </script>
+    </head>
+    <body>
+        <div class="content">
+            <h1>Hyppykeli</h1>
+
+            <!-- prettier-ignore -->
+            <p>
+                Hyppykeli.fi on laskuvarjohyppääjien sääpalvelu joka tarjoaa
+                ajankohtaisia havaintotietoja sekä ennusteita tuulen puuskasta, suunnasta sekä pilvien määrästä ja korkeudesta.
+                Tiedot haetaan
+                <a href="https://www.ilmatieteenlaitos.fi/avoin-data">Ilmatieteenlaitoksen avoimista rajapinnoista</a>. Ylätuulien ennusteet haetaan
+                <a href="https://open-meteo.com/">Open-Meteosta</a>.
+                Osa METAR-sanomista haetaan
+                <a href="https://flyk.com">Flyk.com</a>:n rajapinnasta.
+            </p>
+
+            <!-- prettier-ignore -->
+            <p>
+                Ennusteet voidaan tehdä minne tahansa Suomeen, mutta järkeviä havaintotietoja on saatavilla vain jos Ilmatieteenlaitoksen havaintoasema on lähellä.
+            </p>
+
+            <!-- prettier-ignore -->
+            <p>
+                Palvelun on luonut <a href="https://esamatti.fi">Esa-Matti Suuronen</a>.
+                Se on ilmainen ja avoin kaikille.
+                Lähdekoodit löytyvät GPL-lisenssillä <a href="https://github.com/esamattis/parempi.hyppykeli.fi">Githubista.</a>
+            </p>
+
+            <h2>Hyppypaikat</h2>
+
+            <!-- prettier-ignore -->
+            <p>
+                Seuraaville hyppypaikoille löytyy kattavat säätiedot:
+            </p>
+
+            <div class="dz-list" style="display: none">
+                <p>
+                    <a href="/dz/?fmisid=137208&icaocode=EFJY">EFJY</a>
+                    – Tikkakoski, Jyväskylä
+                </p>
+
+                <p>
+                    <a href="/dz/?fmisid=101191&icaocode=EFUT">EFUT</a>
+                    – Utti, Kouvola
+                </p>
+
+                <p>
+                    <a href="/dz/?fmisid=101044&icaocode=EFPO">EFPO</a>
+                    – Pori
+                </p>
+
+                <p>
+                    <a href="/dz/?fmisid=101237&icaocode=EFLP">EFLP</a>
+                    – Lappeenranta
+                </p>
+
+                <p>
+                    <a href="/dz/?fmisid=101570&icaocode=EFKU">EFKU</a>
+                    – Rissala, Siilinjärvi
+                </p>
+
+                <p>
+                    <a href="/dz/?fmisid=101786&icaocode=EFOU">EFOU</a>
+                    – Oulunsalo, Oulu
+                </p>
+
+                <p>
+                    <a href="/dz/?fmisid=101065&icaocode=EFTU">EFTU</a>
+                    – Turku
+                </p>
+
+                <p>
+                    <a href="/dz/?fmisid=101840&icaocode=EFKE">EFKE</a>
+                    - Lautiosaari, Keminmaa
+                </p>
+
+                <p>
+                    <a href="/dz/?fmisid=101462&icaocode=EFVA">EFVA</a>
+                    - Vaasa
+                </p>
+            </div>
+            <script>
+                sortPrevious();
+            </script>
+
+            <p>Vajaavaiset tiedot löytyvät myös seuraaville paikoille:</p>
+
+            <div class="dz-list" style="display: none">
+                <p>
+                    <!-- prettier-ignore -->
+                    <a href="/dz/?fmisid=101291&lat=61.780727&lon=22.718886&name=EFJM" >EFJM</a>
+                    – Jämijärvi. Ei METAR-sanomia, havaintoasema kaukana.
+                </p>
+
+                <p>
+                    <!-- prettier-ignore -->
+                    <a href="/dz/?fmisid=101310&lat=62.5551416&lon=23.571403&name=EFAL" >EFAL</a>
+                    – Alavus. Ei METAR-sanomia, havaintoasema kaukana.
+                </p>
+
+                <p>
+                    <!-- prettier-ignore -->
+                    <a href="/dz/?fmisid=104796&icaocode=EFLA&lat=61.146406&lon=25.693366&flyk_metar=1" >EFLA</a>
+                    – Vesivehmaa, Asikkala. Vain METAR-sanomat ja ennusteet
+                </p>
+
+                <p>
+                    <!-- prettier-ignore -->
+                    <a href="/dz/?icaocode=EFHK&fmisid=100968&name=Meripuisto&lat=60.155125&lon=24.945773" >Meripuisto</a>
+                    – Meripuisto, Helsinki. EFKH:n havannot ja METAR-sanomat
+                </p>
+            </div>
+            <script>
+                sortPrevious();
+            </script>
+
+            <h2>Luo hyppypaikka</h2>
+
+            <form action="/dz">
+                <style>
+                    @scope {
+                        label {
+                            display: flex;
+                            font-weight: bold;
+                        }
+                        label > span {
+                            width: 200px;
+                            display: flex;
+                        }
+                        .desc {
+                            margin-left: 200px;
+                            font-style: italic;
+                            margin-bottom: 5px;
+                            color: gray;
+                            font-size: 80%;
+                        }
+                        input[type="text"] {
+                            display: flex;
+                            width: 20ch;
+                            padding: 2px;
+                        }
+
+                        label small {
+                            font-weight: normal;
+                            font-size: 75%;
+                        }
+                    }
+                </style>
+
+                <fieldset>
+                    <label>
+                        <span>Nimi</span>
+                        <input type="text" name="name" placeholder="My DZ" />
+                    </label>
+                    <div class="desc"></div>
+
+                    <label>
+                        <span>FMISID</span>
+                        <input type="text" name="fmisid" placeholder="123445" />
+                    </label>
+
+                    <div class="desc">
+                        Hae havaintoaseman FMISID
+                        <a
+                            href="https://www.ilmatieteenlaitos.fi/havaintoasemat"
+                        >
+                            täältä
+                        </a>
+                    </div>
+
+                    <label>
+                        <span>ICAO</span>
+                        <input type="text" name="icaocode" placeholder="EFXY" />
+                    </label>
+
+                    <div class="desc">
+                        Nelikirjaminen lentokentän tunnus, esim. EFUT
+                    </div>
+
+                    <label>
+                        <span>Flyk.com METAR</span>
+                        <input type="checkbox" name="flyk_metar" value="1" />
+                        <small>
+                            Osa METAR-sanomista ei löydy Ilmatieteenlaitoksen
+                            rajapinnoista.
+                        </small>
+                    </label>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Ennusteen koordinaatit</legend>
+                    <label>
+                        <span>Lattitude</span>
+                        <input type="text" name="lat" placeholder="60.1234" />
+                    </label>
+                    <div class="desc"></div>
+
+                    <label>
+                        <span>Longitude</span>
+                        <input type="text" name="lon" placeholder="24.1234" />
+                    </label>
+                    <div class="desc">
+                        Desimaalimuodossa. Ei pakollinen. Käytetään
+                        havaintoaseman sijaintia jos ei annettu.
+                    </div>
+                    <button type="button">Käytä nykyistä sijaintiani</button>
+                    <script>
+                        document.currentScript.previousElementSibling.addEventListener(
+                            "click",
+                            (e) => {
+                                e.target.disabled = true;
+                                navigator.geolocation.getCurrentPosition(
+                                    (position) => {
+                                        e.target.disabled = false;
+                                        document.querySelector(
+                                            'input[name="lat"]',
+                                        ).value = position.coords.latitude;
+                                        document.querySelector(
+                                            'input[name="lon"]',
+                                        ).value = position.coords.longitude;
+                                    },
+                                );
+                            },
+                        );
+                    </script>
+                </fieldset>
+
+                <input type="hidden" name="save" value="1" />
+
+                <button style="margin-top: 10px">Luo</button>
+            </form>
+
+            <p>
+                Hyppypaikka tallenetaan vain tähän selaimeen. Hyppypaikan voi
+                jakaa muille jakamalla sen linkin.
+            </p>
+
+            <p>
+                Vanha versio löytyy vielä
+                <a href="https://hyppykeli-fi.vercel.app/">täältä.</a>
+            </p>
+        </div>
+    </body>
+</html>
