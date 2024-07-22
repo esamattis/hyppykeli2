@@ -355,14 +355,14 @@ function LatestWind() {
             >
                 ${" "}${obs.gust?.toFixed(1) ?? "?"} m/s${" "}
             </span>
-            Tuuli
+            Keskituuli
             <span class="latest-value latest-wind">
                 ${" "}${obs.speed?.toFixed(1) ?? "?"} m/s${" "}
             </span>
 
             Suunta${" "}
             <span class="latest-value latest-wind">
-                ${" "}${obs.direction?.toFixed(0)}°${" "}
+                ${" "}${obs.direction?.toFixed(0) ?? "?"}°${" "}
             </span>
             ${" "}
 
