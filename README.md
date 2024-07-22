@@ -1,5 +1,5 @@
 
-# [parempi.hyppykeli.fi](https://parempi.hyppykeli.fi)
+# [hyppykeli.fi](https://hyppykeli.fi)
 
 Vanha hyppykeli.fi mätäni. Tässä on uusi (2024) joka ehkä toimii paremmin.
 
