@@ -89,9 +89,15 @@ export const STATION_NAME = signal(undefined);
 export const OBSERVATIONS = signal([]);
 
 export const HAS_WIND_OBSERVATIONS = computed(() => {
+    let count = 0;
+
     for (const obs of OBSERVATIONS.value) {
-        // at least one
         if (hasValidWindData(obs)) {
+            count++;
+        }
+
+        // At least two observations with wind data
+        if (count > 1) {
             return true;
         }
     }
