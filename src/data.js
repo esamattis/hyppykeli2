@@ -963,8 +963,6 @@ async function fetchRoadObservations(roadsid) {
     OBSERVATIONS.value = [obs];
 
     const history = await historyPromise;
-    history?.reverse();
-
     if (!history) {
         return;
     }
@@ -1008,6 +1006,8 @@ async function fetchRoadObservations(roadsid) {
             dewPoint: dewPointHistory,
         };
     });
+
+    combined.reverse();
 
     OBSERVATIONS.value = [obs, ...combined];
 }
