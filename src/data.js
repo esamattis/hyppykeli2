@@ -973,21 +973,6 @@ async function fetchRoadObservations(roadsid) {
 
     const gusts = history.filter((v) => v.sensorId === gust.id);
 
-    /**
-     * @param {number|undefined} sensorId
-     * @param {string} time
-     */
-    const findMatchingHistory = (sensorId, time) => {
-        if (isNullish(sensorId)) {
-            return;
-        }
-
-        // No observation name in the history api, must use the sensor id
-        return history.find(
-            (h) => h && h.sensorId === sensorId && h.measuredTime === time,
-        )?.sensorValue;
-    };
-
     /** @type {WeatherData[]} */
     const combined = gusts.flatMap((roadObservation) => {
         // just pick gusts to get an single array of observations
@@ -995,23 +980,26 @@ async function fetchRoadObservations(roadsid) {
             return [];
         }
 
+        const otherObservations = history.filter(
+            (h) => h.measuredTime === roadObservation.measuredTime,
+        );
+
         // find matching history for other values than the gust
-        const windHistory = findMatchingHistory(
-            wind?.id,
-            roadObservation.measuredTime,
-        );
-        const directionHistory = findMatchingHistory(
-            windDirection?.id,
-            roadObservation.measuredTime,
-        );
-        const temperatureHistory = findMatchingHistory(
-            temperature?.id,
-            roadObservation.measuredTime,
-        );
-        const dewPointHistory = findMatchingHistory(
-            dewPoint?.id,
-            roadObservation.measuredTime,
-        );
+        const windHistory = otherObservations.find(
+            (ob) => ob.sensorId === wind?.id,
+        )?.sensorValue;
+
+        const directionHistory = otherObservations.find(
+            (ob) => ob.sensorId === windDirection?.id,
+        )?.sensorValue;
+
+        const temperatureHistory = otherObservations.find(
+            (ob) => ob.sensorId === temperature?.id,
+        )?.sensorValue;
+
+        const dewPointHistory = otherObservations.find(
+            (ob) => ob.sensorId === dewPoint?.id,
+        )?.sensorValue;
 
         return {
             source: "roads",
