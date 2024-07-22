@@ -81,8 +81,8 @@ function ObservationTHead() {
             <th>Puuska</th>
             <th>Tuuli</th>
             <th>Suunta</th>
-            <th>Lämpötila</th>
             <th>KP Korkeus</th>
+            <th>Lämpötila</th>
         </tr>
     `;
 }
@@ -105,7 +105,6 @@ function ObservationRows(props) {
                 <td>
                     <${WindDirection} direction=${point.direction} />
                 </td>
-                <td>${point.temperature?.toFixed(1)} °C</td>
 
                 <td>
                     ${!isNullish(point.dewPoint) &&
@@ -118,6 +117,8 @@ function ObservationRows(props) {
                           `
                         : null}
                 </td>
+
+                <td>${point.temperature?.toFixed(1)} °C</td>
             </tr>
         `;
     });
