@@ -409,10 +409,23 @@ function LatestClouds() {
             ${isNullish(dewPointAltitute)
                 ? null
                 : html`
-                      <li
-                          style="margin-top: 5px; font-style: italic; font-size: 90%"
-                      >
+                      <li>
+                          <span style="margin-top: 5px; font-style: italic; font-size: 90%">
                           Kastepisteen korkeus ${dewPointAltitute.toFixed(0)}M
+                          </span>
+
+                          <${Help} label="?">
+                            <p>
+                                Arvio pilvien korkeudesta kastepisteen perusteella.
+                                Laskettu lämpötilasta ${latest?.temperature?.toFixed(1)}°C ja kastepisteestä ${latest?.dewPoint?.toFixed(1)}°C.
+                            </p>
+
+                            <p>
+                                Kastepiste on lämpötila jonka alapuolella vesihöyry tiivistyy pisaroiksi muodostaen pilviä.
+                                Eli arvio kertoo missä korkeudessa lämpötila laskee kastepisteeseen.
+                            </p>
+
+                          </${Help}>
                       </li>
                   `}
         </ul>
