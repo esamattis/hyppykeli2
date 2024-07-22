@@ -48,6 +48,7 @@ import {
     removeNullish,
     ResizeRecreate,
     saveTextToFile,
+    toMeters,
 } from "./utils.js";
 
 effect(() => {
@@ -81,6 +82,7 @@ function ObservationTHead() {
             <th>Tuuli</th>
             <th>Suunta</th>
             <th>Lämpötila</th>
+            <th>KP Korkeus</th>
         </tr>
     `;
 }
@@ -104,6 +106,18 @@ function ObservationRows(props) {
                     <${WindDirection} direction=${point.direction} />
                 </td>
                 <td>${point.temperature?.toFixed(1)} °C</td>
+
+                <td>
+                    ${!isNullish(point.dewPoint) &&
+                    !isNullish(point.temperature)
+                        ? html`
+                              ${calculateCloudBase(
+                                  point.temperature,
+                                  point.dewPoint,
+                              )}${" "}M
+                          `
+                        : null}
+                </td>
             </tr>
         `;
     });
@@ -327,23 +341,6 @@ function GustTrend() {
     `;
 }
 
-/**
- * @param {number} value
- * @param {string} unit
- * @returns {number}
- */
-function toMeters(value, unit) {
-    if (unit === "hft") {
-        return value * 30.48;
-    }
-
-    if (unit === "ft") {
-        return value * 0.3048;
-    }
-
-    return value;
-}
-
 // const CLOUDS = {
 //     NCD: "Ei pilviä",
 //     VV: "SUMUA PERKELE",
@@ -402,7 +399,9 @@ function LatestClouds() {
                                   ${CLOUD_TYPES[cloud.amount] ?? cloud.amount}
                               </a>
                               ${" "}
-                              ${toMeters(cloud.base, cloud.unit).toFixed(0)}M
+                              ${Math.round(
+                                  toMeters(cloud.base, cloud.unit) / 10,
+                              ) * 10}M
                           </li>
                       `,
                   )}
@@ -411,13 +410,14 @@ function LatestClouds() {
                 : html`
                       <li>
                           <span style="margin-top: 5px; font-style: italic; font-size: 90%">
-                          Kastepisteen korkeus ${dewPointAltitute.toFixed(0)}M
+                          Kastepisteen korkeus ${dewPointAltitute}M
                           </span>
 
                           <${Help} label="?">
                             <p>
                                 Arvio pilvien korkeudesta kastepisteen perusteella.
-                                Laskettu lämpötilasta ${latest?.temperature?.toFixed(1)}°C ja kastepisteestä ${latest?.dewPoint?.toFixed(1)}°C.
+                                Laskettu lämpötilasta ${latest?.temperature?.toFixed(1)}°C ja kastepisteestä ${latest?.dewPoint?.toFixed(1)}°C
+                                pyöristeän lähimpään 100 metriin.
                             </p>
 
                             <p>

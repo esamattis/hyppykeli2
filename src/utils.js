@@ -421,5 +421,23 @@ export function calculateCloudBase(temp, dewPoint) {
     // Estimate the cloud base altitude in meters
     const cloudBaseAltitude = 125 * deltaT;
 
-    return cloudBaseAltitude;
+    // Round to the nearest 100 meters
+    return Math.round(cloudBaseAltitude / 100) * 100;
+}
+
+/**
+ * @param {number} value
+ * @param {string} unit
+ * @returns {number}
+ */
+export function toMeters(value, unit) {
+    if (unit === "hft") {
+        return value * 30.48;
+    }
+
+    if (unit === "ft") {
+        return value * 0.3048;
+    }
+
+    return value;
 }
