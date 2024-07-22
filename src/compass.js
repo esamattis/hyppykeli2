@@ -6,7 +6,7 @@ import {
     OBSERVATIONS,
     WIND_VARIATIONS,
 } from "./data.js";
-import { FromNow, Help, isNullish, isValidObservation } from "./utils.js";
+import { FromNow, Help, isNullish, hasValidWindData } from "./utils.js";
 
 // Constants for needle length calculation
 const MIN_NEEDLE_LENGTH = 30;
@@ -153,7 +153,7 @@ function Needle() {
         return null;
     }
 
-    if (!isValidObservation(obs)) {
+    if (!hasValidWindData(obs)) {
         return null;
     }
 

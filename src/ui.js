@@ -44,7 +44,7 @@ import {
     Help,
     humanDayText,
     isNullish,
-    isValidObservation,
+    hasValidWindData,
     removeNullish,
     ResizeRecreate,
     saveTextToFile,
@@ -298,7 +298,7 @@ function LatestWind() {
         return null;
     }
 
-    if (!isValidObservation(obs)) {
+    if (!hasValidWindData(obs)) {
         return html`
             <p>Ei havaintoja :(</p>
         `;

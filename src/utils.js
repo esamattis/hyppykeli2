@@ -367,7 +367,7 @@ export const EXAMPLE_CSS = `
 /**
  * @param {WeatherData|undefined} obs
  */
-export function isValidObservation(obs) {
+export function hasValidWindData(obs) {
     if (!obs) {
         return false;
     }

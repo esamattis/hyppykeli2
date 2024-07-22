@@ -6,7 +6,7 @@ import {
     debug,
     filterNullish,
     isNullish,
-    isValidObservation,
+    hasValidWindData,
     knotsToMs,
     removeNullish,
     safeParseNumber,
@@ -91,7 +91,7 @@ export const OBSERVATIONS = signal([]);
 export const HAS_WIND_OBSERVATIONS = computed(() => {
     for (const obs of OBSERVATIONS.value) {
         // at least one
-        if (isValidObservation(obs)) {
+        if (hasValidWindData(obs)) {
             return true;
         }
     }
@@ -108,7 +108,7 @@ export const HOVERED_OBSERVATION = signal(undefined);
  * @type {Signal<WeatherData|undefined>}
  */
 export const LATEST_OBSERVATION = computed(() => {
-    if (OBSERVATIONS.value[0] && isValidObservation(OBSERVATIONS.value[0])) {
+    if (OBSERVATIONS.value[0] && hasValidWindData(OBSERVATIONS.value[0])) {
         return OBSERVATIONS.value[0];
     }
 
@@ -136,7 +136,7 @@ export const LATEST_OBSERVATION = computed(() => {
         temperature: metar.temperature,
     };
 
-    if (isValidObservation(metarObs)) {
+    if (hasValidWindData(metarObs)) {
         return metarObs;
     }
 });
