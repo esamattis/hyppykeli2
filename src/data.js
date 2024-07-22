@@ -896,6 +896,11 @@ async function fetchRoadStationInfo(roadsid) {
         },
     );
 
+    if (!res.ok) {
+        addError(`Virhe Digitraffic API:ssa: ${res.status}`);
+        return;
+    }
+
     /** @type {RoadStationInfo} */
     const data = await res.json();
 
@@ -918,6 +923,11 @@ async function fetchRoadObservations(roadsid) {
             },
         },
     );
+
+    if (!res.ok) {
+        addError(`Virhe Digitraffic API:ssa: ${res.status}`);
+        return;
+    }
 
     /** @type {RoadStationObservations} */
     const data = await res.json();
