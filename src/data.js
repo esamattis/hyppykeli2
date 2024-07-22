@@ -829,7 +829,7 @@ export async function fetchFmiObservations(fmisid) {
         return;
     }
 
-    STATION_NAME.value = name;
+    STATION_NAME.value = name + " (FMI)";
 
     STATION_COORDINATES.value =
         doc.querySelector("pos")?.innerHTML.trim().split(/\s+/).join(",") ??
@@ -897,7 +897,7 @@ async function fetchRoadStationInfo(roadsid) {
     if (!FORECAST_COORDINATES.value) {
         FORECAST_COORDINATES.value = STATION_COORDINATES.value;
     }
-    STATION_NAME.value = data.properties.names.fi;
+    STATION_NAME.value = data.properties.names.fi + " (Digitraffic)";
 }
 
 /**
