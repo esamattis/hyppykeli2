@@ -400,6 +400,25 @@ export function filterNullish(array) {
 }
 
 /**
+ * Execute the given callback and return value only if all values are non-nullish (not null or undefined).
+ *
+ * @template T
+ * @template R
+ * @param {T[]} values
+ * @param {(...values: NonNullable<T>[]) => R} cb
+ * @returns {R | null}
+ */
+export function whenAll(values, cb) {
+    const ok = values.every((value) => value !== null && value !== undefined);
+    return ok
+        ? cb(
+              // @ts-ignore
+              ...values,
+          )
+        : null;
+}
+
+/**
  * @param {number} num
  */
 export function knotsToMs(num) {

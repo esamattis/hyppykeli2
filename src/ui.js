@@ -49,6 +49,7 @@ import {
     ResizeRecreate,
     saveTextToFile,
     toMeters,
+    whenAll,
 } from "./utils.js";
 
 effect(() => {
@@ -107,15 +108,12 @@ function ObservationRows(props) {
                 </td>
 
                 <td>
-                    ${!isNullish(point.dewPoint) &&
-                    !isNullish(point.temperature)
-                        ? html`
-                              ${calculateCloudBase(
-                                  point.temperature,
-                                  point.dewPoint,
-                              )}${" "}M
-                          `
-                        : null}
+                    ${whenAll(
+                        [point.dewPoint, point.temperature],
+                        (temp, dew) => html`
+                            ${calculateCloudBase(temp, dew)}${" "}M
+                        `,
+                    )}
                 </td>
 
                 <td>${point.temperature?.toFixed(1)} °C</td>
@@ -189,15 +187,12 @@ function ForecastRows(props) {
                 </td>
 
                 <td>
-                    ${!isNullish(point.dewPoint) &&
-                    !isNullish(point.temperature)
-                        ? html`
-                              ${calculateCloudBase(
-                                  point.temperature,
-                                  point.dewPoint,
-                              )}${" "}M
-                          `
-                        : null}
+                    ${whenAll(
+                        [point.dewPoint, point.temperature],
+                        (temp, dew) => html`
+                            ${calculateCloudBase(temp, dew)}${" "}M
+                        `,
+                    )}
                 </td>
 
                 <td>${point.rain?.toFixed(0)}%</td>
@@ -385,10 +380,6 @@ const CLOUD_TYPES = {
 function LatestClouds() {
     const metar = METARS.value?.at(-1);
     const latest = LATEST_OBSERVATION.value;
-    const dewPointAltitute =
-        !isNullish(latest?.temperature) && !isNullish(latest?.dewPoint)
-            ? calculateCloudBase(latest.temperature, latest.dewPoint)
-            : null;
 
     if (!metar) {
         return null;
@@ -423,18 +414,19 @@ function LatestClouds() {
                           </li>
                       `,
                   )}
-            ${isNullish(dewPointAltitute)
-                ? null
-                : html`
+            ${whenAll(
+                [latest?.temperature, latest?.dewPoint],
+                (temp, dew) =>
+                    html`
                       <li>
                           <span style="margin-top: 5px; font-style: italic; font-size: 90%">
-                          Kastepisteen korkeus ${dewPointAltitute}M
+                          Kastepisteen korkeus ${calculateCloudBase(temp, dew)}M
                           </span>
 
                           <${Help} label="?">
                             <p>
                                 Arvio mahdollisten pilvien korkeudesta kastepisteen perusteella.
-                                Laskettu lämpötilasta ${latest?.temperature?.toFixed(1)}°C ja kastepisteestä ${latest?.dewPoint?.toFixed(1)}°C
+                                Laskettu lämpötilasta ${temp.toFixed(1)}°C ja kastepisteestä ${dew.toFixed(1)}°C
                                 pyöristäen lähimpään 100 metriin.
                             </p>
 
@@ -445,7 +437,8 @@ function LatestClouds() {
 
                           </${Help}>
                       </li>
-                  `}
+                  `,
+            )}
         </ul>
 
         <p>
