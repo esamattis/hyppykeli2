@@ -72,13 +72,17 @@ function calculateNeedleLength(gust) {
 }
 
 export function Compass() {
-    const circle = INSTRUCTOR_LIMIT_LENGTH;
+    const urlParams = new URLSearchParams(window.location.search);
+    const rc = parseInt(urlParams.get("rc"), 10);
+    const rotation = isNaN(rc) ? 0 : rc; // Default to 0 degrees if invalid
+    const circle = INSTRUCTOR_LIMIT_LENGTH; 
     const studentCircle = STUDENT_LIMIT_LENGTH;
     const latestObservation = OBSERVATIONS.value[0];
     // prettier-ignore
     return html`
         <div id="compass" class="compass">
             <svg
+                style="transform: rotate(${rotation}deg); transform-origin: center;"
                 viewBox="0 0 400 400"
                 xmlns="http://www.w3.org/2000/svg">
 
@@ -101,6 +105,7 @@ export function Compass() {
                     fill="black"
                     font-weight="bold"
                     class="compass-observations-gust"
+                    style="transform: rotate(-${rotation}deg); transform-origin: center;"
                 >
                     ${latestObservation ? latestObservation.gust + " m/s" : ""}
                 </text>
@@ -111,6 +116,7 @@ export function Compass() {
                     text-anchor="middle"
                     fill="black"
                     class="compass-observations-speed"
+                    style="transform: rotate(-${rotation}deg); transform-origin: center;"
                 >
                     ${latestObservation ? latestObservation.speed + " m/s" : ""}
                 </text>
