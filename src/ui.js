@@ -415,7 +415,7 @@ function LatestClouds() {
 
                           <${Help} label="?">
                             <p>
-                                Arvio pilvien korkeudesta kastepisteen perusteella.
+                                Arvio mahdollisten pilvien korkeudesta kastepisteen perusteella.
                                 Laskettu lämpötilasta ${latest?.temperature?.toFixed(1)}°C ja kastepisteestä ${latest?.dewPoint?.toFixed(1)}°C
                                 pyöristäen lähimpään 100 metriin.
                             </p>
