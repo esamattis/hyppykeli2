@@ -109,7 +109,7 @@ function ObservationRows(props) {
 
                 <td>
                     ${whenAll(
-                        [point.dewPoint, point.temperature],
+                        [point.temperature, point.dewPoint],
                         (temp, dew) => html`
                             ${calculateCloudBase(temp, dew)}${" "}M
                         `,
@@ -188,7 +188,7 @@ function ForecastRows(props) {
 
                 <td>
                     ${whenAll(
-                        [point.dewPoint, point.temperature],
+                        [point.temperature, point.dewPoint],
                         (temp, dew) => html`
                             ${calculateCloudBase(temp, dew)}${" "}M
                         `,
