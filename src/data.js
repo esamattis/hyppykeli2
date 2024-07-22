@@ -108,7 +108,9 @@ export const HOVERED_OBSERVATION = signal(undefined);
  * @type {Signal<WeatherData|undefined>}
  */
 export const LATEST_OBSERVATION = computed(() => {
-    if (OBSERVATIONS.value[0] && hasValidWindData(OBSERVATIONS.value[0])) {
+    const obs = OBSERVATIONS.value[0];
+
+    if (obs && hasValidWindData(obs)) {
         return OBSERVATIONS.value[0];
     }
 
@@ -125,7 +127,8 @@ export const LATEST_OBSERVATION = computed(() => {
         source: "metar",
         lowCloudCover: undefined,
         middleCloudCover: undefined,
-        dewPoint: metar.dewpoint,
+        temperature: obs?.temperature ?? metar.temperature,
+        dewPoint: obs?.dewPoint ?? metar.dewpoint,
         time: metar.time,
         gust: isNullish(gust) ? undefined : knotsToMs(gust),
         speed: isNullish(speed) ? undefined : knotsToMs(speed),
@@ -133,7 +136,6 @@ export const LATEST_OBSERVATION = computed(() => {
             typeof metar.wind.direction === "number"
                 ? metar.wind.direction
                 : undefined,
-        temperature: metar.temperature,
     };
 
     if (hasValidWindData(metarObs)) {
