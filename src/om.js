@@ -99,12 +99,10 @@ export function clearOMCache() {
     localStorage.removeItem("ECMWFWindAloftCoordinates");
 }
 
-export async function fetchHighWinds() {
-    if (!FORECAST_COORDINATES.value) {
-        throw new Error("No coordinates, cannot fetch fmi forecasts");
-    }
-
-    const coordinates = FORECAST_COORDINATES.value;
+/**
+ * @param {string} coordinates
+ */
+export async function fetchHighWinds(coordinates) {
     const cachedData = localStorage.getItem("ECMWFWindAloft");
     const cachedTime = localStorage.getItem("ECMWFWindAloftTime");
     const cachedCoordinates = localStorage.getItem("ECMWFWindAloftCoordinates");

@@ -70,7 +70,7 @@ type OpenMeteoDayData = Record<
  * Interface representing weather data.
  */
 interface WeatherData {
-    source: "metar" | "fmi" | "forecast" | "mock";
+    source: "metar" | "fmi" | "roads" | "forecast" | "mock";
     gust?: number;
     speed?: number;
     direction?: number;
@@ -118,6 +118,7 @@ interface QueryParams {
     mock?: string;
     rc?: string;
     fmisid?: string;
+    roadsid?: string;
     icaocode?: string;
     lat?: string;
     lon?: string;
@@ -219,6 +220,66 @@ interface MetarJSResponse {
     temperature: number;
     dewpoint: number;
     altimeterInHpa: number;
+}
+
+interface RoadSensorValue {
+    id: number;
+    stationId: number;
+    name: string;
+    shortName: string;
+    measuredTime: string;
+    value: number;
+    unit: string;
+}
+
+interface RoadStationObservations {
+    id: number;
+    dataUpdatedTime: string;
+    sensorValues: RoadSensorValue[];
+}
+
+interface RoadStationInfo {
+    type: string;
+    id: number;
+    geometry: {
+        type: string;
+        coordinates: [number, number, number];
+    };
+    properties: {
+        id: number;
+        name: string;
+        collectionStatus: string;
+        state: string | null;
+        dataUpdatedTime: string;
+        collectionInterval: number;
+        names: {
+            fi: string;
+            sv: string;
+            en: string;
+        };
+        roadAddress: {
+            roadNumber: number;
+            roadSection: number;
+            distanceFromRoadSectionStart: number;
+            carriageway: string;
+            side: string;
+            contractArea: string;
+            contractAreaCode: number;
+        };
+        liviId: string;
+        country: string | null;
+        startTime: string;
+        repairMaintenanceTime: string | null;
+        annualMaintenanceTime: string | null;
+        purpose: string | null;
+        municipality: string;
+        municipalityCode: number;
+        province: string;
+        provinceCode: number;
+        stationType: string;
+        master: boolean;
+        sensors: number[];
+    };
 }
 
 declare module "metar" {}

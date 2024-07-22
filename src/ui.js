@@ -418,10 +418,7 @@ const CLOUD_TYPES = {
 function LatestClouds() {
     const metar = METARS.value?.at(-1);
     const latest = LATEST_OBSERVATION.value;
-
-    if (!metar) {
-        return null;
-    }
+    const time = metar?.time ?? latest?.time;
 
     let msg = "";
 
@@ -439,7 +436,7 @@ function LatestClouds() {
                 ? html`
                       <li>${msg}</li>
                   `
-                : metar.clouds.map(
+                : metar?.clouds.map(
                       (cloud, i) => html`
                           <li>
                               <a href=${cloud.href}>
@@ -480,10 +477,14 @@ function LatestClouds() {
         </ul>
 
         <p>
-            <${FromNow} date=${metar.time} />
+            <${FromNow} date=${time} />
 
             <br />
-            <em class="metar">${metar.metar}</em>
+            ${metar?.metar
+                ? html`
+                      <em class="metar">${metar.metar}</em>
+                  `
+                : null}
         </p>
     `;
 }
@@ -1070,8 +1071,7 @@ function Info() {
         <div id="info">
             ${STATION_NAME.value
                 ? html`
-                      Havaintotiedot haettu Ilmatieteenlaitoksen
-                      havaintoasemalta${" "}
+                      Havaintotiedot haettu havaintoasemalta${" "}
                       <a
                           href="https://www.google.fi/maps/place/${STATION_COORDINATES.value}"
                       >

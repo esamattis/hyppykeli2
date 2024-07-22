@@ -516,11 +516,10 @@ export function addError(msg) {
     ERRORS.value = [...ERRORS.value, msg];
 }
 
-async function fetchFmiForecasts() {
-    if (!FORECAST_COORDINATES.value) {
-        throw new Error("No coordinates, cannot fetch fmi forecasts");
-    }
-
+/**
+ * @param {string} coordinates
+ */
+async function fetchFmiForecasts(coordinates) {
     const forecastRange = Number(QUERY_PARAMS.value.forecast_range) || 12;
 
     const forecastStartTime = new Date();
@@ -743,15 +742,15 @@ function setMETARSfromMetarMessage(metars) {
     METARS.value = parsed;
 }
 
-export async function fetchObservations() {
-    const fmisid = QUERY_PARAMS.value.fmisid;
+/**
+
+
+* @param {string} fmisid
+*/
+export async function fetchFmiObservations(fmisid) {
     const icaocode = QUERY_PARAMS.value.icaocode;
     const customName = QUERY_PARAMS.value.name;
     const obsRange = Number(QUERY_PARAMS.value.observation_range) || 12;
-
-    if (!fmisid) {
-        return;
-    }
 
     NAME.value = customName || icaocode || undefined;
     if (NAME.value) {
@@ -872,19 +871,102 @@ export async function fetchObservations() {
     OBSERVATIONS.value = combined;
 }
 
+/**
+ * @param {string} roadsid
+ */
+async function fetchRoadStationInfo(roadsid) {
+    const res = await fetch(
+        `https://tie.digitraffic.fi/api/weather/v1/stations/${roadsid}`,
+        {
+            headers: {
+                "Digitraffic-User": "hyppykeli.fi",
+            },
+        },
+    );
+
+    /** @type {RoadStationInfo} */
+    const data = await res.json();
+
+    STATION_COORDINATES.value = `${data.geometry.coordinates[1]},${data.geometry.coordinates[0]}`;
+    if (!FORECAST_COORDINATES.value) {
+        FORECAST_COORDINATES.value = STATION_COORDINATES.value;
+    }
+    STATION_NAME.value = data.properties.names.fi;
+}
+
+/**
+ * @param {string} roadsid
+ */
+async function fetchRoadObservations(roadsid) {
+    const res = await fetch(
+        `https://tie.digitraffic.fi/api/weather/v1/stations/${roadsid}/data`,
+        {
+            headers: {
+                "Digitraffic-User": "hyppykeli.fi",
+            },
+        },
+    );
+
+    /** @type {RoadStationObservations} */
+    const data = await res.json();
+
+    const gust = data.sensorValues.find((v) => v.name === "MAKSIMITUULI");
+    const wind = data.sensorValues.find((v) => v.name === "KESKITUULI");
+    const windDirection = data.sensorValues.find(
+        (v) => v.name === "TUULENSUUNTA",
+    );
+    const temperature = data.sensorValues.find((v) => v.name === "ILMA");
+    const dewPoint = data.sensorValues.find((v) => v.name === "KASTEPISTE");
+
+    /** @type {WeatherData} */
+    const obs = {
+        source: "roads",
+        speed: wind?.value,
+        gust: gust?.value,
+        direction: windDirection?.value,
+        temperature: temperature?.value,
+        dewPoint: dewPoint?.value,
+        time: new Date(data.dataUpdatedTime),
+    };
+
+    OBSERVATIONS.value = [obs];
+}
+
+async function fetchObservations() {
+    if (QUERY_PARAMS.value.fmisid) {
+        await fetchFmiObservations(QUERY_PARAMS.value.fmisid);
+    } else if (QUERY_PARAMS.value.roadsid) {
+        await Promise.all([
+            fetchRoadObservations(QUERY_PARAMS.value.roadsid),
+            fetchRoadStationInfo(QUERY_PARAMS.value.roadsid),
+        ]);
+    } else {
+        addError(
+            "Ilmatieteenlaitoksen eikä tiehallinnon havaintoasemaa ole määritetty.",
+        );
+    }
+}
+
 export async function updateWeatherData() {
     ERRORS.value = [];
     if (FORECAST_COORDINATES.value) {
         // we can fetch everyting in parallel if we have manually provided coordinates
         await Promise.all([
             fetchObservations(),
-            fetchFmiForecasts(),
-            fetchHighWinds(),
+            fetchFmiForecasts(FORECAST_COORDINATES.value),
+            fetchHighWinds(FORECAST_COORDINATES.value),
         ]);
     } else {
         // otherwise we need to fetch the stationdata first to get the station coordinates
         await fetchObservations();
-        await Promise.all([fetchFmiForecasts(), fetchHighWinds()]);
+        if (FORECAST_COORDINATES.value) {
+            await Promise.all([
+                fetchFmiForecasts(FORECAST_COORDINATES.value),
+                fetchHighWinds(FORECAST_COORDINATES.value),
+            ]);
+        } else {
+            addError("Koordinaattien haku epännistui havaintoasemalta.");
+        }
     }
 }
 
