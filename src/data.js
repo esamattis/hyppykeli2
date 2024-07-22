@@ -1063,7 +1063,7 @@ export function calculateVariationRange(directions) {
     let maxDiff = 0;
     for (let i = 0; i < directions.length; i++) {
         for (let j = i + 1; j < directions.length; j++) {
-            const diff = Math.abs(directions[i] - directions[j]);
+            const diff = Math.abs((directions[i] ?? 0) - (directions[j] ?? 0));
             const adjustedDiff = Math.min(diff, 360 - diff);
             maxDiff = Math.max(maxDiff, adjustedDiff);
         }
