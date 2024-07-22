@@ -261,7 +261,13 @@ if (QUERY_PARAMS.value.save) {
         if (!name) {
             return;
         }
-        unsub();
+
+        //  unsub is not properly defined if the name is already set.
+        // Workaround by setting a timeout.
+        setTimeout(() => {
+            unsub();
+        }, 0);
+
         saveCurrentDz(name);
         navigateQs({ save: undefined }, { replace: true });
     });
