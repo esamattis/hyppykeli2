@@ -4,6 +4,7 @@ import {
     HOVERED_OBSERVATION,
     LATEST_OBSERVATION,
     OBSERVATIONS,
+    QUERY_PARAMS,
     WIND_VARIATIONS,
 } from "./data.js";
 import { FromNow, Help, isNullish, hasValidWindData } from "./utils.js";
@@ -72,12 +73,12 @@ function calculateNeedleLength(gust) {
 }
 
 export function Compass() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const rc = parseInt(urlParams.get("rc"), 10);
+    const rc = parseInt(QUERY_PARAMS.value.rc ?? "0", 10);
     const rotation = isNaN(rc) ? 0 : rc; // Default to 0 degrees if invalid
-    const circle = INSTRUCTOR_LIMIT_LENGTH; 
+    const circle = INSTRUCTOR_LIMIT_LENGTH;
     const studentCircle = STUDENT_LIMIT_LENGTH;
     const latestObservation = OBSERVATIONS.value[0];
+
     // prettier-ignore
     return html`
         <div id="compass" class="compass">

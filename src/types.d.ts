@@ -116,6 +116,7 @@ interface MetarData {
 interface QueryParams {
     debug?: string;
     mock?: string;
+    rc?: string;
     fmisid?: string;
     icaocode?: string;
     lat?: string;
