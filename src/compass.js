@@ -3,11 +3,12 @@ import { html } from "htm/preact";
 import {
     HOVERED_OBSERVATION,
     LATEST_OBSERVATION,
+    navigateQs,
     OBSERVATIONS,
     QUERY_PARAMS,
     WIND_VARIATIONS,
 } from "./data.js";
-import { FromNow, Help, isNullish, hasValidWindData } from "./utils.js";
+import { FromNow, hasValidWindData, Help, isNullish } from "./utils.js";
 
 // Constants for needle length calculation
 const MIN_NEEDLE_LENGTH = 30;
@@ -78,10 +79,17 @@ export function Compass() {
     const circle = INSTRUCTOR_LIMIT_LENGTH;
     const studentCircle = STUDENT_LIMIT_LENGTH;
     const latestObservation = OBSERVATIONS.value[0];
+    const rotate = () => {
+        const current = parseInt(QUERY_PARAMS.value.rc ?? "0", 10);
+        navigateQs({ rc: String(current + 20) });
+    };
 
     // prettier-ignore
     return html`
         <div id="compass" class="compass">
+            <button type="button" onClick=${rotate}>
+                Käännä
+            </button>
             <svg
                 style="transform: rotate(${rotation}deg); transform-origin: center;"
                 viewBox="0 0 400 400"
