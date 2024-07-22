@@ -235,7 +235,7 @@ function CloudCover(props) {
     return html`
         <span class="cloud-cover">
             <${PieChart} percentage=${props.percentage} />
-            ${props.percentage} %
+            ${props.percentage.toFixed(0)} %
         </span>
     `;
 }
