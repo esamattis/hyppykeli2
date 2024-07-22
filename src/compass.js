@@ -185,15 +185,19 @@ function WindVariations() {
     const { variationRange, averageDirection, color, extraWidth } = variations;
     const radius = INSTRUCTOR_LIMIT_LENGTH; // Radius of the compass circle
     const arcWidth = BASE_ARC_WIDTH + (extraWidth || 0);
-    const outerRadius = radius + arcWidth / 2;
-    const innerRadius = radius - arcWidth / 2;
+    const outerRadius = radius; // Always use the compass radius as the outer radius
+    const innerRadius = radius - arcWidth;
 
-    // Calculate the start and end angles for the arc (180-degree swap)
-    const startAngle =
-        (averageDirection + 180 - variationRange / 2 + 360) % 360;
-    const endAngle = (averageDirection + 180 + variationRange / 2) % 360;
+    // Calculate the start and end angles for the arc
+    let startAngle = (averageDirection + 180 - variationRange / 2 + 360) % 360;
+    let endAngle = (averageDirection + 180 + variationRange / 2 + 360) % 360;
 
-    // Convert angles to radians (no change in offset as it's for SVG coordinates)
+    // Adjust for crossing the 0-degree mark
+    if (startAngle > endAngle) {
+        endAngle += 360; // Extend endAngle for correct arc drawing
+    }
+
+    // Convert angles to radians for SVG coordinates
     const startRad = ((startAngle - 90) * Math.PI) / 180;
     const endRad = ((endAngle - 90) * Math.PI) / 180;
 
@@ -207,16 +211,13 @@ function WindVariations() {
     const endInnerX = 200 + innerRadius * Math.cos(startRad);
     const endInnerY = 200 + innerRadius * Math.sin(startRad);
 
-    // Determine if the arc should be drawn the long way around
-    const longArc = variationRange > 180 ? 1 : 0;
-
     return html`
         <g>
             <path
                 d=${`M ${startOuterX} ${startOuterY}
-                    A ${outerRadius} ${outerRadius} 0 ${longArc} 1 ${endOuterX} ${endOuterY}
+                    A ${outerRadius} ${outerRadius} 0 0 1 ${endOuterX} ${endOuterY}
                     L ${startInnerX} ${startInnerY}
-                    A ${innerRadius} ${innerRadius} 0 ${longArc} 0 ${endInnerX} ${endInnerY} Z`}
+                    A ${innerRadius} ${innerRadius} 0 0 0 ${endInnerX} ${endInnerY} Z`}
                 fill=${color}
                 fill-opacity="0.2"
                 stroke=${color}

@@ -178,100 +178,6 @@ function mockLatestObservation(original) {
 }
 
 /**
- * @typedef {Object} WindVariations
- * @property {number} variationRange
- * @property {number} averageDirection
- * @property {string} color
- * @property {number} extraWidth
- */
-
-/**
- * @type {Signal<WindVariations | undefined>}
- */
-export const WIND_VARIATIONS = computed(() => {
-    const observations = OBSERVATIONS.value;
-
-    // Calculate wind variations for the last 30 minutes
-    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
-    const recentObservations = observations.filter(
-        (obs) => obs.time >= thirtyMinutesAgo && obs.direction !== -1,
-    );
-
-    if (recentObservations.length === 0) {
-        return;
-    }
-
-    const directions = filterNullish(
-        recentObservations.map((obs) => obs.direction),
-    );
-    const speeds = filterNullish(recentObservations.map((obs) => obs.speed));
-    const gusts = filterNullish(recentObservations.map((obs) => obs.gust));
-
-    // Calculate the average direction
-    const sumSin = directions.reduce(
-        (sum, dir) => sum + Math.sin((dir * Math.PI) / 180),
-        0,
-    );
-    const sumCos = directions.reduce(
-        (sum, dir) => sum + Math.cos((dir * Math.PI) / 180),
-        0,
-    );
-    const averageDirection =
-        ((Math.atan2(sumSin, sumCos) * 180) / Math.PI + 360) % 360;
-
-    // Calculate the variation range
-    let maxDiff = 0;
-    for (let i = 0; i < directions.length; i++) {
-        for (let j = i + 1; j < directions.length; j++) {
-            const dir1 = directions[i];
-            const dir2 = directions[j];
-            if (typeof dir1 === "number" && typeof dir2 === "number") {
-                const diff = calculateDirectionDifference(dir1, dir2);
-                if (diff > maxDiff) {
-                    maxDiff = diff;
-                }
-            }
-        }
-    }
-
-    const variationRange = maxDiff;
-
-    // Calculate speed variation
-    const averageSpeed =
-        speeds.reduce((sum, speed) => sum + speed, 0) / speeds.length;
-
-    const maxGust = Math.max(...filterNullish(gusts));
-    const gustSpeedRatio = maxGust / averageSpeed;
-
-    // Determine color and width based on criteria
-    let color = "green";
-    let extraWidth = 0;
-
-    if (maxGust > 4) {
-        if (gustSpeedRatio >= 2) {
-            color = "red";
-            extraWidth = 20;
-        } else if (gustSpeedRatio >= 1.5) {
-            color = "orange";
-            extraWidth = 10;
-        }
-    }
-
-    if (variationRange > 90) {
-        color = "red";
-    } else if (variationRange >= 45 && color !== "red") {
-        color = "orange";
-    }
-
-    return {
-        variationRange,
-        averageDirection,
-        color,
-        extraWidth,
-    };
-});
-
-/**
  * @type {Signal<number>}
  */
 export const GUST_TREND = computed(() => {
@@ -1053,4 +959,255 @@ QUERY_PARAMS.subscribe(() => {
             element.scrollIntoView();
         }
     });
+});
+
+// Constants for WIND_VARIATIONS
+const DEBUG = false;
+const DEBUG_SPEEDS = [1];
+const DEBUG_GUSTS = [6];
+const DEBUG_DIRECTIONS = [270, 270, 270, 270, 200, 200];
+
+const THIRTY_MINUTES_IN_MS = 30 * 60 * 1000;
+const MAX_EXTRA_WIDTH = 30;
+const EXTRA_WIDTH_MULTIPLIER = 3;
+const COLOR_MAPPINGS = {
+    0: "#E6DB00",
+    1: "#2CF000",
+    2: "orange",
+    3: "red",
+    4: "#AC0000",
+};
+
+const SPEED_THRESHOLDS = {
+    LOW: 2,
+    MEDIUM: 6,
+    HIGH: 8,
+};
+
+const GUST_THRESHOLDS = {
+    LOW: 3,
+    MEDIUM: 4,
+    HIGH: 7,
+    VERY_HIGH: 11,
+};
+
+const GUST_DIFF_THRESHOLDS = {
+    MEDIUM: 4,
+    HIGH: 5.5,
+    VERY_HIGH: 7,
+};
+
+const WIND_REF_BASE_TABLE = [
+    { gustSpeed: GUST_THRESHOLDS.VERY_HIGH, avgSpeed: 0, windRef: 4 },
+    {
+        gustSpeed: GUST_THRESHOLDS.HIGH,
+        avgSpeed: SPEED_THRESHOLDS.HIGH,
+        windRef: 3,
+    },
+    {
+        gustSpeed: GUST_THRESHOLDS.MEDIUM,
+        avgSpeed: SPEED_THRESHOLDS.MEDIUM,
+        windRef: 2,
+    },
+    { gustSpeed: GUST_THRESHOLDS.MEDIUM, avgSpeed: 0, windRef: 2 },
+    { gustSpeed: GUST_THRESHOLDS.LOW, avgSpeed: 0, windRef: 1 },
+    { gustSpeed: 0, avgSpeed: 0, windRef: 0 },
+];
+
+const GUST_DIFF_TABLE = [
+    { diff: GUST_DIFF_THRESHOLDS.VERY_HIGH, increment: 1 },
+    { diff: GUST_DIFF_THRESHOLDS.HIGH, increment: 0.5 },
+    { diff: GUST_DIFF_THRESHOLDS.MEDIUM, increment: 0.25 },
+    { diff: 0, increment: 0 },
+];
+
+const DIRECTION_VARIATION_TABLE = [
+    { gustSpeed: GUST_THRESHOLDS.VERY_HIGH, direction: 180, increment: 1 },
+    { gustSpeed: GUST_THRESHOLDS.HIGH, direction: 90, increment: 1 },
+    { gustSpeed: GUST_THRESHOLDS.HIGH, direction: 45, increment: 0.5 },
+    { gustSpeed: GUST_THRESHOLDS.MEDIUM, direction: 90, increment: 0.5 },
+    { gustSpeed: GUST_THRESHOLDS.MEDIUM, direction: 45, increment: 0.25 },
+    { gustSpeed: GUST_THRESHOLDS.LOW, direction: 90, increment: 0.25 },
+    { gustSpeed: 0, direction: 0, increment: 0 },
+];
+
+// Helper functions for WIND_VARIATIONS
+function calculateAverageDirection(directions) {
+    if (DEBUG)
+        console.log(`calculateAverageDirection: directions = ${directions}`);
+    const sumSin = directions.reduce(
+        (sum, dir) => sum + Math.sin((dir * Math.PI) / 180),
+        0,
+    );
+    const sumCos = directions.reduce(
+        (sum, dir) => sum + Math.cos((dir * Math.PI) / 180),
+        0,
+    );
+    const result = ((Math.atan2(sumSin, sumCos) * 180) / Math.PI + 360) % 360;
+    if (DEBUG) console.log(`calculateAverageDirection: result = ${result}`);
+    return result;
+}
+
+export function calculateVariationRange(directions) {
+    if (DEBUG)
+        console.log(`calculateVariationRange: directions = ${directions}`);
+    let maxDiff = 0;
+    for (let i = 0; i < directions.length; i++) {
+        for (let j = i + 1; j < directions.length; j++) {
+            const diff = Math.abs(directions[i] - directions[j]);
+            const adjustedDiff = Math.min(diff, 360 - diff);
+            maxDiff = Math.max(maxDiff, adjustedDiff);
+        }
+    }
+    return maxDiff;
+}
+
+function findBaseWindRef(avgSpeed, gustSpeed) {
+    for (const entry of WIND_REF_BASE_TABLE) {
+        if (gustSpeed >= entry.gustSpeed && avgSpeed >= entry.avgSpeed) {
+            if (DEBUG) console.log("BASE WINDREF: " + entry.windRef);
+            return entry.windRef;
+        }
+    }
+    return 0;
+}
+
+function findGustDiffIncrement(gustDiff) {
+    for (const entry of GUST_DIFF_TABLE) {
+        if (gustDiff >= entry.diff) {
+            return entry.increment;
+        }
+    }
+    return 0;
+}
+
+function findDirectionVariationIncrement(directionVariation, gustSpeed) {
+    for (const entry of DIRECTION_VARIATION_TABLE) {
+        if (
+            gustSpeed >= entry.gustSpeed &&
+            directionVariation >= entry.direction
+        ) {
+            return entry.increment;
+        }
+    }
+    return 0;
+}
+
+function calculateWindRef(avgSpeed, gustSpeed, directionVariation) {
+    if (DEBUG)
+        console.log(
+            `calculateWindRef: avgSpeed = ${avgSpeed}, gustSpeed = ${gustSpeed}, directionVariation = ${directionVariation}`,
+        );
+
+    let windRef = findBaseWindRef(avgSpeed, gustSpeed);
+    const gustDiff = gustSpeed - avgSpeed;
+    const gustDiffIncrement = findGustDiffIncrement(gustDiff);
+    windRef += gustDiffIncrement;
+
+    const directionVariationIncrement = findDirectionVariationIncrement(
+        directionVariation,
+        gustSpeed,
+    );
+    windRef += directionVariationIncrement;
+
+    const result = Math.min(Math.max(Math.round(windRef), 0), 4);
+    if (DEBUG) console.log(`calculateWindRef: result = ${result}`);
+    return result;
+}
+
+function filterRecentObservations(observations) {
+    if (DEBUG) return observations;
+    const thirtyMinutesAgo = new Date(Date.now() - THIRTY_MINUTES_IN_MS);
+    return observations.filter(
+        (obs) => obs.time >= thirtyMinutesAgo && obs.direction !== -1,
+    );
+}
+
+function extractAndFilterData(observations) {
+    const directions = observations
+        .map((obs) => obs.direction)
+        .filter((dir) => dir != null);
+    const speeds = observations
+        .map((obs) => obs.speed)
+        .filter((speed) => speed != null);
+    const gusts = observations
+        .map((obs) => obs.gust)
+        .filter((gust) => gust != null);
+    return { directions, speeds, gusts };
+}
+
+function calculateWindData(directions, speeds, gusts) {
+    const averageDirection = calculateAverageDirection(directions);
+    const variationRange = calculateVariationRange(directions);
+    const averageSpeed =
+        speeds.reduce((sum, speed) => sum + speed, 0) / speeds.length;
+    const maxGust = Math.max(...gusts);
+    return { averageDirection, variationRange, averageSpeed, maxGust };
+}
+
+function calculateExtraWidth(maxGust, averageSpeed) {
+    return Math.min(
+        Math.max(
+            Math.round((maxGust - averageSpeed) * EXTRA_WIDTH_MULTIPLIER),
+            0,
+        ),
+        MAX_EXTRA_WIDTH,
+    );
+}
+
+export const WIND_VARIATIONS = computed(() => {
+    if (DEBUG) console.log("WIND_VARIATIONS: Calculating...");
+
+    const observations = DEBUG
+        ? DEBUG_DIRECTIONS.map((dir, idx) => ({
+              direction: dir,
+              speed: DEBUG_SPEEDS[idx % DEBUG_SPEEDS.length],
+              gust: DEBUG_GUSTS[idx % DEBUG_GUSTS.length],
+              time: new Date(),
+          }))
+        : OBSERVATIONS.value;
+
+    if (DEBUG) console.log("WIND_VARIATIONS: observations = ", observations);
+
+    const recentObservations = filterRecentObservations(observations);
+
+    if (recentObservations.length === 0) {
+        console.warn("WIND_VARIATIONS: No recent observations available");
+        return undefined;
+    }
+
+    const { directions, speeds, gusts } =
+        extractAndFilterData(recentObservations);
+
+    if (directions.length === 0 || speeds.length === 0 || gusts.length === 0) {
+        console.warn("WIND_VARIATIONS: Insufficient data after filtering");
+        return undefined;
+    }
+
+    const { averageDirection, variationRange, averageSpeed, maxGust } =
+        calculateWindData(directions, speeds, gusts);
+
+    const windRefValue = calculateWindRef(
+        averageSpeed,
+        maxGust,
+        variationRange,
+    );
+    const windRef = ["0", "1", "2", "3", "4"][windRefValue];
+
+    if (windRef === undefined) {
+        console.error(
+            "WIND_VARIATIONS: Invalid wind reference value calculated",
+        );
+        return undefined;
+    }
+
+    const result = {
+        variationRange,
+        averageDirection,
+        color: COLOR_MAPPINGS[windRef] || "green",
+        extraWidth: calculateExtraWidth(maxGust, averageSpeed),
+    };
+
+    if (DEBUG) console.log("WIND_VARIATIONS: result = ", result);
+    return result;
 });
