@@ -815,7 +815,9 @@ export async function fetchFmiObservations(fmisid) {
     }
 
     if (doc === "error") {
-        addError(`Virhe havaintoaseman ${fmisid} tietojen hakemisessa.`);
+        addError(
+            `Virhe Ilmatieteenlaitoksen havaintoaseman ${fmisid} tietojen hakemisessa.`,
+        );
         return;
     }
 
