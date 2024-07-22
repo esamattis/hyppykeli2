@@ -238,13 +238,6 @@ interface RoadStationObservations {
     sensorValues: RoadSensorValue[];
 }
 
-interface RoadStationHistoryValue {
-    roadStationId: number;
-    sensorId: number;
-    sensorValue: number;
-    measuredTime: string;
-}
-
 interface RoadStationInfo {
     type: string;
     id: number;

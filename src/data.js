@@ -10,7 +10,6 @@ import {
     knotsToMs,
     removeNullish,
     safeParseNumber,
-    fetchJSON,
 } from "./utils.js";
 import { fetchHighWinds } from "./om.js";
 // just exposes the parseMETAR global
@@ -580,7 +579,7 @@ async function fetchFmiForecasts(coordinates) {
                 "PoP", // precipitation probability
             ].join(","),
             // place: "Utti",
-            latlon: coordinates,
+            latlon: FORECAST_COORDINATES.value,
         },
         "/example_data/forecast.xml",
     );
@@ -710,10 +709,12 @@ async function fetchFmiMetar(icaocode, startTime, cacheBust) {
  * @param {string} icaocode - The ICAO code of the airport.
  */
 async function fetchFlykMetar(icaocode) {
+    const res = await fetch("https://flyk.com/api/metars.geojson");
     /** @type {FlykMetar} */
-    const data = await fetchJSON("https://flyk.com/api/metars.geojson");
+    const json = await res.json();
+
     const re = new RegExp(`^(METAR|SPECI) ${icaocode} `);
-    const features = data.features.find((f) => {
+    const features = json.features.find((f) => {
         return re.test(f.properties.text);
     });
     return features?.properties.text;
@@ -916,19 +917,7 @@ async function fetchRoadStationInfo(roadsid) {
  * @param {string} roadsid
  */
 async function fetchRoadObservations(roadsid) {
-    // load in background as not so important
-    /** @type {Promise<RoadStationHistoryValue[]|undefined>} */
-    const historyPromise = fetchJSON(
-        `https://tie.digitraffic.fi/api/beta/weather-history-data/${roadsid}`,
-        {
-            headers: {
-                "Digitraffic-User": "hyppykeli.fi",
-            },
-        },
-    );
-
-    /** @type {RoadStationObservations|undefined} */
-    const data = await fetchJSON(
+    const res = await fetch(
         `https://tie.digitraffic.fi/api/weather/v1/stations/${roadsid}/data`,
         {
             headers: {
@@ -937,9 +926,13 @@ async function fetchRoadObservations(roadsid) {
         },
     );
 
-    if (!data) {
+    if (!res.ok) {
+        addError(`Virhe Digitraffic API:ssa: ${res.status}`);
         return;
     }
+
+    /** @type {RoadStationObservations} */
+    const data = await res.json();
 
     const gust = data.sensorValues.find((v) => v.name === "MAKSIMITUULI");
     const wind = data.sensorValues.find((v) => v.name === "KESKITUULI");
@@ -961,55 +954,6 @@ async function fetchRoadObservations(roadsid) {
     };
 
     OBSERVATIONS.value = [obs];
-
-    const history = await historyPromise;
-    if (!history) {
-        return;
-    }
-
-    if (!gust) {
-        return;
-    }
-
-    const gusts = history.filter((v) => v.sensorId === gust.id);
-
-    /**
-     * @param {RoadSensorValue|undefined} sensorValue
-     */
-    const findMatchingHistory = (sensorValue) => {
-        if (!sensorValue) {
-            return;
-        }
-
-        return history.find((h) => h && h.sensorId === sensorValue?.id)
-            ?.sensorValue;
-    };
-
-    /** @type {WeatherData[]} */
-    const combined = gusts.flatMap((roadObservation) => {
-        if (roadObservation.sensorId !== gust.id) {
-            return [];
-        }
-
-        const windHistory = findMatchingHistory(wind);
-        const directionHistory = findMatchingHistory(windDirection);
-        const temperatureHistory = findMatchingHistory(temperature);
-        const dewPointHistory = findMatchingHistory(dewPoint);
-
-        return {
-            source: "roads",
-            time: new Date(roadObservation.measuredTime),
-            gust: roadObservation.sensorValue,
-            speed: windHistory,
-            direction: directionHistory,
-            temperature: temperatureHistory,
-            dewPoint: dewPointHistory,
-        };
-    });
-
-    combined.reverse();
-
-    OBSERVATIONS.value = [obs, ...combined];
 }
 
 async function fetchObservations() {
