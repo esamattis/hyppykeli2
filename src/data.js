@@ -1054,6 +1054,9 @@ function calculateAverageDirection(directions) {
     return result;
 }
 
+/**
+ * @param {number[]} directions
+ */
 export function calculateVariationRange(directions) {
     if (DEBUG)
         console.log(`calculateVariationRange: directions = ${directions}`);
