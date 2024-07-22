@@ -82,7 +82,18 @@ function ObservationTHead() {
             <th>Puuska</th>
             <th>Tuuli</th>
             <th>Suunta</th>
-            <th>KP Korkeus</th>
+            <th style="width: 8ch">
+            KPK
+            <${Help} label="?">
+                <p>
+                Kastepisteen korkeus.${" "}
+                <a href="#" onClick=${(/** @type {any} */ e) => {
+                    e.preventDefault();
+                    document.getElementById("dewpoint")?.click();
+                }}>Lue lisää</a>
+                </p>
+            </${Help}>
+            </th>
             <th>Lämpötila</th>
         </tr>
     `;
@@ -128,31 +139,43 @@ function ForecastTHead() {
         <th>Puuska</th>
         <th>Tuuli</th>
         <th>Suunta</th>
-        <th>
-            Pilvet
-            <${Help} label="(L)">
+        <th style="width: 10ch">
+            Pilvet L
+            <${Help} label="?">
                 <p>
                     Matalakerroksen (Low) pilvet jotka sijaitsevat yleensä alle 2 kilometrin (noin 6 500 jalan) korkeudella merenpinnasta.
                 </p>
             </${Help}>
         </th>
-        <th>
-            Pilvet
-            <${Help} label="(ML)">
+        <th style="width: 11ch">
+            Pilvet ML
+            <${Help} label="?">
                 <p>
                     Matalan ja keskikerroksen (MiddleAndLow) pilvet jotka sijaitsevat yleensä 2-7 kilometrin (noin 6 500-23 000 jalan) korkeudella merenpinnasta.
                 </p>
             </${Help}>
         </th>
 
-        <th>KP Korkeus</th>
-
-        <th>
-            Sade t.
+        <th style="width: 8ch">
+            KPK
             <${Help} label="?">
-            Sateen todenäköisyys prosentteina.
+                <p>
+                Kastepisteen korkeus.${" "}
+                <a href="#" onClick=${(/** @type {any} */ e) => {
+                    e.preventDefault();
+                    document.getElementById("dewpoint")?.click();
+                }}>Lue lisää</a>
+                </p>
             </${Help}>
         </th>
+
+        <th>
+            Sade
+            <${Help} label="?">
+                <p>Sateen todenäköisyys prosentteina.</p>
+            </${Help}>
+        </th>
+
         <th>Lämpötila</th>
 
     </tr>`;
@@ -177,13 +200,11 @@ function ForecastRows(props) {
                     <${WindDirection} direction=${point.direction} />
                 </td>
                 <td>
-                    <${PieChart} percentage=${point.lowCloudCover ?? 0} />
-                    ${point.lowCloudCover?.toFixed(0) ?? "-1"}%
+                    <${CloudCover} percentage=${point.lowCloudCover} />
                 </td>
 
                 <td>
-                    <${PieChart} percentage=${point.middleCloudCover ?? 0} />
-                    ${point.middleCloudCover?.toFixed(0) ?? "-1"}%
+                    <${CloudCover} percentage=${point.middleCloudCover} />
                 </td>
 
                 <td>
@@ -200,6 +221,23 @@ function ForecastRows(props) {
             </tr>
         `;
     });
+}
+
+/**
+ * @param {Object} props
+ * @param {number} [props.percentage]
+ */
+function CloudCover(props) {
+    if (isNullish(props.percentage)) {
+        return null;
+    }
+
+    return html`
+        <span class="cloud-cover">
+            <${PieChart} percentage=${props.percentage} />
+            ${props.percentage} %
+        </span>
+    `;
 }
 
 /**
@@ -423,7 +461,7 @@ function LatestClouds() {
                           Kastepisteen korkeus ${calculateCloudBase(temp, dew)}M
                           </span>
 
-                          <${Help} label="?">
+                          <${Help} label="?" id="dewpoint">
                             <p>
                                 Arvio mahdollisten pilvien korkeudesta kastepisteen perusteella.
                                 Laskettu lämpötilasta ${temp.toFixed(1)}°C ja kastepisteestä ${dew.toFixed(1)}°C

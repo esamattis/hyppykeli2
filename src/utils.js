@@ -19,6 +19,7 @@ export function debug(...args) {
  * @param {Object} props
  * @param {any} props.children
  * @param {any} props.label
+ * @param {string} props.id
  */
 export function Help(props) {
     /** @type {import('preact').RefObject<HTMLDialogElement>} */
@@ -33,7 +34,7 @@ export function Help(props) {
     };
 
     return html`
-        <button class="help" type="button" onClick=${open}>
+        <button class="help" type="button" onClick=${open} id=${props.id}>
             ${props.label ?? "Ohje"}
         </button>
         <dialog ref=${ref}>
