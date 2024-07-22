@@ -562,6 +562,7 @@ async function fetchFmiForecasts() {
                 "LowCloudCover",
                 "MiddleAndLowCloudCover",
                 "Temperature",
+                "DewPoint",
                 "PoP", // precipitation probability
             ].join(","),
             // place: "Utti",
@@ -605,6 +606,12 @@ async function fetchFmiForecasts() {
         -100,
     );
 
+    const dewPointForecasts = parseTimeSeries(
+        forecastXml,
+        "mts-1-1-DewPoint",
+        -100,
+    );
+
     const directionForecasts = parseTimeSeries(
         forecastXml,
         "mts-1-1-WindDirection",
@@ -645,6 +652,7 @@ async function fetchFmiForecasts() {
             middleCloudCover: middleCloudCoverForecasts[i]?.value,
             rain: popForecasts[i]?.value,
             temperature: temperatureForecasts[i]?.value,
+            dewPoint: dewPointForecasts[i]?.value,
         };
     });
 

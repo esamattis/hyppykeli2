@@ -145,6 +145,9 @@ function ForecastTHead() {
                 </p>
             </${Help}>
         </th>
+
+        <th>KP Korkeus</th>
+
         <th>
             Sade t.
             <${Help} label="?">
@@ -178,10 +181,24 @@ function ForecastRows(props) {
                     <${PieChart} percentage=${point.lowCloudCover ?? 0} />
                     ${point.lowCloudCover?.toFixed(0) ?? "-1"}%
                 </td>
+
                 <td>
                     <${PieChart} percentage=${point.middleCloudCover ?? 0} />
                     ${point.middleCloudCover?.toFixed(0) ?? "-1"}%
                 </td>
+
+                <td>
+                    ${!isNullish(point.dewPoint) &&
+                    !isNullish(point.temperature)
+                        ? html`
+                              ${calculateCloudBase(
+                                  point.temperature,
+                                  point.dewPoint,
+                              )}${" "}M
+                          `
+                        : null}
+                </td>
+
                 <td>${point.rain?.toFixed(0)}%</td>
                 <td>${point.temperature?.toFixed(1)} °C</td>
             </tr>
