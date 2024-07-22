@@ -963,6 +963,8 @@ async function fetchRoadObservations(roadsid) {
     OBSERVATIONS.value = [obs];
 
     const history = await historyPromise;
+    history?.reverse();
+
     if (!history) {
         return;
     }
