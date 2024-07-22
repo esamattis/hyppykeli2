@@ -111,7 +111,7 @@ function ObservationRows(props) {
                     ${formatClock(point.time)}
                 </td>
                 <td class=${getWarningLevel(point.gust ?? 0)}>
-                    ${point.gust ?? -1} m/s
+                    ${point.gust?.toFixed(1) ?? -1} m/s
                 </td>
                 <td>${point.speed} m/s</td>
                 <td>
@@ -272,10 +272,14 @@ function PieChart({ percentage }) {
 /**
  *
  * @param {Object} props
- * @param {number} props.direction
+ * @param {number|undefined} props.direction
  * @param {boolean} props.value
  */
 function WindDirection(props) {
+    if (isNullish(props.direction)) {
+        return null;
+    }
+
     return html`
         <span>
             ${props.value !== false

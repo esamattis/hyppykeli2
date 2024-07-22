@@ -914,10 +914,43 @@ async function fetchRoadStationInfo(roadsid) {
 }
 
 /**
+ * @param {string} url
+ * @param {Object} [options]
+ * @param {Record<string, string>} [options.headers]
+ */
+async function fetchJSON(url, options) {
+    const { hostname, search } = new URL(url);
+    const res = await fetch(url, {
+        headers: options?.headers,
+    });
+
+    if (!res.ok) {
+        addError(
+            `Virhe ${hostname} API:ssa: ${res.status}, parametrit: ${search}`,
+        );
+        return;
+    }
+
+    return await res.json();
+}
+
+/**
  * @param {string} roadsid
  */
 async function fetchRoadObservations(roadsid) {
-    const res = await fetch(
+    // load in background as not so important
+    /** @type {Promise<RoadStationHistoryValue[]|undefined>} */
+    const historyPromise = fetchJSON(
+        `https://tie.digitraffic.fi/api/beta/weather-history-data/${roadsid}`,
+        {
+            headers: {
+                "Digitraffic-User": "hyppykeli.fi",
+            },
+        },
+    );
+
+    /** @type {RoadStationObservations|undefined} */
+    const data = await fetchJSON(
         `https://tie.digitraffic.fi/api/weather/v1/stations/${roadsid}/data`,
         {
             headers: {
@@ -926,13 +959,9 @@ async function fetchRoadObservations(roadsid) {
         },
     );
 
-    if (!res.ok) {
-        addError(`Virhe Digitraffic API:ssa: ${res.status}`);
+    if (!data) {
         return;
     }
-
-    /** @type {RoadStationObservations} */
-    const data = await res.json();
 
     const gust = data.sensorValues.find((v) => v.name === "MAKSIMITUULI");
     const wind = data.sensorValues.find((v) => v.name === "KESKITUULI");
@@ -954,6 +983,53 @@ async function fetchRoadObservations(roadsid) {
     };
 
     OBSERVATIONS.value = [obs];
+
+    const history = await historyPromise;
+    if (!history) {
+        return;
+    }
+
+    if (!gust) {
+        return;
+    }
+
+    const gusts = history.filter((v) => v.sensorId === gust.id);
+
+    /**
+     * @param {RoadSensorValue|undefined} sensorValue
+     */
+    const findMatchingHistory = (sensorValue) => {
+        if (!sensorValue) {
+            return;
+        }
+
+        return history.find((h) => h && h.sensorId === sensorValue?.id)
+            ?.sensorValue;
+    };
+
+    /** @type {WeatherData[]} */
+    const combined = gusts.flatMap((roadObservation) => {
+        if (roadObservation.sensorId !== gust.id) {
+            return [];
+        }
+
+        const windHistory = findMatchingHistory(wind);
+        const directionHistory = findMatchingHistory(windDirection);
+        const temperatureHistory = findMatchingHistory(temperature);
+        const dewPointHistory = findMatchingHistory(dewPoint);
+
+        return {
+            source: "roads",
+            time: new Date(roadObservation.measuredTime),
+            gust: roadObservation.sensorValue,
+            speed: windHistory,
+            direction: directionHistory,
+            temperature: temperatureHistory,
+            dewPoint: dewPointHistory,
+        };
+    });
+
+    OBSERVATIONS.value = [obs, ...combined];
 }
 
 async function fetchObservations() {
