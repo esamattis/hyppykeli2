@@ -227,6 +227,10 @@ export const STATION_COORDINATES = signal(null);
  */
 export const FORECAST_COORDINATES = signal(null);
 
+if (QUERY_PARAMS.value.lat && QUERY_PARAMS.value.lon) {
+    FORECAST_COORDINATES.value = `${QUERY_PARAMS.value.lat},${QUERY_PARAMS.value.lon}`;
+}
+
 /**
  * @type {Signal<string|null>}
  */
@@ -247,10 +251,6 @@ export const FORECAST_DAY = computed(() => {
     const day = QUERY_PARAMS.value.forecast_day;
     return day ? Number(day) : 0;
 });
-
-if (QUERY_PARAMS.value.lat && QUERY_PARAMS.value.lon) {
-    FORECAST_COORDINATES.value = `${QUERY_PARAMS.value.lat},${QUERY_PARAMS.value.lon}`;
-}
 
 if (QUERY_PARAMS.value.save) {
     const unsub = effect(() => {
