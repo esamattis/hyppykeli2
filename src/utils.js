@@ -3,7 +3,7 @@
 import { Component, html } from "htm/preact";
 import { Fragment } from "preact";
 import { useCallback, useEffect, useRef, useState } from "preact/hooks";
-import { QUERY_PARAMS } from "./data.js";
+import { addError, QUERY_PARAMS } from "./data.js";
 
 /**
  * Logs the provided arguments to the console when the query string contains debug=1
@@ -460,4 +460,25 @@ export function toMeters(value, unit) {
     }
 
     return value;
+}
+
+/**
+ * @param {string} url
+ * @param {Object} [options]
+ * @param {Record<string, string>} [options.headers]
+ */
+export async function fetchJSON(url, options) {
+    const { hostname, search } = new URL(url);
+    const res = await fetch(url, {
+        headers: options?.headers,
+    });
+
+    if (!res.ok) {
+        addError(
+            `Virhe ${hostname} API:ssa: ${res.status}, parametrit: ${search}`,
+        );
+        return;
+    }
+
+    return await res.json();
 }
