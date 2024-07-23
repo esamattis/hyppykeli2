@@ -88,13 +88,21 @@ export function redirectToDz() {
 
 /**
  * @param {string} name
- * @param {string|number} value
+ * @param {string|number|undefined} value
  */
 function fillInputByName(name, value) {
     const input = document.querySelector(`input[name="${name}"]`);
     if (input instanceof HTMLInputElement) {
-        input.value = value.toString();
+        input.value = value?.toString().trim() ?? "";
     }
+}
+
+/**
+ * @param {string} name
+ * @returns {HTMLInputElement|null}
+ */
+function getInputByName(name) {
+    return document.querySelector(`input[name="${name}"]`);
 }
 
 document.getElementById("get-location")?.addEventListener("click", (e) => {
@@ -106,19 +114,41 @@ document.getElementById("get-location")?.addEventListener("click", (e) => {
     el.disabled = true;
     navigator.geolocation.getCurrentPosition((position) => {
         el.disabled = false;
-
         fillInputByName("lat", position.coords.latitude);
         fillInputByName("lon", position.coords.longitude);
+    });
+});
 
-        findClosestRoadStation([
-            position.coords.latitude,
-            position.coords.longitude,
-        ]).then((station) => {
-            if (!station) {
-                return;
-            }
-            fillInputByName("name", station.properties.name);
-            fillInputByName("roadsid", station.id);
-        });
+document.getElementById("get-roadsid")?.addEventListener("click", (e) => {
+    const el = e.target;
+    if (!(el instanceof HTMLButtonElement)) {
+        return;
+    }
+
+    const lat = getInputByName("lat")?.value;
+    const lon = getInputByName("lon")?.value;
+
+    if (!lat || !lon) {
+        alert("Koordinaatit puuttuvat");
+        return;
+    }
+
+    findClosestRoadStation([Number(lat), Number(lon)]).then((station) => {
+        if (!station) {
+            return;
+        }
+        fillInputByName("name", station.properties.name);
+        fillInputByName("roadsid", station.id);
+    });
+});
+
+getInputByName("lat")?.addEventListener("paste", (e) => {
+    setTimeout(() => {
+        if (!(e.target instanceof HTMLInputElement)) {
+            return;
+        }
+        const [lat, lon] = e.target.value.split(",");
+        fillInputByName("lat", lat);
+        fillInputByName("lon", lon);
     });
 });
