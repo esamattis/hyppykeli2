@@ -253,26 +253,21 @@ export const FORECAST_DAY = computed(() => {
     return day ? Number(day) : 0;
 });
 
-if (QUERY_PARAMS.value.save) {
-    const unsub = effect(() => {
-        const name =
-            NAME.value ??
-            QUERY_PARAMS.value.name ??
-            QUERY_PARAMS.value.icaocode;
-        if (!name) {
-            return;
-        }
+effect(() => {
+    if (!QUERY_PARAMS.value.save) {
+        return;
+    }
 
-        //  unsub is not properly defined if the name is already set.
-        // Workaround by setting a timeout.
-        setTimeout(() => {
-            unsub();
-        }, 0);
+    const name =
+        NAME.value ?? QUERY_PARAMS.value.name ?? QUERY_PARAMS.value.icaocode;
 
-        saveCurrentDz(name);
-        navigateQs({ save: undefined }, { replace: true });
-    });
-}
+    if (!name) {
+        return;
+    }
+
+    saveCurrentDz(name);
+    navigateQs({ save: undefined }, { replace: true });
+});
 
 /**
  * @type {Signal<Date>}
