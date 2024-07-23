@@ -36,22 +36,19 @@ import { Compass } from "./compass.js";
 import {
     calculateCloudBase,
     dateOffset,
-    ErrorBoundary,
     EXAMPLE_CSS,
     formatClock,
     formatDate,
-    FromNow,
-    Help,
     humanDayText,
     isNullish,
     hasValidWindData,
     removeNullish,
-    ResizeRecreate,
     saveTextToFile,
     toMeters,
     whenAll,
     coordinateDistance,
 } from "./utils.js";
+import { Help, FromNow, ErrorBoundary, ResizeRecreate } from "./components.js";
 
 effect(() => {
     document.title = NAME.value + " – Hyppykeli";

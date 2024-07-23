@@ -1444,3 +1444,9 @@ export const WIND_VARIATIONS = computed(() => {
     debug("WIND_VARIATIONS: result = ", result);
     return result;
 });
+
+document.addEventListener("fetchjsonerror", (event) => {
+    if (event instanceof CustomEvent && event.detail.message) {
+        addError(event.detail.message);
+    }
+});

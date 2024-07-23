@@ -7,7 +7,8 @@ import {
     QUERY_PARAMS,
     WIND_VARIATIONS,
 } from "./data.js";
-import { FromNow, Help, isNullish, hasValidWindData } from "./utils.js";
+import { isNullish, hasValidWindData } from "./utils.js";
+import { FromNow, Help } from "./components.js";
 
 // Constants for needle length calculation
 const MIN_NEEDLE_LENGTH = 30;
