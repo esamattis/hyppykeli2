@@ -245,7 +245,26 @@ interface RoadStationHistoryValue {
     measuredTime: string;
 }
 
-interface RoadStationInfo {
+interface RoadStations {
+    type: string;
+    dataUpdatedTime: string;
+    features: {
+        type: string;
+        id: number;
+        geometry: {
+            type: string;
+            coordinates: [number, number, number];
+        };
+        properties: {
+            id: number;
+            name: string;
+            collectionStatus: string;
+            state: string | null;
+            dataUpdatedTime: string;
+        };
+    }[];
+}
+interface RoadStationInfoDetailed {
     type: string;
     id: number;
     geometry: {

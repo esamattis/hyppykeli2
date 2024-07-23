@@ -257,26 +257,9 @@
                         Desimaalimuodossa. Ei pakollinen. Käytetään
                         havaintoaseman sijaintia jos ei annettu.
                     </div>
-                    <button type="button">Käytä nykyistä sijaintiani</button>
-                    <script>
-                        document.currentScript.previousElementSibling.addEventListener(
-                            "click",
-                            (e) => {
-                                e.target.disabled = true;
-                                navigator.geolocation.getCurrentPosition(
-                                    (position) => {
-                                        e.target.disabled = false;
-                                        document.querySelector(
-                                            'input[name="lat"]',
-                                        ).value = position.coords.latitude;
-                                        document.querySelector(
-                                            'input[name="lon"]',
-                                        ).value = position.coords.longitude;
-                                    },
-                                );
-                            },
-                        );
-                    </script>
+                    <button id="get-location" type="button">
+                        Käytä nykyistä sijaintiani
+                    </button>
                 </fieldset>
 
                 <input type="hidden" name="save" value="1" />

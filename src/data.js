@@ -905,7 +905,7 @@ async function fetchRoadStationInfo(roadsid) {
         return;
     }
 
-    /** @type {RoadStationInfo} */
+    /** @type {RoadStationInfoDetailed} */
     const data = await res.json();
 
     STATION_COORDINATES.value = `${data.geometry.coordinates[1]},${data.geometry.coordinates[0]}`;
