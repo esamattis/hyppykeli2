@@ -9,6 +9,11 @@ export async function findClosestRoadStation(coordinates) {
     /** @type {RoadStations|undefined} */
     const stations = await fetchJSON(
         "https://tie.digitraffic.fi/api/weather/v1/stations",
+        {
+            headers: {
+                "Digitraffic-User": "hyppykeli.fi",
+            },
+        },
     );
 
     const closest = stations?.features.reduce((prev, curr) => {
