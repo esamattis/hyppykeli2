@@ -50,6 +50,7 @@ import {
     saveTextToFile,
     toMeters,
     whenAll,
+    coordinateDistance,
 } from "./utils.js";
 
 effect(() => {
@@ -1091,6 +1092,19 @@ function Info() {
                       ${metar.elevation.toFixed(0)}M. ${" "}
                   `
                 : null}
+            ${whenAll(
+                [STATION_COORDINATES.value, FORECAST_COORDINATES.value],
+                (station, forecast) => {
+                    if (station === forecast) {
+                        return null;
+                    }
+
+                    const distance = coordinateDistance(station, forecast);
+                    const km = (distance / 1000).toFixed(1);
+
+                    return `Etäisyys havaintoasemalle ${km}km.`;
+                },
+            )}
             ${QUERY_PARAMS.value.flyk_metar
                 ? html`
                       METAR-sanomat tarjoaa ${" "}
