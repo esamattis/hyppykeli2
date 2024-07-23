@@ -2,10 +2,6 @@
 
 import { coordinateDistance, fetchJSON } from "./utils.js";
 
-const usingBackButton =
-    window.performance?.navigation.type ===
-    window.performance.navigation.TYPE_BACK_FORWARD;
-
 /**
  * @param {[number, number]} coordinates
  */
@@ -48,6 +44,10 @@ export function redirectToDz() {
         history.replaceState(null, "", "?" + params.toString());
         return;
     }
+
+    const usingBackButton =
+        window.performance?.navigation.type ===
+        window.performance.navigation.TYPE_BACK_FORWARD;
 
     if (usingBackButton || !redirectName) {
         return;
