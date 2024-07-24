@@ -350,7 +350,7 @@ function LatestWind() {
     return html`
         <p class=${history ? "historic" : ""}>
 
-            <div class="wind-cell">
+            <div class="latest-wind-cell">
             Puuska
                 <span
                     class=${
@@ -362,14 +362,14 @@ function LatestWind() {
                 </span>
             </div>
 
-            <div class="wind-cell">
+            <div class="latest-wind-cell">
             Keskituuli
             <span class="latest-value latest-wind">
                 ${" "}${obs.speed?.toFixed(1) ?? "?"} m/s${" "}
             </span>
             </div>
 
-            <div class="wind-cell">
+            <div class="latest-wind-cell">
             Suunta${" "}
             <span class="latest-value latest-wind">
                 ${" "}${obs.direction?.toFixed(0) ?? "?"}°${" "}

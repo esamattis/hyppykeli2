@@ -92,7 +92,7 @@ button {
     flex-direction: column;
 }
 
-.wind-cell {
+.latest-wind-cell {
     display: flex;
     white-space: nowrap;
     justify-content: space-between;
@@ -128,7 +128,7 @@ button {
         --compass-width: 200px;
     }
 
-    .wind-cell {
+    .latest-wind-cell {
         display: inline;
     }
 
