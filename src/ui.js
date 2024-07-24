@@ -346,29 +346,41 @@ function LatestWind() {
 
     return html`
         <p class=${history ? "historic" : ""}>
+
+            <div class="wind-cell">
             Puuska
-            <span
-                class=${"latest-value latest-gust " +
-                getWarningLevel(obs.gust ?? 0)}
-            >
-                ${" "}${obs.gust?.toFixed(1) ?? "?"} m/s${" "}
-            </span>
+                <span
+                    class=${
+                        "latest-value latest-gust " +
+                        getWarningLevel(obs.gust ?? 0)
+                    }
+                >
+                    ${" "}${obs.gust?.toFixed(1) ?? "?"} m/s${" "}
+                </span>
+            </div>
+
+            <div class="wind-cell">
             Keskituuli
             <span class="latest-value latest-wind">
                 ${" "}${obs.speed?.toFixed(1) ?? "?"} m/s${" "}
             </span>
+            </div>
 
+            <div class="wind-cell">
             Suunta${" "}
             <span class="latest-value latest-wind">
                 ${" "}${obs.direction?.toFixed(0) ?? "?"}°${" "}
             </span>
             ${" "}
+            </div>
 
-            <br />
-            <${FromNow} date=${obs.time} />
+            <div>
+                <${FromNow} date=${obs.time} />
+            </div>
 
-            <br />
-            <${GustTrend} />
+            <div>
+                <${GustTrend} />
+            </div>
         </p>
     `;
 }

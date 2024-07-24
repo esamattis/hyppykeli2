@@ -92,6 +92,13 @@ button {
     flex-direction: column;
 }
 
+.wind-cell {
+    display: flex;
+    white-space: nowrap;
+    justify-content: space-between;
+    max-width: 20ch;
+}
+
 .grid {
     display: grid;
     margin: 10px;
@@ -119,6 +126,10 @@ button {
 @media (min-width: 900px) {
     :root {
         --compass-width: 200px;
+    }
+
+    .wind-cell {
+        display: inline;
     }
 
     /** BIG SCREEN **/
