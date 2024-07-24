@@ -198,11 +198,11 @@ function ForecastRows(props) {
                     <${WindDirection} direction=${point.direction} />
                 </td>
                 <td>
-                    <${CloudCover} percentage=${point.lowCloudCover} />
+                    <${Percentage} percentage=${point.lowCloudCover} />
                 </td>
 
                 <td>
-                    <${CloudCover} percentage=${point.middleCloudCover} />
+                    <${Percentage} percentage=${point.middleCloudCover} />
                 </td>
 
                 <td>
@@ -214,7 +214,10 @@ function ForecastRows(props) {
                     )}
                 </td>
 
-                <td>${point.rain?.toFixed(0)}%</td>
+                <td>
+                    <${Percentage} percentage=${point.rain} />
+                </td>
+
                 <td>${point.temperature?.toFixed(1)} °C</td>
             </tr>
         `;
@@ -225,7 +228,7 @@ function ForecastRows(props) {
  * @param {Object} props
  * @param {number} [props.percentage]
  */
-function CloudCover(props) {
+function Percentage(props) {
     if (isNullish(props.percentage)) {
         return null;
     }
