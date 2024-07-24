@@ -18,7 +18,6 @@ button {
 #info {
     grid-area: info;
     width: calc(100vw - 30px - var(--compass-width));
-    max-width: 750px;
     line-height: 1.8;
 }
 
@@ -92,6 +91,19 @@ button {
     flex-direction: column;
 }
 
+.title-dash {
+    display: none;
+}
+
+.title-temp {
+    font-size: 70%;
+}
+
+.title-name,
+.title-temp {
+    display: block;
+}
+
 .latest-wind-cell {
     display: flex;
     white-space: nowrap;
@@ -126,6 +138,13 @@ button {
 @media (min-width: 900px) {
     :root {
         --compass-width: 200px;
+    }
+
+    .title-name,
+    .title-dash,
+    .title-temp {
+        display: inline;
+        font-size: 100%;
     }
 
     .latest-wind-cell {
@@ -293,10 +312,6 @@ dialog {
 .metar {
     font-size: 70%;
     font-family: monospace;
-}
-
-p {
-    max-width: 500px;
 }
 
 .disclaimer {

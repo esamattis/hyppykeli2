@@ -1133,12 +1133,24 @@ function Info() {
     `;
 }
 
-export function Root() {
+function Title() {
     const historic = !!HOVERED_OBSERVATION.value;
     const temperature =
         HOVERED_OBSERVATION.value?.temperature ??
         LATEST_OBSERVATION.value?.temperature;
 
+    return html`
+        <h1 id="title">
+            <span class="title-name">${NAME}</span>
+            <span class="title-dash">${" – "}</span>
+            <span class="title-temp" style=${{ opacity: historic ? 0.5 : 1 }}>
+                ${temperature}°C
+            </span>
+        </h1>
+    `;
+}
+
+export function Root() {
     return html`
         <div class="content grid">
             ${
@@ -1155,13 +1167,8 @@ export function Root() {
                     : null
             }
 
-            <h1 id="title">
-                <span id="title">${NAME} –${" "}
-                <span style=${{ opacity: historic ? 0.5 : 1 }}>
-                ${temperature}°C
-                </span>
-                </span>
-            </h1>
+            <${Title} />
+
 
 
             <${Info}/>
