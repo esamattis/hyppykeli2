@@ -372,7 +372,7 @@ function LatestWind() {
             <div class="latest-wind-cell">
             Suunta${" "}
             <span class="latest-value latest-wind">
-                ${" "}${obs.direction?.toFixed(0) ?? "?"}°${" "}
+                <${WindDirection} direction=${obs.direction} />
             </span>
             ${" "}
             </div>
