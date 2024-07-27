@@ -137,7 +137,7 @@ document.getElementById("get-roadsid")?.addEventListener("click", (e) => {
         if (!station) {
             return;
         }
-        fillInputByName("name", station.properties.name);
+        fillInputByName("name", station.properties.name.replaceAll("_", " "));
         fillInputByName("roadsid", station.id);
     });
 });
