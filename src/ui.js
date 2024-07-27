@@ -473,7 +473,7 @@ function LatestClouds() {
                         <span
                             style="margin-top: 5px; font-style: italic; font-size: 90%"
                         >
-                            Kastepisteen korkeus
+                            Kastepisteen korkeus${" "}
                             ${calculateCloudBase(temp, dew)}M
                         </span>
 
