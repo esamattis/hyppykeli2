@@ -468,28 +468,38 @@ function LatestClouds() {
                   )}
             ${whenAll(
                 [latest?.temperature, latest?.dewPoint],
-                (temp, dew) =>
-                    html`
-                      <li>
-                          <span style="margin-top: 5px; font-style: italic; font-size: 90%">
-                          Kastepisteen korkeus ${calculateCloudBase(temp, dew)}M
-                          </span>
+                (temp, dew) => html`
+                    <li>
+                        <span
+                            style="margin-top: 5px; font-style: italic; font-size: 90%"
+                        >
+                            Kastepisteen korkeus
+                            ${calculateCloudBase(temp, dew)}M
+                        </span>
 
-                          <${Help} label="?" id="dewpoint">
-                            <p>
-                                Arvio mahdollisten pilvien korkeudesta kastepisteen perusteella.
-                                Laskettu lämpötilasta ${temp.toFixed(1)}°C ja kastepisteestä ${dew.toFixed(1)}°C
-                                pyöristäen lähimpään 100 metriin.
-                            </p>
+                        ${h(
+                            Help,
+                            { label: "?", id: "dewpoint" },
+                            html`
+                                <p>
+                                    Arvio mahdollisten pilvien korkeudesta
+                                    kastepisteen perusteella. Kastepiste on
+                                    lämpötila jonka alapuolella vesihöyry
+                                    tiivistyy pisaroiksi muodostaen pilviä.
+                                    Arvio kertoo missä korkeudessa lämpötila
+                                    laskee kastepisteeseen.
+                                </p>
 
-                            <p>
-                                Kastepiste on lämpötila jonka alapuolella vesihöyry tiivistyy pisaroiksi muodostaen pilviä.
-                                Eli arvio kertoo missä korkeudessa lämpötila laskee kastepisteeseen.
-                            </p>
-
-                          </${Help}>
-                      </li>
-                  `,
+                                <p>
+                                    Laskettu lämpötilasta ${temp.toFixed(1)}°C
+                                    ja kastepisteestä ${dew.toFixed(1)}°C
+                                    pyöristäen lähimpään 100 metriin.${" "}
+                                    ${h(FromNow, { date: latest?.time })}
+                                </p>
+                            `,
+                        )}
+                    </li>
+                `,
             )}
         </ul>
 
