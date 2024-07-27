@@ -17,6 +17,10 @@ button {
     word-break: break-word;
 }
 
+.nowrap {
+    white-space: nowrap;
+}
+
 #info {
     grid-area: info;
     width: calc(100vw - 30px - var(--compass-width));

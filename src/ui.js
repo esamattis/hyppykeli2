@@ -1152,8 +1152,9 @@ function Title() {
         <h1 id="title">
             <span class="title-name">${NAME}</span>
             <span class="title-temp" style=${{ opacity: historic ? 0.5 : 1 }}>
-                ${temperature?.toFixed(1)}°C maassa, ${temps?.[4].toFixed(1)}°C
-                4km:ssä
+                <span class="nowrap">${temperature?.toFixed(1)}°C maassa,</span>
+                ${" "}
+                <span class="nowrap">${temps?.[4].toFixed(1)}°C 4km:ssä</span>
                 ${h(
                     Help,
                     { label: "?" },
