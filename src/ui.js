@@ -1,7 +1,7 @@
 // @ts-check
 import { effect, signal } from "@preact/signals";
 import { useState } from "preact/hooks";
-import { html } from "htm/preact";
+import { h, html } from "htm/preact";
 import { clearOMCache, OpenMeteoTool, OpenMeteoRaw } from "./om.js";
 import {
     FORECASTS,
@@ -1139,12 +1139,44 @@ function Title() {
         HOVERED_OBSERVATION.value?.temperature ??
         LATEST_OBSERVATION.value?.temperature;
 
+    const temps = isNullish(temperature)
+        ? null
+        : {
+              1: temperature - 6.5 * 1,
+              2: temperature - 6.5 * 2,
+              3: temperature - 6.5 * 3,
+              4: temperature - 6.5 * 4,
+          };
+
     return html`
         <h1 id="title">
             <span class="title-name">${NAME}</span>
-            <span class="title-dash">${" – "}</span>
             <span class="title-temp" style=${{ opacity: historic ? 0.5 : 1 }}>
-                ${temperature}°C
+                ${temperature?.toFixed(1)}°C maassa, ${temps?.[1].toFixed(1)}°C
+                4km:ssä
+                ${h(
+                    Help,
+                    { label: "?" },
+                    html`
+                        <p>
+                            ICAO:n${" "}
+                            <a
+                                href="https://fi.wikipedia.org/wiki/Kansainv%C3%A4linen_standardi-ilmakeh%C3%A4"
+                            >
+                                ilmakehämallin
+                            </a>
+                            ${" "} mukainen lämpötilan muutos Troposfäärissä
+                            (-6.5°C/km)
+                        </p>
+
+                        <ul>
+                            <li>1km ${temps?.[1].toFixed(1)}°C</li>
+                            <li>2km ${temps?.[2].toFixed(1)}°C</li>
+                            <li>3km ${temps?.[3].toFixed(1)}°C</li>
+                            <li>4km ${temps?.[4].toFixed(1)}°C</li>
+                        </ul>
+                    `,
+                )}
             </span>
         </h1>
     `;

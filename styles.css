@@ -91,12 +91,10 @@ button {
     flex-direction: column;
 }
 
-.title-dash {
-    display: none;
-}
-
 .title-temp {
-    font-size: 70%;
+    font-size: 65%;
+    color: #707070;
+    font-family: monospace;
 }
 
 .title-name,
@@ -138,13 +136,6 @@ button {
 @media (min-width: 900px) {
     :root {
         --compass-width: 200px;
-    }
-
-    .title-name,
-    .title-dash,
-    .title-temp {
-        display: inline;
-        font-size: 100%;
     }
 
     .latest-wind-cell {
@@ -298,6 +289,9 @@ dialog {
 }
 
 .help-content {
+    font-size: initial;
+    font-family: initial;
+    font-weight: initial;
     width: clamp(300px, 400px, 90vw);
 }
 

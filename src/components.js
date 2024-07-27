@@ -7,9 +7,9 @@ import { formatClock } from "./utils.js";
 
 /**
  * @param {Object} props
- * @param {any} props.children
+ * @param {any} [props.children]
  * @param {any} props.label
- * @param {string} props.id
+ * @param {string} [props.id]
  */
 export function Help(props) {
     /** @type {import('preact').RefObject<HTMLDialogElement>} */
