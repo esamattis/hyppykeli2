@@ -13,6 +13,8 @@ button {
 
 #title {
     grid-area: title;
+    width: calc(100vw - 30px - var(--compass-width));
+    word-break: break-word;
 }
 
 #info {
