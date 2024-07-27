@@ -390,11 +390,11 @@ function LatestWind() {
 
 function GustTrend() {
     const trend = GUST_TREND.value;
-    if (Math.abs(trend) < 1) {
+    if (Math.abs(trend) < 2) {
         return;
     }
 
-    const help = html`<${Help} label="?">Seuraavan tunnin ennustuksien keskiarvon erotuksesta päätelty (${trend.toFixed(1)} m/s).</${Help}>`;
+    const help = html`<${Help} label="?">Seuraavan tunnin aikana puuska vaikuttaa muuttuvan yli 2m/s.</${Help}>`;
 
     return html`
         <div title=${`Ero ${trend.toFixed(1)}m/s`}>
