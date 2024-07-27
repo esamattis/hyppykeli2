@@ -1135,6 +1135,8 @@ function Info() {
 
 function Title() {
     const historic = !!HOVERED_OBSERVATION.value;
+    const time =
+        HOVERED_OBSERVATION.value?.time ?? LATEST_OBSERVATION.value?.time;
     const temperature =
         HOVERED_OBSERVATION.value?.temperature ??
         LATEST_OBSERVATION.value?.temperature;
@@ -1176,6 +1178,8 @@ function Title() {
                             <li>3km ${temps?.[3].toFixed(1)}°C</li>
                             <li>4km ${temps?.[4].toFixed(1)}°C</li>
                         </ul>
+
+                        <p>${h(FromNow, { date: time })}</p>
                     `,
                 )}
             </span>
