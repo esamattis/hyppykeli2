@@ -136,39 +136,3 @@ export function FromNow(props) {
         <small>(klo ${formatClock(props.date)})</small>
     `;
 }
-
-/**
- * @param {Object} props
- * @param {any} props.children
- */
-export function ResizeRecreate({ children }) {
-    const [key, setKey] = useState(0);
-
-    useEffect(() => {
-        /** @type {ReturnType<typeof setTimeout> | null} */
-        let timer = null;
-
-        const handleResize = () => {
-            if (timer) {
-                clearTimeout(timer);
-            }
-
-            timer = setTimeout(() => {
-                setKey((prevKey) => prevKey + 1);
-            }, 1000);
-        };
-
-        window.addEventListener("resize", handleResize, {
-            passive: true,
-        });
-
-        return () => {
-            if (timer) {
-                clearTimeout(timer);
-            }
-            window.removeEventListener("resize", handleResize);
-        };
-    }, []);
-
-    return html`<${Fragment} key=${key}>${children}</${Fragment}>`;
-}

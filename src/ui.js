@@ -48,7 +48,7 @@ import {
     whenAll,
     coordinateDistance,
 } from "./utils.js";
-import { Help, FromNow, ErrorBoundary, ResizeRecreate } from "./components.js";
+import { Help, FromNow, ErrorBoundary } from "./components.js";
 
 effect(() => {
     document.title = NAME.value + " – Hyppykeli";
@@ -1211,25 +1211,21 @@ function Title() {
 export function Root() {
     return html`
         <div class="content grid">
-            ${
-                ERRORS.value.length > 0
-                    ? html`
-                          <div id="errors" class="errors">
-                              ${ERRORS.value.map((error) => {
-                                  return html`
-                                      <p>${error}</p>
-                                  `;
-                              })}
-                          </div>
-                      `
-                    : null
-            }
+            ${ERRORS.value.length > 0
+                ? html`
+                      <div id="errors" class="errors">
+                          ${ERRORS.value.map((error) => {
+                              return html`
+                                  <p>${error}</p>
+                              `;
+                          })}
+                      </div>
+                  `
+                : null}
 
             <${Title} />
 
-
-
-            <${Info}/>
+            <${Info} />
 
             <div class="clouds" id="clouds">
                 <h2 class="h2-with-icon">
@@ -1251,18 +1247,12 @@ export function Root() {
 
             <${Compass} />
 
-            <${ResizeRecreate}>
-                ${
-                    /* Graph.js does not resize correctly when the window is resized.
-                    Force full recreation of the component when the window is resized. */ null
-                }
-                <${Graph} />
-            </${ResizeRecreate}>
+            <${Graph} />
 
             <div id="observations-table" class="observations">
                 <h2 class="sticky">
                     Havainnot
-                    <span class="date"> ${formatDate(new Date())} </span>
+                    <span class="date">${formatDate(new Date())}</span>
                 </h2>
                 <div class="side-scroll">
                     <${DataTable}
@@ -1309,6 +1299,5 @@ export function Root() {
         <${StickyFooter} />
 
         <${RenderInjectedCSS} />
-
     `;
 }

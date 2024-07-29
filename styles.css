@@ -150,7 +150,7 @@ button {
 
     /** BIG SCREEN **/
     .grid {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: minmax(250px, 1fr) minmax(250px, 1fr);
         grid-template-areas:
             "errors errors"
             "title title"
