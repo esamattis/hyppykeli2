@@ -1163,36 +1163,47 @@ function Title() {
     return html`
         <h1 id="title">
             <span class="title-name">${NAME}</span>
-            <span class="title-temp" style=${{ opacity: historic ? 0.5 : 1 }}>
-                <span class="nowrap">${temperature?.toFixed(1)}°C maassa,</span>
-                ${" "}
-                <span class="nowrap">${temps?.[4].toFixed(1)}°C 4km:ssä</span>
-                ${h(
-                    Help,
-                    { label: "?" },
-                    html`
-                        <p>
-                            ICAO:n${" "}
-                            <a
-                                href="https://fi.wikipedia.org/wiki/Kansainv%C3%A4linen_standardi-ilmakeh%C3%A4"
-                            >
-                                ilmakehämallin
-                            </a>
-                            ${" "} mukainen lämpötilan muutos Troposfäärissä
-                            (-6.5°C/km)
-                        </p>
+            ${temps
+                ? html`
+                      <span
+                          class="title-temp"
+                          style=${{ opacity: historic ? 0.5 : 1 }}
+                      >
+                          <span class="nowrap">
+                              ${temperature?.toFixed(1)}°C maassa,
+                          </span>
+                          ${" "}
+                          <span class="nowrap">
+                              ${temps[4].toFixed(1)}°C 4km:ssä
+                          </span>
+                          ${h(
+                              Help,
+                              { label: "?" },
+                              html`
+                                  <p>
+                                      ICAO:n${" "}
+                                      <a
+                                          href="https://fi.wikipedia.org/wiki/Kansainv%C3%A4linen_standardi-ilmakeh%C3%A4"
+                                      >
+                                          ilmakehämallin
+                                      </a>
+                                      ${" "} mukainen lämpötilan muutos
+                                      Troposfäärissä (-6.5°C/km)
+                                  </p>
 
-                        <ul>
-                            <li>1km ${temps?.[1].toFixed(1)}°C</li>
-                            <li>2km ${temps?.[2].toFixed(1)}°C</li>
-                            <li>3km ${temps?.[3].toFixed(1)}°C</li>
-                            <li>4km ${temps?.[4].toFixed(1)}°C</li>
-                        </ul>
+                                  <ul>
+                                      <li>1km ${temps[1].toFixed(1)}°C</li>
+                                      <li>2km ${temps[2].toFixed(1)}°C</li>
+                                      <li>3km ${temps[3].toFixed(1)}°C</li>
+                                      <li>4km ${temps[4].toFixed(1)}°C</li>
+                                  </ul>
 
-                        <p>${h(FromNow, { date: time })}</p>
-                    `,
-                )}
-            </span>
+                                  <p>${h(FromNow, { date: time })}</p>
+                              `,
+                          )}
+                      </span>
+                  `
+                : null}
         </h1>
     `;
 }
