@@ -993,7 +993,12 @@ export function StickyFooter() {
 }
 
 function Anvil() {
-    const cb = METARS.value?.at(-1)?.metar?.includes("//////CB");
+    const metar = METARS.value?.at(-1)?.metar;
+    if (!metar) {
+        return;
+    }
+
+    const cb = /[^ ]CB /.test(metar);
     if (!cb) {
         return;
     }
