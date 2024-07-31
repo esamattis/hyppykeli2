@@ -53,8 +53,8 @@ interface FormattedTableData {
 
 type AverageWindSpeeds = {
     [key: string]: {
-        speed: number;
-        direction: number;
+        speed: number | null;
+        direction: number | null;
     };
 };
 

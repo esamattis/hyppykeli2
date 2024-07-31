@@ -2,6 +2,7 @@
 import { html } from "htm/preact";
 import { FORECAST_COORDINATES, STATION_COORDINATES } from "./data.js";
 import { signal } from "@preact/signals";
+import { isNullish } from "./utils.js";
 
 // Vakiot tiedoston alussa
 const PRESSURE_LEVELS = [
@@ -194,6 +195,7 @@ function getAverageData(hourly, targetHour, dayOffset) {
             const currentIndex = hourly.time.findIndex(
                 (time) => new Date(time).getHours() === currentHour,
             );
+
             result[level] = {
                 speed: hourly[speedKey]?.[currentIndex] ?? 0,
                 direction: hourly[directionKey]?.[currentIndex] ?? 0,
@@ -207,9 +209,15 @@ function getAverageData(hourly, targetHour, dayOffset) {
             );
 
             result[level] = {
-                speed: speeds.reduce((a, b) => a + b, 0) / speeds.length,
+                speed:
+                    speeds.length > 0
+                        ? speeds.reduce((a, b) => a + b, 0) / speeds.length
+                        : null,
                 direction:
-                    directions.reduce((a, b) => a + b, 0) / directions.length,
+                    directions.length > 0
+                        ? directions.reduce((a, b) => a + b, 0) /
+                          directions.length
+                        : null,
             };
         }
     });
@@ -218,10 +226,14 @@ function getAverageData(hourly, targetHour, dayOffset) {
 }
 
 /**
- * @param {number} speed
- * @param {string} height
+ * @param {number|null} speed
+ * @param {string|null} height
  */
 const getWindSpeedClass = (speed, height) => {
+    if (speed === null || height === null) {
+        return "";
+    }
+
     if (ON_CANOPY_HEIGHTS.includes(height)) {
         if (speed < 8) return WIND_SPEED_CLASSES[0];
         if (speed < 11) return WIND_SPEED_CLASSES[1];
@@ -245,9 +257,13 @@ function roundToNearestFive(num) {
 
 /**
  * @param {Object} props
- * @param {number} props.direction
+ * @param {number|null} props.direction
  */
 export function WindArrow({ direction }) {
+    if (isNullish(direction)) {
+        return null;
+    }
+
     const arrow = "➤";
     const rotationDegree = direction + 90;
     return html`
@@ -265,8 +281,8 @@ export function WindArrow({ direction }) {
 /**
  * @param {Object} props
  * @param {Object} props.data
- * @param {number} props.data.speed
- * @param {number} props.data.direction
+ * @param {number|null} props.data.speed
+ * @param {number|null} props.data.direction
  * @param {string} props.columnClass
  * @param {string} props.height
  */
@@ -277,8 +293,10 @@ export function WindCell({ data, columnClass, height }) {
         `;
 
     const { speed, direction } = data;
-    const speedInMS = Math.round(speed / 3.6);
-    const roundedDirection = roundToNearestFive(direction.toFixed(0));
+    const speedInMS = isNullish(speed) ? null : Math.round(speed / 3.6);
+    const roundedDirection = isNullish(direction)
+        ? null
+        : roundToNearestFive(direction.toFixed(0));
 
     return html`
         <td
@@ -287,11 +305,19 @@ export function WindCell({ data, columnClass, height }) {
                 height,
             )}`}
         >
-            <div class="wind-speed">${speedInMS} m/s</div>
-            <div class="wind-direction">
-                ${roundedDirection}°
-                <${WindArrow} direction=${roundedDirection} />
-            </div>
+            ${isNullish(speed)
+                ? null
+                : html`
+                      <div class="wind-speed">${speedInMS} m/s</div>
+                  `}
+            ${isNullish(speed)
+                ? null
+                : html`
+                      <div class="wind-direction">
+                          ${roundedDirection}°
+                          <${WindArrow} direction=${roundedDirection} />
+                      </div>
+                  `}
         </td>
     `;
 }

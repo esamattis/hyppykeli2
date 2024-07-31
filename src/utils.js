@@ -208,7 +208,8 @@ export function hasValidWindData(obs) {
 }
 
 /**
- * Zero is falsy in JavaScript, so we need to check for it explicitly
+ * Zero is falsy in JavaScript, so when checking for undefined or null,
+ * we need to check explicitly for them instead of just using `if (!value)`.
  *
  * @param {any} value
  * @returns {value is null | undefined}
