@@ -97,6 +97,7 @@ export function Compass() {
               <text x="20" y="210" font-weight="bold" font-family="monospace" font-size="40" text-anchor="middle" fill="black">W</text>
               <text x="200" y="390" font-weight="bold" font-family="monospace" font-size="40" text-anchor="middle" fill="black">S</text>
               <text x="380" y="210" font-weight="bold" font-family="monospace" font-size="40" text-anchor="middle" fill="black">E</text>
+              <${HistoryNeedles} />
               <${Needle} />
               <${WindVariations} />
               <text
@@ -177,6 +178,45 @@ function Needle() {
             />
             <!-- Center Point -->
             <circle cx="200" cy="200" r="10" fill="black" />
+        </g>
+    `;
+}
+
+function HistoryNeedles() {
+    const observations = OBSERVATIONS.value.flatMap((obs) => {
+        if (isNullish(obs.gust) || isNullish(obs.direction)) {
+            return [];
+        }
+
+        if (!hasValidWindData(obs)) {
+            return [];
+        }
+
+        const age = Date.now() - obs.time.getTime();
+        if (age > 3600000) {
+            return [];
+        }
+
+        return {
+            gust: obs.gust,
+            direction: obs.direction,
+        };
+    });
+
+    return html`
+        <g>
+            ${observations.map((obs) => {
+                const needleLength = calculateNeedleLength(obs.gust);
+
+                return html`
+                    <polygon
+                        points=${`190,${200 - needleLength} 210,${200 - needleLength} 220,200 180,200`}
+                        fill="black"
+                        style="opacity: 0.01"
+                        transform=${`rotate(${obs.direction - 180}, 200, 200)`}
+                    />
+                `;
+            })}
         </g>
     `;
 }
