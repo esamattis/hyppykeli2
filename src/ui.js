@@ -443,12 +443,8 @@ function CloudSummary() {
 
     let msg = "";
 
-    if (metar?.clouds.length === 0) {
-        if (metar.metar.includes("CAVOK")) {
-            msg = "Ei pilviä alle 1500M (CAVOK)";
-        } else {
-            msg = "Ei tietoa pilvistä METARissa";
-        }
+    if (metar?.clouds.length === 0 && metar.metar.includes("CAVOK")) {
+        msg = "Ei pilviä alle 1500M (CAVOK)";
     }
 
     return html`
@@ -542,7 +538,12 @@ function CloudSummary() {
                     <li>
                         <span class="vertical-center">
                             <span style="margin-right: 1ch">
-                                Kahden tunnin päästä
+                                2h päästä
+                                ${whenAll(
+                                    [forecast?.temperature, forecast?.dewPoint],
+                                    (temp, dew) =>
+                                        ` ${getLiftedCondensationLevel(temp, dew)} M`,
+                                )}
                             </span>
                             ${h(PercentagePie, {
                                 percentage: forecast?.lowCloudCover ?? 0,
@@ -552,8 +553,8 @@ function CloudSummary() {
                                 { label: "?", id: "cloudforecast" },
                                 html`
                                     <p>
-                                        Pilvipeiton ennuste matalille (alle 2km)
-                                        pilville
+                                        Tiivistymiskorkeuden ja pilvipeiton
+                                        ennuste matalille (alle 2km) pilville
                                         ${forecast
                                             ? ` klo ${formatClock(forecast?.time)}`
                                             : null}
