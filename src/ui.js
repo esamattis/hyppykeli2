@@ -141,7 +141,7 @@ function ForecastTHead() {
             Pilvet L
             <${Help} label="?">
                 <p>
-                    Matalakerroksen (Low) pilvet jotka sijaitsevat yleensä alle 2 kilometrin (noin 6 500 jalan) korkeudella merenpinnasta.
+                    Matalakerroksen (Low) pilvien peittävyys jotka sijaitsevat yleensä alle 2 kilometrin (noin 6 500 jalan) korkeudella merenpinnasta.
                 </p>
             </${Help}>
         </th>
@@ -149,7 +149,7 @@ function ForecastTHead() {
             Pilvet ML
             <${Help} label="?">
                 <p>
-                    Matalan ja keskikerroksen (MiddleAndLow) pilvet jotka sijaitsevat yleensä 2-7 kilometrin (noin 6 500-23 000 jalan) korkeudella merenpinnasta.
+                    Matalan ja keskikerroksen (MiddleAndLow) pilvien peittävyys jotka sijaitsevat yleensä 2-7 kilometrin (noin 6 500-23 000 jalan) korkeudella merenpinnasta.
                 </p>
             </${Help}>
         </th>
