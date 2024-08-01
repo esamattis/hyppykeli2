@@ -537,7 +537,7 @@ function CloudSummary() {
                     <li>
                         <span class="vertical-center">
                             <span style="margin-right: 1ch">
-                                Kahden tunnin kuluttua
+                                Kahden tunnin päästä
                             </span>
                             ${h(PercentagePie, {
                                 percentage: forecast?.lowCloudCover ?? 0,
