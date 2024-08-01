@@ -106,6 +106,7 @@ interface MetarData {
         unit: string;
     };
     metar: string;
+    cb: boolean;
     time: Date;
     elevation?: number;
 }

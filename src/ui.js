@@ -482,6 +482,11 @@ function CloudSummary() {
                           </li>
                       `,
                   )}
+            ${metar?.cb
+                ? html`
+                      <li>Ukkospilviä ⚡️</li>
+                  `
+                : null}
 
             <li>
                 <small>
@@ -1040,13 +1045,7 @@ export function StickyFooter() {
 }
 
 function Anvil() {
-    const metar = METARS.value?.at(-1)?.metar;
-    if (!metar) {
-        return;
-    }
-
-    const cb = /[^ ]CB /.test(metar);
-    if (!cb) {
+    if (!METARS.value?.at(-1)?.cb) {
         return;
     }
 

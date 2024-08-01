@@ -508,6 +508,7 @@ function parseCloudsXml(xml) {
                 direction: windDirection,
                 unit: "kt",
             },
+            cb: /[^ ]CB /.test(metar),
             temperature,
             time,
             elevation,
@@ -725,6 +726,7 @@ function setMETARSfromMetarMessage(metars) {
         const metarData = {
             time: new Date(m.time),
             metar,
+            cb: /[^ ]CB /.test(metar),
             wind: {
                 gust: m.wind.gust ?? undefined,
                 speed: m.wind.speed ?? undefined,
