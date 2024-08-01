@@ -447,12 +447,12 @@ function CloudSummary() {
         if (metar.metar.includes("CAVOK")) {
             msg = "Ei pilviä alle 1500M (CAVOK)";
         } else {
-            msg = "Ei tietoa pilvistä";
+            msg = "Ei tietoa pilvistä METARissa";
         }
     }
 
     return html`
-        <ul>
+        <ul class="cloud-list" style=${{ display: metar ? "block" : "none" }}>
             ${msg
                 ? html`
                       <li>${msg}</li>
@@ -482,6 +482,22 @@ function CloudSummary() {
                           </li>
                       `,
                   )}
+
+            <li>
+                <small>
+                    <${FromNow} date=${time} />
+                </small>
+
+                <br />
+                ${metar?.metar
+                    ? html`
+                          <em class="metar">${metar.metar}</em>
+                      `
+                    : null}
+            </li>
+        </ul>
+
+        <ul class="cloud-list">
             ${whenAll(
                 [latest?.temperature, latest?.dewPoint],
                 (temp, dew) => html`
@@ -519,8 +535,8 @@ function CloudSummary() {
                     </li>
 
                     <li>
-                        <span class="cloud-list-item-alt">
-                            <span style="margin-right: 5px">
+                        <span class="vertical-center">
+                            <span style="margin-right: 1ch">
                                 Kahden tunnin kuluttua
                             </span>
                             ${h(PercentagePie, {
@@ -544,17 +560,6 @@ function CloudSummary() {
                 `,
             )}
         </ul>
-
-        <p>
-            <${FromNow} date=${time} />
-
-            <br />
-            ${metar?.metar
-                ? html`
-                      <em class="metar">${metar.metar}</em>
-                  `
-                : null}
-        </p>
     `;
 }
 

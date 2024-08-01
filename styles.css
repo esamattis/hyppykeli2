@@ -163,11 +163,8 @@ button {
     }
 }
 
-.cloud-list-item-alt {
-    font-style: italic;
-    font-size: 90%;
+.vertical-center {
     display: inline-flex;
-    flex-direction: row;
     align-items: center;
 }
 
