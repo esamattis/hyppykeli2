@@ -34,7 +34,7 @@ import {
 import { Graph } from "./graph.js";
 import { Compass } from "./compass.js";
 import {
-    calculateCloudBase,
+    getLiftedCondensationLevel,
     dateOffset,
     EXAMPLE_CSS,
     formatClock,
@@ -81,10 +81,10 @@ function ObservationTHead() {
             <th>Tuuli</th>
             <th>Suunta</th>
             <th style="width: 8ch">
-            KPK
+            TK
             <${Help} label="?">
                 <p>
-                Kastepisteen korkeus.${" "}
+                Tiivistymiskorkeus.${" "}
                 <a href="#" onClick=${(/** @type {any} */ e) => {
                     e.preventDefault();
                     document.getElementById("dewpoint")?.click();
@@ -120,7 +120,7 @@ function ObservationRows(props) {
                     ${whenAll(
                         [point.temperature, point.dewPoint],
                         (temp, dew) => html`
-                            ${calculateCloudBase(temp, dew)}${" "}M
+                            ${getLiftedCondensationLevel(temp, dew)}${" "}M
                         `,
                     )}
                 </td>
@@ -155,10 +155,10 @@ function ForecastTHead() {
         </th>
 
         <th style="width: 8ch">
-            KPK
+            TK
             <${Help} label="?">
                 <p>
-                Kastepisteen korkeus.${" "}
+                Tiivistymiskorkeus.${" "}
                 <a href="#" onClick=${(/** @type {any} */ e) => {
                     e.preventDefault();
                     document.getElementById("dewpoint")?.click();
@@ -209,7 +209,7 @@ function ForecastRows(props) {
                     ${whenAll(
                         [point.temperature, point.dewPoint],
                         (temp, dew) => html`
-                            ${calculateCloudBase(temp, dew)}${" "}M
+                            ${getLiftedCondensationLevel(temp, dew)}${" "}M
                         `,
                     )}
                 </td>
@@ -473,28 +473,33 @@ function LatestClouds() {
                         <span
                             style="margin-top: 5px; font-style: italic; font-size: 90%"
                         >
-                            Kastepisteen korkeus${" "}
-                            ${calculateCloudBase(temp, dew)}M
+                            Tiivistymiskorkeus${" "}
+                            ${getLiftedCondensationLevel(temp, dew)}M
                         </span>
 
                         ${h(
                             Help,
                             { label: "?", id: "dewpoint" },
                             html`
+                                <!-- prettier-ignore -->
                                 <p>
-                                    Arvio mahdollisten pilvien korkeudesta
-                                    kastepisteen perusteella. Kastepiste on
-                                    lämpötila jonka alapuolella vesihöyry
-                                    tiivistyy pisaroiksi muodostaen pilviä.
-                                    Arvio kertoo missä korkeudessa lämpötila
-                                    laskee kastepisteeseen.
-                                </p>
-
-                                <p>
+                                    Arvio mahdollisten pilvien korkeudesta${" "}
+                                    <a href="https://fi.wikipedia.org/wiki/Nostotiivistyskorkeus">tiivistymiskorkeuden</a>${" "}
+                                    perusteella.
                                     Laskettu lämpötilasta ${temp.toFixed(1)}°C
                                     ja kastepisteestä ${dew.toFixed(1)}°C
                                     pyöristäen lähimpään 100 metriin.${" "}
                                     ${h(FromNow, { date: latest?.time })}
+
+                                </p>
+
+                                <p>
+                                    Arvio on järjellinen vain silloin kun pilvet
+                                    ovat muodostuneet mittauspaikalla. Jos
+                                    pilvet ovat muodostuneet toisaalla eri
+                                    lämpötilassa/kastepisteessä ja saapuneet
+                                    tuulen mukana, arvio on todennäköisesti päin
+                                    prinkkalaa.
                                 </p>
                             `,
                         )}

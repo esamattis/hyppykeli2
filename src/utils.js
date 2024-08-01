@@ -256,21 +256,16 @@ export function knotsToMs(num) {
 
 /**
  * Calculate the cloud base altitude in meters from the surface temperature and dew point temperature.
- * https://en.wikipedia.org/wiki/Cloud_base
+ * https://en.wikipedia.org/wiki/Lifted_condensation_level
  *
  * @param {number} temp - The surface temperature in Celsius.
  * @param {number} dewPoint - The dew point temperature in Celsius.
  * @return {number} - The estimated cloud base altitude in meters.
  */
-export function calculateCloudBase(temp, dewPoint) {
-    // Calculate the difference between the surface temperature and the dew point temperature
-    const deltaT = temp - dewPoint;
-
-    // Estimate the cloud base altitude in meters
-    const cloudBaseAltitude = 125 * deltaT;
-
+export function getLiftedCondensationLevel(temp, dewPoint) {
+    const lcl = 125 * (temp - dewPoint);
     // Round to the nearest 100 meters
-    return Math.round(cloudBaseAltitude / 100) * 100;
+    return Math.round(lcl / 100) * 100;
 }
 
 /**
