@@ -163,6 +163,14 @@ button {
     }
 }
 
+.cloud-list-item-alt {
+    font-style: italic;
+    font-size: 90%;
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+}
+
 a:visited {
     color: blue;
 }
@@ -207,6 +215,10 @@ a:visited {
 
 .cloud-cover {
     display: inline-flex;
+}
+
+.cloud-cover svg {
+    margin-right: 1ch;
 }
 
 .ok {
@@ -298,6 +310,7 @@ dialog {
     font-size: initial;
     font-family: initial;
     font-weight: initial;
+    font-style: normal;
     width: clamp(300px, 400px, 90vw);
 }
 
@@ -399,10 +412,6 @@ h2 .date {
 .anvil {
     height: 30px;
     margin-left: 1ch;
-}
-
-.forecast-row .pie {
-    margin-right: 1ch;
 }
 
 .direction-value {

@@ -198,11 +198,11 @@ function ForecastRows(props) {
                     <${WindDirection} direction=${point.direction} />
                 </td>
                 <td>
-                    <${Percentage} percentage=${point.lowCloudCover} />
+                    <${PercentagePie} percentage=${point.lowCloudCover} />
                 </td>
 
                 <td>
-                    <${Percentage} percentage=${point.middleCloudCover} />
+                    <${PercentagePie} percentage=${point.middleCloudCover} />
                 </td>
 
                 <td>
@@ -215,7 +215,7 @@ function ForecastRows(props) {
                 </td>
 
                 <td>
-                    <${Percentage} percentage=${point.rain} />
+                    <${PercentagePie} percentage=${point.rain} />
                 </td>
 
                 <td>${point.temperature?.toFixed(1)} °C</td>
@@ -228,7 +228,7 @@ function ForecastRows(props) {
  * @param {Object} props
  * @param {number} [props.percentage]
  */
-function Percentage(props) {
+function PercentagePie(props) {
     if (isNullish(props.percentage)) {
         return null;
     }
@@ -236,7 +236,7 @@ function Percentage(props) {
     return html`
         <span class="cloud-cover">
             <${PieChart} percentage=${props.percentage} />
-            ${props.percentage.toFixed(0)} %
+            <span class="text">${props.percentage.toFixed(0)} %</span>
         </span>
     `;
 }
@@ -333,7 +333,7 @@ function DataTable(props) {
     `;
 }
 
-function LatestWind() {
+function WindSummary() {
     const history = !!HOVERED_OBSERVATION.value;
     const obs = HOVERED_OBSERVATION.value || LATEST_OBSERVATION.value;
 
@@ -432,10 +432,14 @@ const CLOUD_TYPES = {
     OVC: "Täysi pilvikatto",
 };
 
-function LatestClouds() {
+function CloudSummary() {
     const metar = METARS.value?.at(-1);
     const latest = LATEST_OBSERVATION.value;
     const time = metar?.time ?? latest?.time;
+    const inTwoHours = Date.now() + 2 * 60 * 60 * 1000;
+    const forecast = FORECASTS.value.find((fore) => {
+        return fore.time.getTime() > inTwoHours;
+    });
 
     let msg = "";
 
@@ -454,7 +458,7 @@ function LatestClouds() {
                       <li>${msg}</li>
                   `
                 : metar?.clouds.map(
-                      (cloud, i) => html`
+                      (cloud) => html`
                           <li>
                               <a href=${cloud.href}>
                                   ${CLOUD_TYPES[cloud.amount] ?? cloud.amount}
@@ -463,20 +467,29 @@ function LatestClouds() {
                               ${Math.round(
                                   toMeters(cloud.base, cloud.unit) / 10,
                               ) * 10}M
+                              ${h(
+                                  Help,
+                                  { label: "?" },
+                                  html`
+                                      <p class="metar" style="font-size: 120%">
+                                          METAR${" "}
+                                          ${cloud.amount}${cloud.base
+                                              .toString()
+                                              .padStart(1, "0")}
+                                      </p>
+                                  `,
+                              )}
                           </li>
                       `,
                   )}
             ${whenAll(
                 [latest?.temperature, latest?.dewPoint],
                 (temp, dew) => html`
-                    <li>
-                        <span
-                            style="margin-top: 5px; font-style: italic; font-size: 90%"
-                        >
+                    <li style="margin-top: 10px">
+                        <span class="cloud-list-item-alt">
                             Tiivistymiskorkeus${" "}
                             ${getLiftedCondensationLevel(temp, dew)}M
                         </span>
-
                         ${h(
                             Help,
                             { label: "?", id: "dewpoint" },
@@ -503,6 +516,30 @@ function LatestClouds() {
                                 </p>
                             `,
                         )}
+                    </li>
+
+                    <li>
+                        <span class="cloud-list-item-alt">
+                            <span style="margin-right: 5px">
+                                Kahden tunnin kuluttua
+                            </span>
+                            ${h(PercentagePie, {
+                                percentage: forecast?.lowCloudCover ?? 0,
+                            })}
+                            ${h(
+                                Help,
+                                { label: "?", id: "cloudforecast" },
+                                html`
+                                    <p>
+                                        Pilvipeiton ennuste matalille (alle 2km)
+                                        pilville
+                                        ${forecast
+                                            ? ` klo ${formatClock(forecast?.time)}`
+                                            : null}
+                                    </p>
+                                `,
+                            )}
+                        </span>
                     </li>
                 `,
             )}
@@ -1243,7 +1280,7 @@ export function Root() {
                     <${Anvil} />
                 </h2>
 
-                <${LatestClouds} />
+                <${CloudSummary} />
             </div>
 
             <div id="winds">
@@ -1252,7 +1289,7 @@ export function Root() {
                     <div style="width: 1ch"></div>
                     <${Parachute} />
                 </h2>
-                <${LatestWind} />
+                <${WindSummary} />
             </div>
 
             <${Compass} />
