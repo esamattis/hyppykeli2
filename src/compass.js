@@ -1,5 +1,6 @@
 // @ts-check
 import { html } from "htm/preact";
+import { h } from "preact";
 import {
     HOVERED_OBSERVATION,
     LATEST_OBSERVATION,
@@ -97,7 +98,8 @@ export function Compass() {
               <text x="20" y="210" font-weight="bold" font-family="monospace" font-size="40" text-anchor="middle" fill="black">W</text>
               <text x="200" y="390" font-weight="bold" font-family="monospace" font-size="40" text-anchor="middle" fill="black">S</text>
               <text x="380" y="210" font-weight="bold" font-family="monospace" font-size="40" text-anchor="middle" fill="black">E</text>
-              <${Needle} />
+              <${HistoryNeedles} />
+              <${GustNeedle} />
               <${WindVariations} />
               <text
                     x="200"
@@ -149,7 +151,24 @@ export function Compass() {
     `;
 }
 
-function Needle() {
+/**
+ * @param {object} props
+ * @param {number} props.direction
+ * @param {number} props.gust
+ * @param {string} props.color
+ */
+function NeedlePolygon(props) {
+    const needleLength = calculateNeedleLength(props.gust);
+    return html`
+        <polygon
+            points=${`190,${200 - needleLength} 210,${200 - needleLength} 220,200 180,200`}
+            fill=${props.color}
+            transform=${`rotate(${props.direction - 180}, 200, 200)`}
+        />
+    `;
+}
+
+function GustNeedle() {
     const history = !!HOVERED_OBSERVATION.value;
     const obs = HOVERED_OBSERVATION.value ?? LATEST_OBSERVATION.value;
 
@@ -165,18 +184,51 @@ function Needle() {
         return null;
     }
 
-    const needleLength = calculateNeedleLength(gust);
     const needleColor = gust > MAX_WIND_SPEED ? "black" : "red";
 
     return html`
         <g className="${history ? "historic" : ""}">
-            <polygon
-                points=${`190,${200 - needleLength} 210,${200 - needleLength} 220,200 180,200`}
-                fill=${needleColor}
-                transform=${`rotate(${obs.direction - 180}, 200, 200)`}
-            />
+            ${h(NeedlePolygon, {
+                gust,
+                direction: obs.direction,
+                color: needleColor,
+            })}
             <!-- Center Point -->
             <circle cx="200" cy="200" r="10" fill="black" />
+        </g>
+    `;
+}
+
+function HistoryNeedles() {
+    const observations = OBSERVATIONS.value.flatMap((obs) => {
+        if (isNullish(obs.gust) || isNullish(obs.direction)) {
+            return [];
+        }
+
+        if (!hasValidWindData(obs)) {
+            return [];
+        }
+
+        const age = Date.now() - obs.time.getTime();
+        if (age > 3600000) {
+            return [];
+        }
+
+        return {
+            gust: obs.gust,
+            direction: obs.direction,
+        };
+    });
+
+    return html`
+        <g>
+            ${observations.map((obs) =>
+                h(NeedlePolygon, {
+                    direction: obs.direction,
+                    gust: obs.gust,
+                    color: "rgba(0, 0, 0, 0.01)",
+                }),
+            )}
         </g>
     `;
 }
