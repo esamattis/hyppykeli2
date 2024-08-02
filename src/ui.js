@@ -447,20 +447,20 @@ function CloudSummary() {
 
     return html`
         <ul class="cloud-list" style=${{ display: metar ? "block" : "none" }}>
-            ${msg
-                ? html`
-                      <li>${msg}</li>
-                  `
-                : metar?.clouds.map(
-                      (cloud) => html`
-                          <li>
+            <li>
+                ${msg
+                    ? msg
+                    : metar?.clouds.map(
+                          (cloud) => html`
                               <a href=${cloud.href}>
                                   ${CLOUD_TYPES[cloud.amount] ?? cloud.amount}
                               </a>
                               ${" "}
-                              ${Math.round(
-                                  toMeters(cloud.base, cloud.unit) / 10,
-                              ) * 10}M
+                              <b>
+                                  ${Math.round(
+                                      toMeters(cloud.base, cloud.unit) / 10,
+                                  ) * 10}M
+                              </b>
                               ${h(
                                   Help,
                                   { label: "?" },
@@ -473,14 +473,10 @@ function CloudSummary() {
                                       </p>
                                   `,
                               )}
-                          </li>
-                      `,
-                  )}
-            ${metar?.cb
-                ? html`
-                      <li>Ukkospilviä ⚡️</li>
-                  `
-                : null}
+                          `,
+                      )}
+                ${metar?.cb ? "Ukkospilviä ⚡️" : null}
+            </li>
 
             <li>
                 <small>
@@ -503,7 +499,7 @@ function CloudSummary() {
                     <li style="margin-top: 10px">
                         <span class="cloud-list-item-alt">
                             Tiivistymiskorkeus${" "}
-                            ${getLiftedCondensationLevel(temp, dew)}M
+                            <b>${getLiftedCondensationLevel(temp, dew)}M</b>
                         </span>
                         ${h(
                             Help,
