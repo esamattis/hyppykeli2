@@ -1,6 +1,6 @@
 // @ts-check
 import { effect, signal } from "@preact/signals";
-import { useState } from "preact/hooks";
+import { useMemo, useState } from "preact/hooks";
 import { h, html } from "htm/preact";
 import { clearOMCache, OpenMeteoTool, OpenMeteoRaw } from "./om.js";
 import {
@@ -1255,19 +1255,17 @@ function Title() {
 }
 
 function MobileHoverCompass() {
-    if (!HOVERED_OBSERVATION.value) {
-        return null;
-    }
+    const hasValue = !!HOVERED_OBSERVATION.value;
 
-    console.log(HOVERED_OBSERVATION.value);
+    const show = useMemo(
+        () =>
+            getComputedStyle(document.documentElement)
+                .getPropertyValue("--device")
+                .trim() === "mobile",
+        [hasValue],
+    );
 
-    const device = getComputedStyle(document.documentElement)
-        .getPropertyValue("--device")
-        .trim();
-
-    console.log(device);
-
-    if (device !== "mobile") {
+    if (!show) {
         return null;
     }
 
