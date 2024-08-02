@@ -467,7 +467,9 @@ function CloudSummary() {
                                   html`
                                       <p class="metar" style="font-size: 120%">
                                           METAR${" "}
-                                          ${cloud.amount}${cloud.base}
+                                          ${cloud.amount}${cloud.base
+                                              .toString()
+                                              .padStart(3, "0")}
                                       </p>
                                   `,
                               )}
