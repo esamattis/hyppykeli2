@@ -1141,7 +1141,7 @@ function Info() {
     const metar = METARS.value?.[0];
 
     return html`
-        <div id="info">
+        <div class="info">
             ${STATION_NAME.value
                 ? html`
                       Havaintotiedot haettu havaintoasemalta${" "}
@@ -1207,7 +1207,7 @@ function Title() {
           };
 
     return html`
-        <h1 id="title">
+        <h1>
             <span class="title-name">${NAME}</span>
             ${temps
                 ? html`
@@ -1269,9 +1269,10 @@ export function Root() {
                   `
                 : null}
 
-            <${Title} />
-
-            <${Info} />
+            <div id="title">
+                <${Title} />
+                <${Info} />
+            </div>
 
             <div class="clouds" id="clouds">
                 <h2 class="h2-with-icon">
@@ -1286,12 +1287,14 @@ export function Root() {
                 <h2 class="h2-with-icon">
                     Tuulet
                     <div style="width: 1ch"></div>
-                    <${Parachute} />
                 </h2>
                 <${WindSummary} />
             </div>
 
-            <${Compass} />
+            <div id="compass">
+                ${h(Compass, {})}
+                <${Parachute} />
+            </div>
 
             <${Graph} />
 

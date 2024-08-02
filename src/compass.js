@@ -83,7 +83,7 @@ export function Compass() {
 
     // prettier-ignore
     return html`
-        <div id="compass" class="compass">
+        <div class="compass">
             <svg
                 style="transform: rotate(${rotation}deg); transform-origin: center;"
                 viewBox="0 0 400 400"

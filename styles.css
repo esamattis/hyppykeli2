@@ -1,7 +1,3 @@
-:root {
-    --compass-width: 100px;
-}
-
 body {
     margin: 0;
     padding: 0;
@@ -13,7 +9,6 @@ button {
 
 #title {
     grid-area: title;
-    width: calc(100vw - 30px - var(--compass-width));
     word-break: break-word;
 }
 
@@ -21,10 +16,12 @@ button {
     white-space: nowrap;
 }
 
+.info {
+    line-height: 1.8;
+}
+
 #info {
     grid-area: info;
-    width: calc(100vw - 30px - var(--compass-width));
-    line-height: 1.8;
 }
 
 #clouds {
@@ -37,6 +34,13 @@ button {
 
 #compass {
     grid-area: compass;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.compass svg {
+    height: 270px;
 }
 
 #observations-graph {
@@ -78,25 +82,6 @@ button {
     margin-bottom: 100px;
 }
 
-.compass svg {
-    width: 100%;
-}
-
-.compass {
-    display: flex;
-    width: var(--compass-width);
-    z-index: 100;
-    position: fixed;
-    padding: 2px;
-    /* border: 1px dashed black; */
-    box-shadow: 0 0 10px 5px gray;
-    border-radius: 5px;
-    background: white;
-    top: 5px;
-    right: 5px;
-    flex-direction: column;
-}
-
 .title-temp {
     font-size: 65%;
     color: #707070;
@@ -126,10 +111,9 @@ button {
     grid-template-areas:
         "errors errors"
         "title title"
-        "info info"
+        "compass compass"
         "clouds clouds"
         "winds winds"
-        "compass compass"
         "observations-graph observations-graph"
         "forecasts-graph forecasts-graph"
         "observations-table observations-table"
@@ -140,10 +124,6 @@ button {
 }
 
 @media (min-width: 900px) {
-    :root {
-        --compass-width: 200px;
-    }
-
     .latest-wind-cell {
         display: inline;
     }
@@ -153,8 +133,8 @@ button {
         grid-template-columns: minmax(250px, 1fr) minmax(250px, 1fr);
         grid-template-areas:
             "errors errors"
-            "title title"
-            "info info"
+            "title compass"
+            "title compass"
             "clouds winds"
             "observations-graph forecasts-graph"
             "observations-table forecasts-table"
@@ -429,11 +409,7 @@ h2 .date {
 }
 
 .icon-parachute {
-    height: 20px;
-}
-
-.scale {
-    transform: scale(2);
+    height: 150px;
 }
 
 .rotate {
