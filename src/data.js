@@ -156,6 +156,16 @@ export const LATEST_OBSERVATION = computed(() => {
 export const FORECASTS = signal([]);
 
 /**
+ * @type {Signal<WeatherData|undefined>}
+ */
+export const SINGLE_FORECAST = computed(() => {
+    const inTwoHours = Date.now() + 2 * 60 * 60 * 1000;
+    return FORECASTS.value.find((fore) => {
+        return fore.time.getTime() > inTwoHours;
+    });
+});
+
+/**
  * @param {WeatherData | undefined} original
  * @returns {WeatherData|undefined}
  */

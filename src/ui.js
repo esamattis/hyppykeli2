@@ -29,6 +29,7 @@ import {
     SAVED_DZs,
     saveCurrentDz,
     removeSavedDz,
+    SINGLE_FORECAST,
 } from "./data.js";
 
 import { Graph } from "./graph.js";
@@ -436,10 +437,7 @@ function CloudSummary() {
     const metar = METARS.value?.at(-1);
     const latest = LATEST_OBSERVATION.value;
     const time = metar?.time ?? latest?.time;
-    const inTwoHours = Date.now() + 2 * 60 * 60 * 1000;
-    const forecast = FORECASTS.value.find((fore) => {
-        return fore.time.getTime() > inTwoHours;
-    });
+    const forecast = SINGLE_FORECAST.value;
 
     let msg = "";
 
@@ -542,7 +540,7 @@ function CloudSummary() {
                                 ${whenAll(
                                     [forecast?.temperature, forecast?.dewPoint],
                                     (temp, dew) =>
-                                        ` ${getLiftedCondensationLevel(temp, dew)} M`,
+                                        ` ${getLiftedCondensationLevel(temp, dew)}M`,
                                 )}
                             </span>
                             ${h(PercentagePie, {
