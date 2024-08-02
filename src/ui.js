@@ -469,7 +469,7 @@ function CloudSummary() {
                                           METAR${" "}
                                           ${cloud.amount}${cloud.base
                                               .toString()
-                                              .padStart(1, "0")}
+                                              .padStart(3, "0")}
                                       </p>
                                   `,
                               )}
