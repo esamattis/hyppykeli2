@@ -125,7 +125,10 @@ export function FromNow(props) {
     }, [props.date]);
 
     if (!props.date) {
-        return null;
+        // add empty container with non-breaking space to keep layout stable
+        return html`
+            <span class="from-now">${"\u00A0"}</span>
+        `;
     }
 
     const fromNow = useInterval(createFromNow);
