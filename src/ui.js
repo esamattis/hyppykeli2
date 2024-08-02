@@ -645,7 +645,7 @@ effect(() => {
             },
         );
 
-        dzs.sort((a, b) => a.title.localeCompare(b.title));
+        dzs.sort((a, b) => a.title.trim().localeCompare(b.title.trim()));
 
         OTHER_DZs.value = dzs;
     });
