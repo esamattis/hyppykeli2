@@ -35,14 +35,37 @@ button {
 #compass {
     grid-area: compass;
     display: flex;
-    align-items: center;
-    justify-content: space-around;
+    align-items: flex-start;
+    justify-content: center;
 }
 
 .compass svg {
     height: 270px;
 }
 
+.icon-parachute {
+    height: 50px;
+}
+
+.sticky-compass {
+    display: flex;
+    width: 130px;
+    height: 130px;
+    z-index: 100;
+    position: fixed;
+    padding: 2px;
+    /* border: 1px dashed black; */
+    box-shadow: 0 0 10px 5px gray;
+    border-radius: 5px;
+    background: white;
+    top: 5px;
+    right: 5px;
+    flex-direction: column;
+}
+
+.sticky-compass .help {
+    display: none;
+}
 #observations-graph {
     grid-area: observations-graph;
 }
@@ -123,7 +146,28 @@ button {
         "high-winds-tomorrow high-winds-tomorrow";
 }
 
+:root {
+    --device: mobile;
+}
+
 @media (min-width: 900px) {
+    :root {
+        --device: desktop;
+    }
+
+    .icon-parachute {
+        height: 150px;
+    }
+
+    #compass {
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    #compass .icon-parachute {
+        margin-left: 150px;
+    }
+
     .latest-wind-cell {
         display: inline;
     }
@@ -406,10 +450,6 @@ h2 .date {
     width: 20px;
     height: 20px;
     transform: rotate(var(--direction));
-}
-
-.icon-parachute {
-    height: 150px;
 }
 
 .rotate {

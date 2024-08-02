@@ -1254,6 +1254,26 @@ function Title() {
     `;
 }
 
+function MobileHoverCompass() {
+    if (!HOVERED_OBSERVATION.value) {
+        return null;
+    }
+
+    console.log(HOVERED_OBSERVATION.value);
+
+    const device = getComputedStyle(document.documentElement)
+        .getPropertyValue("--device")
+        .trim();
+
+    console.log(device);
+
+    if (device !== "mobile") {
+        return null;
+    }
+
+    return h(Compass, { className: "sticky-compass" });
+}
+
 export function Root() {
     return html`
         <div class="content grid">
@@ -1346,6 +1366,8 @@ export function Root() {
         </div>
         <${SideMenu} />
         <${StickyFooter} />
+
+        ${h(MobileHoverCompass, {})}
 
         <${RenderInjectedCSS} />
     `;
