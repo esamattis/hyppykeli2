@@ -849,7 +849,7 @@ export function SideMenu() {
                 </a>
             </p>
 
-            <h2>DZs</h2>
+            <h2>Hyppypaikat</h2>
 
             <h3>Tallennetut</h3>
 
