@@ -22,7 +22,7 @@
                 const dzList = document.currentScript.previousElementSibling;
                 const children = Array.from(dzList.children);
                 children.sort((a, b) =>
-                    a.textContent.localeCompare(b.textContent),
+                    a.textContent.trim().localeCompare(b.textContent.trim()),
                 );
                 dzList.innerHTML = "";
                 for (const child of children) {
