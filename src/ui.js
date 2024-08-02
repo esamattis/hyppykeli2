@@ -1259,6 +1259,7 @@ function MobileHoverCompass() {
 
     const show = useMemo(
         () =>
+            hasValue &&
             getComputedStyle(document.documentElement)
                 .getPropertyValue("--device")
                 .trim() === "mobile",
