@@ -897,7 +897,7 @@ export function SideMenu() {
             </button>
 
             <h3>Muut</h3>
-            <div class="dzs" onClick=${savePreviousDz}>
+            <div class="dzs dz-grid" onClick=${savePreviousDz}>
                 ${OTHER_DZs.value.map(
                     (dz) => html`
                         <p><a href=${dz.href}>${dz.title}</a></p>

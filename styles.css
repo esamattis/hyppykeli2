@@ -566,3 +566,9 @@ h2 .date {
     font-size: 70%;
     text-align: center;
 }
+
+.dz-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2px;
+}
