@@ -74,7 +74,11 @@ function calculateNeedleLength(gust) {
     }
 }
 
-export function Compass() {
+/**
+ * @param {Object} props
+ * @param {string} [props.className]
+ */
+export function Compass(props) {
     const rc = parseInt(QUERY_PARAMS.value.rc ?? "0", 10);
     const rotation = isNaN(rc) ? 0 : rc; // Default to 0 degrees if invalid
     const circle = INSTRUCTOR_LIMIT_LENGTH;
@@ -83,7 +87,7 @@ export function Compass() {
 
     // prettier-ignore
     return html`
-        <div id="compass" class="compass">
+        <div class="compass ${props.className ?? ""}">
             <svg
                 style="transform: rotate(${rotation}deg); transform-origin: center;"
                 viewBox="0 0 400 400"
@@ -127,7 +131,7 @@ export function Compass() {
 
             </svg>
 
-            <p class="compass-time">
+            <p class="compass-time nowrap">
                 <${FromNow} date=${HOVERED_OBSERVATION.value?.time} />
             </p>
 
