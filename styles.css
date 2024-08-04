@@ -161,11 +161,7 @@ button {
 
     #compass {
         align-items: center;
-        justify-content: flex-start;
-    }
-
-    #compass .icon-parachute {
-        margin-left: 150px;
+        justify-content: space-around;
     }
 
     .latest-wind-cell {
