@@ -25,7 +25,7 @@ export function Help(props) {
 
     return html`
         <button class="help" type="button" onClick=${open} id=${props.id}>
-            ${props.label ?? "Ohje"}
+            ${props.label ?? "?"}
         </button>
         <dialog ref=${ref}>
             <div class="help-content">${props.children}</div>
@@ -125,10 +125,7 @@ export function FromNow(props) {
     }, [props.date]);
 
     if (!props.date) {
-        // add empty container with non-breaking space to keep layout stable
-        return html`
-            <span class="from-now">${"\u00A0"}</span>
-        `;
+        return null;
     }
 
     const fromNow = useInterval(createFromNow);

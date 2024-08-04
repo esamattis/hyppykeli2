@@ -41,7 +41,6 @@ button {
 
 .compass {
     display: flex;
-    flex-direction: column;
     justify-content: center;
 }
 
@@ -430,6 +429,7 @@ h2 .date {
 .h2-with-icon {
     display: flex;
     align-items: center;
+    margin-top: 0;
 }
 
 .anvil {
