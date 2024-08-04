@@ -270,19 +270,10 @@ export function getLiftedCondensationLevel(temp, dewPoint) {
 
 /**
  * @param {number} value
- * @param {string} unit
  * @returns {number}
  */
-export function toMeters(value, unit) {
-    if (unit === "hft") {
-        return value * 30.48;
-    }
-
-    if (unit === "ft") {
-        return value * 0.3048;
-    }
-
-    return value;
+export function feetToMeters(value) {
+    return value * 30.48;
 }
 
 /**

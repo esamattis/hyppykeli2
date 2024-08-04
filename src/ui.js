@@ -45,7 +45,7 @@ import {
     hasValidWindData,
     removeNullish,
     saveTextToFile,
-    toMeters,
+    feetToMeters,
     whenAll,
     coordinateDistance,
 } from "./utils.js";
@@ -457,9 +457,8 @@ function CloudSummary() {
                               </a>
                               ${" "}
                               <b>
-                                  ${Math.round(
-                                      toMeters(cloud.base, cloud.unit) / 10,
-                                  ) * 10}M
+                                  ${Math.round(feetToMeters(cloud.base) / 10) *
+                                  10}M
                               </b>
                               ${h(
                                   Help,
