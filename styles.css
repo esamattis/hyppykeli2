@@ -39,6 +39,12 @@ button {
     justify-content: center;
 }
 
+.compass {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
 .compass svg {
     height: 270px;
 }
